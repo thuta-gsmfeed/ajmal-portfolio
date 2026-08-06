@@ -1,328 +1,111 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { products, Product } from "@/data/content";
-import { Sparkles, Layers, Cpu, Globe2, ShieldCheck, X, ChevronRight } from "lucide-react";
+import { AnimatePresence, motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Layers, X } from "lucide-react";
+import { Product, products } from "@/data/content";
 
 export function ProductsSection() {
-  const [activeProject, setActiveProject] = useState<number>(0);
-  const [selectedModal, setSelectedModal] = useState<Product | null>(null);
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const [active, setActive] = useState(0);
+  const [selected, setSelected] = useState<Product | null>(null);
+  const rotateX = useSpring(useMotionValue(0), { stiffness: 120, damping: 20 });
+  const rotateY = useSpring(useMotionValue(0), { stiffness: 120, damping: 20 });
+  const glowX = useMotionValue(50);
+  const glowY = useMotionValue(50);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
+  const backgroundY = useTransform(scrollYProgress, [0, 1], [80, -100]);
+  const product = products[active];
 
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
+  const move = (event: React.MouseEvent<HTMLDivElement>) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - bounds.left) / bounds.width;
+    const y = (event.clientY - bounds.top) / bounds.height;
+    rotateX.set((0.5 - y) * 5);
+    rotateY.set((x - 0.5) * 7);
+    glowX.set(x * 100);
+    glowY.set(y * 100);
+  };
 
-  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+  const change = (next: number) => setActive((next + products.length) % products.length);
 
   return (
-    <section ref={sectionRef} id="products" className="relative overflow-hidden py-28 md:py-40 bg-[#030506]">
-      {/* Background Ambient Glow & Grid Pattern */}
-      <motion.div style={{ y: backgroundY }} className="pointer-events-none absolute inset-0 opacity-30">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 size-[650px] rounded-full bg-cyan-400/10 blur-[140px]" />
-        <div className="absolute bottom-10 left-1/3 size-[500px] rounded-full bg-blue-600/10 blur-[130px]" />
-        <div className="hero-grid absolute inset-0 opacity-40" />
+    <section ref={sectionRef} id="products" className="relative overflow-hidden bg-[#030506] py-28 md:py-40">
+      <motion.div style={{ y: backgroundY }} className="pointer-events-none absolute inset-0">
+        <div className="absolute left-1/2 top-1/4 size-[780px] -translate-x-1/2 rounded-full bg-cyan-400/[.065] blur-[150px]" />
+        <div className="hero-grid absolute inset-0 opacity-25" />
       </motion.div>
 
       <div className="container relative z-10">
-        {/* Header Section */}
-        <div className="max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="eyebrow mb-6"
-          >
-            <Sparkles className="size-3.5 text-cyan-300" />
-            <span>VISION IN ACTION</span>
-          </motion.div>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="section-title text-white tracking-[0.03em]"
-          >
-            Explore Our{" "}
-            <span className="bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">
-              Vision in Action
-            </span>
-          </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="mt-8 text-lg leading-relaxed text-white/70 md:text-xl md:leading-relaxed max-w-3xl"
-          >
-            Our projects are designed to simplify complex processes, foster connections, and empower businesses with tools for sustainable growth. Explore our vision in action.
+        <div className="grid gap-10 lg:grid-cols-[.8fr_1.2fr] lg:items-end">
+          <div>
+            <motion.p initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="eyebrow">Vision in action</motion.p>
+            <div className="mt-7 overflow-hidden">
+              <motion.h2 initial={{ y: "110%" }} whileInView={{ y: 0 }} viewport={{ once: true }} transition={{ duration: .9, ease: [0.22, 1, 0.36, 1] }} className="section-title">Ideas become<br /><span className="text-white/35">working systems.</span></motion.h2>
+            </div>
+          </div>
+          <motion.p initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: .15 }} className="max-w-xl text-lg leading-relaxed text-white/55 lg:ml-auto">
+            Digital products designed to simplify complex operations, connect international markets, and create practical leverage for growing businesses.
           </motion.p>
         </div>
 
-        {/* Project Selector Bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-14 flex flex-wrap items-center gap-3 border-b border-white/10 pb-6"
-        >
-          {products.map((project, idx) => {
-            const isActive = activeProject === idx;
-            return (
-              <button
-                key={project.name}
-                onClick={() => setActiveProject(idx)}
-                className={`relative px-5 py-2.5 text-xs font-mono uppercase tracking-[0.2em] transition-all duration-300 rounded-full border ${
-                  isActive
-                    ? "border-cyan-300/80 bg-cyan-300/10 text-cyan-200 shadow-[0_0_20px_rgba(104,231,255,0.2)]"
-                    : "border-white/15 text-white/50 hover:border-white/40 hover:text-white"
-                }`}
-              >
-                <span>0{idx + 1} / {project.name}</span>
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTabIndicator"
-                    className="absolute inset-0 rounded-full border border-cyan-300/60"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
-                )}
+        <div className="mt-16 border-y border-white/10">
+          <div className="flex overflow-x-auto">
+            {products.map((item, index) => (
+              <button key={item.name} onClick={() => setActive(index)} aria-pressed={active === index} className={`relative min-w-52 flex-1 border-r border-white/10 px-5 py-5 text-left transition last:border-r-0 ${active === index ? "bg-white/[.055] text-white" : "text-white/35 hover:text-white/70"}`}>
+                <span className="font-mono text-[9px] uppercase tracking-[.2em]">0{index + 1}</span>
+                <span className="mt-2 block text-sm">{item.name}</span>
+                {active === index && <motion.span layoutId="product-tab" className="absolute inset-x-0 bottom-0 h-px bg-cyan-200" />}
               </button>
-            );
-          })}
-        </motion.div>
-
-        {/* Main 4 Projects Grid Showcase */}
-        <div className="mt-16 grid gap-12 lg:grid-cols-2">
-          {products.map((project, idx) => (
-            <ProjectCard
-              key={project.name}
-              project={project}
-              index={idx}
-              isFocused={activeProject === idx}
-              onSelect={() => {
-                setActiveProject(idx);
-                setSelectedModal(project);
-              }}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Project Detail Modal Drawer */}
-      <AnimatePresence>
-        {selectedModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedModal(null)}
-            className="fixed inset-0 z-[350] flex items-center justify-center bg-black/80 p-4 md:p-8 backdrop-blur-xl"
-          >
-            <motion.div
-              initial={{ scale: 0.94, opacity: 0, y: 30 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.94, opacity: 0, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-white/20 bg-[#090c0e] p-8 md:p-12 shadow-[0_0_80px_rgba(0,0,0,0.9)]"
-            >
-              {/* Close Button */}
-              <button
-                onClick={() => setSelectedModal(null)}
-                className="absolute top-6 right-6 grid size-10 place-items-center rounded-full border border-white/20 text-white/70 transition hover:bg-white hover:text-black"
-              >
-                <X className="size-5" />
-              </button>
-
-              <div className="flex items-center gap-3 font-mono text-xs text-cyan-300 uppercase tracking-[0.25em]">
-                <Layers className="size-4" />
-                <span>Project Vision 0{products.indexOf(selectedModal) + 1}</span>
-              </div>
-
-              <h3 className="mt-4 text-3xl md:text-4xl font-medium tracking-tight text-white">
-                {selectedModal.name}
-              </h3>
-              <p className="mt-2 text-sm text-white/50 uppercase tracking-widest font-mono">
-                {selectedModal.category} · {selectedModal.year}
-              </p>
-
-              <div className="mt-6 relative aspect-video w-full overflow-hidden rounded-2xl border border-white/15">
-                <Image
-                  src={selectedModal.image.src}
-                  alt={selectedModal.image.alt}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-
-              <p className="mt-6 text-base leading-relaxed text-white/80">
-                {selectedModal.description}
-              </p>
-
-              <div className="mt-6 flex flex-wrap gap-2">
-                {selectedModal.technology.map((tech) => (
-                  <span
-                    key={tech}
-                    className="rounded-full border border-cyan-300/30 bg-cyan-300/10 px-4 py-1.5 font-mono text-xs text-cyan-200"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-
-              <div className="mt-8 flex items-center justify-between border-t border-white/15 pt-6">
-                <span className="font-mono text-xs text-white/40">Status: Active Development</span>
-                <button
-                  onClick={() => setSelectedModal(null)}
-                  className="pill text-xs !min-h-10 border-white/30 text-white hover:bg-white hover:text-black"
-                >
-                  Close Vision Overview
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </section>
-  );
-}
-
-{/* Individual Project Card Component with 3D Tilt & Mouse Spotlight */}
-function ProjectCard({
-  project,
-  index,
-  isFocused,
-  onSelect,
-}: {
-  project: Product;
-  index: number;
-  isFocused: boolean;
-  onSelect: () => void;
-}) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  };
-
-  const getIcon = (idx: number) => {
-    switch (idx) {
-      case 0:
-        return <Cpu className="size-5 text-cyan-300" />;
-      case 1:
-        return <Globe2 className="size-5 text-cyan-300" />;
-      case 2:
-        return <Layers className="size-5 text-cyan-300" />;
-      default:
-        return <ShieldCheck className="size-5 text-cyan-300" />;
-    }
-  };
-
-  return (
-    <motion.div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      initial={{ opacity: 0, y: 35 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.7, delay: index * 0.12 }}
-      onClick={onSelect}
-      className={`group relative overflow-hidden rounded-3xl border transition-all duration-500 cursor-pointer ${
-        isFocused
-          ? "border-cyan-300/70 bg-[#0d1013] shadow-[0_0_50px_rgba(104,231,255,0.15)]"
-          : "border-white/15 bg-[#090b0d] hover:border-white/40 hover:bg-[#0c0f12]"
-      }`}
-    >
-      {/* Mouse Follow Spotlight Background Layer */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-        style={{
-          background: `radial-gradient(500px circle at ${mousePos.x}px ${mousePos.y}px, rgba(104, 231, 255, 0.12), transparent 70%)`,
-        }}
-      />
-
-      <div className="p-8 md:p-10 flex flex-col justify-between h-full">
-        <div>
-          {/* Card Top Metadata Bar */}
-          <div className="flex items-center justify-between font-mono text-xs uppercase tracking-[0.2em] text-white/50">
-            <div className="flex items-center gap-2.5">
-              <div className="grid size-9 place-items-center rounded-xl border border-white/15 bg-white/5">
-                {getIcon(index)}
-              </div>
-              <span className="text-cyan-300 font-medium">0{index + 1}</span>
-            </div>
-            <span className="rounded-full border border-white/10 px-3 py-1 text-[10px] text-white/40">
-              {project.year}
-            </span>
-          </div>
-
-          {/* Project Title */}
-          <h3 className="mt-8 text-3xl font-medium tracking-tight text-white transition-colors duration-300 group-hover:text-cyan-100 md:text-4xl">
-            {project.name}
-          </h3>
-
-          <p className="mt-2 text-xs font-mono uppercase tracking-[0.18em] text-cyan-200/70">
-            {project.category}
-          </p>
-
-          <p className="mt-5 text-sm leading-relaxed text-white/60 line-clamp-3">
-            {project.description}
-          </p>
-        </div>
-
-        {/* Project Image Mockup Frame */}
-        <div className="mt-8 overflow-hidden rounded-2xl border border-white/15 bg-[#050708] p-2 transition-transform duration-500 group-hover:scale-[1.02]">
-          <div className="flex items-center gap-1.5 px-3 py-2 border-b border-white/10">
-            <span className="size-2 rounded-full bg-white/20" />
-            <span className="size-2 rounded-full bg-white/15" />
-            <span className="size-2 rounded-full bg-white/10" />
-            <span className="ml-auto font-mono text-[9px] text-white/30 tracking-widest">VISION SYSTEM</span>
-          </div>
-
-          <div className="relative aspect-[16/9] overflow-hidden rounded-xl">
-            <Image
-              src={project.image.src}
-              alt={project.image.alt}
-              fill
-              sizes="(max-width: 1024px) 100vw, 45vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
-          </div>
-        </div>
-
-        {/* Bottom Tech Pills & CTA */}
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-white/10">
-          <div className="flex flex-wrap gap-2">
-            {project.technology.map((tech) => (
-              <span
-                key={tech}
-                className="rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-[10px] text-white/60"
-              >
-                {tech}
-              </span>
             ))}
           </div>
+        </div>
 
-          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.15em] text-cyan-300 transition-transform duration-300 group-hover:translate-x-1">
-            <span>Explore Vision</span>
-            <ChevronRight className="size-4" />
-          </div>
+        <div className="relative min-h-[740px] py-16 md:py-20">
+          <AnimatePresence mode="wait">
+            <motion.div key={product.name} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: .42 }} className="grid items-center gap-14 lg:grid-cols-[.72fr_1.28fr]">
+              <div className="relative z-10">
+                <motion.p initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: .12 }} className="font-mono text-xs uppercase tracking-[.2em] text-cyan-200">0{active + 1} / {product.year}</motion.p>
+                <motion.h3 initial={{ opacity: 0, y: 32, filter: "blur(8px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: .65, ease: [0.22, 1, 0.36, 1] }} className="mt-7 text-[clamp(3.5rem,6vw,7rem)] font-medium leading-[.88] tracking-[-.065em]">{product.name}</motion.h3>
+                <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .16 }} className="mt-5 text-xs uppercase tracking-[.18em] text-white/40">{product.category}</motion.p>
+                <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .22 }} className="mt-8 max-w-lg text-lg leading-relaxed text-white/55">{product.description}</motion.p>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: .3 }} className="mt-8 flex flex-wrap gap-2">{product.technology.map((tech) => <span key={tech} className="rounded-full border border-white/15 px-3 py-1.5 font-mono text-[9px] uppercase tracking-wider text-white/50">{tech}</span>)}</motion.div>
+                <motion.button initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .36 }} onClick={() => setSelected(product)} className="pill mt-10">Explore the product <ArrowUpRight size={16} /></motion.button>
+              </div>
+
+              <motion.div
+                data-cursor="View"
+                onMouseMove={move}
+                onMouseLeave={() => { rotateX.set(0); rotateY.set(0); }}
+                onClick={() => setSelected(product)}
+                initial={{ opacity: 0, x: 60, scale: .94 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                transition={{ duration: .8, ease: [0.22, 1, 0.36, 1] }}
+                className="relative cursor-pointer [perspective:1400px]"
+              >
+                <motion.div aria-hidden className="pointer-events-none absolute size-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-300/20 blur-[100px]" style={{ left: useTransform(glowX, value => `${value}%`), top: useTransform(glowY, value => `${value}%`) }} />
+                <motion.div style={{ rotateX, rotateY, transformStyle: "preserve-3d" }} className="relative rounded-[1.75rem] border border-white/20 bg-[#101416] p-2 shadow-[0_40px_100px_rgba(0,0,0,.65)]">
+                  <div className="flex h-10 items-center gap-2 border-b border-white/10 px-3"><i className="size-2 rounded-full bg-white/25" /><i className="size-2 rounded-full bg-white/15" /><i className="size-2 rounded-full bg-white/10" /><span className="ml-3 h-4 flex-1 rounded-full bg-white/[.035]" /><span className="font-mono text-[8px] uppercase tracking-[.14em] text-white/25">Live preview</span></div>
+                  <div className="relative aspect-[16/10] overflow-hidden rounded-b-[1.25rem]"><Image src={product.image.src} alt={product.image.alt} fill sizes="(max-width:1024px) 100vw, 60vw" className="object-cover" /><div className="absolute inset-0 bg-gradient-to-tr from-black/30 via-transparent to-cyan-200/10" /></div>
+                  <div className="absolute -bottom-5 -right-5 grid size-24 place-items-center rounded-full border border-white/20 bg-black/70 font-mono text-[9px] uppercase tracking-[.16em] text-cyan-100 backdrop-blur-xl">Open<br />system</div>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          </AnimatePresence>
+
+          <motion.div key={`number-${active}`} initial={{ opacity: 0, y: 50 }} animate={{ opacity: .035, y: 0 }} className="pointer-events-none absolute -bottom-12 right-0 -z-10 text-[clamp(14rem,35vw,34rem)] font-semibold leading-none tracking-[-.1em]">0{active + 1}</motion.div>
+        </div>
+
+        <div className="flex items-center justify-between border-t border-white/10 pt-5">
+          <p className="font-mono text-[9px] uppercase tracking-[.18em] text-white/30">Select a product · Drag your attention</p>
+          <div className="flex gap-2"><button onClick={() => change(active - 1)} aria-label="Previous product" className="grid size-11 place-items-center rounded-full border border-white/15 transition hover:bg-white hover:text-black"><ArrowLeft size={16} /></button><button onClick={() => change(active + 1)} aria-label="Next product" className="grid size-11 place-items-center rounded-full border border-white/15 transition hover:bg-white hover:text-black"><ArrowRight size={16} /></button></div>
         </div>
       </div>
-    </motion.div>
+
+      <AnimatePresence>
+        {selected && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelected(null)} className="fixed inset-0 z-[350] grid place-items-center bg-black/80 p-4 backdrop-blur-xl md:p-8"><motion.div role="dialog" aria-modal="true" aria-label={`${selected.name} overview`} initial={{ opacity: 0, y: 40, scale: .96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: .97 }} onClick={event => event.stopPropagation()} className="relative max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-[2rem] border border-white/20 bg-[#090c0e] p-6 shadow-2xl md:p-10"><button onClick={() => setSelected(null)} aria-label="Close product overview" className="absolute right-5 top-5 z-10 grid size-11 place-items-center rounded-full border border-white/20 bg-black/50 transition hover:bg-white hover:text-black"><X size={17} /></button><div className="grid gap-8 lg:grid-cols-2 lg:items-center"><div><div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[.18em] text-cyan-200"><Layers size={14} />Product overview</div><h3 className="mt-6 text-5xl tracking-[-.06em] md:text-7xl">{selected.name}</h3><p className="mt-6 text-lg leading-relaxed text-white/55">{selected.description}</p><div className="mt-7 flex flex-wrap gap-2">{selected.technology.map(tech => <span key={tech} className="rounded-full border border-white/15 px-3 py-1 text-xs text-white/50">{tech}</span>)}</div><a href={selected.url} className="pill mt-9">Visit website <ArrowUpRight size={16} /></a></div><div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-white/15"><Image src={selected.image.src} alt={selected.image.alt} fill sizes="(max-width:1024px) 100vw, 50vw" className="object-cover" /></div></div></motion.div></motion.div>}
+      </AnimatePresence>
+    </section>
   );
 }
