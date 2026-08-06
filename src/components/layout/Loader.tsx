@@ -77,13 +77,13 @@ export function Loader() {
                 className="absolute inset-0 -m-8 rounded-full bg-cyan-400/5 blur-3xl" 
               />
 
-              {/* Second Logo (Full Logo) */}
+              {/* Gholzad Monogram Logo */}
               <Image
-                src="/images/logo/logo-full.svg"
-                alt="Gholzad Management Group"
-                width={340}
-                height={260}
-                className="h-auto w-full max-w-[320px] object-contain drop-shadow-[0_0_25px_rgba(255,255,255,0.2)]"
+                src="/images/logo/gholzad-logo.svg"
+                alt="Gholzad Monogram Logo"
+                width={120}
+                height={120}
+                className="h-28 w-auto object-contain filter drop-shadow-[0_0_30px_rgba(255,255,255,0.4)]"
                 priority
               />
 
