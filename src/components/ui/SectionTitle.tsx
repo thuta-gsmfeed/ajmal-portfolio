@@ -1,0 +1,1 @@
+export function SectionTitle({kicker,title,body}:{kicker:string;title:string;body?:string}) { return <div className="grid gap-8 lg:grid-cols-[1fr_2fr]"><p className="eyebrow">{kicker}</p><div><h2 className="section-title max-w-5xl">{title}</h2>{body&&<p className="mt-7 max-w-xl text-lg leading-relaxed text-white/55">{body}</p>}</div></div> }
