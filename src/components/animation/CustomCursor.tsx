@@ -64,7 +64,7 @@ export function CustomCursor() {
       />
       <motion.div
         aria-hidden
-        className="pointer-events-none fixed left-0 top-0 z-[299] -ml-[22px] -mt-[22px] hidden size-11 items-center justify-center rounded-full border border-white/55 bg-cyan-200/[.035] text-[7px] font-medium uppercase tracking-[.13em] text-white backdrop-blur-[1px] md:flex"
+        className="pointer-events-none fixed left-0 top-0 z-[299] -ml-[22px] -mt-[22px] hidden size-11 items-center justify-center rounded-full border border-white/55 bg-cyan-200/[.035] text-[7px] font-medium uppercase tracking-[.13em] text-white md:flex"
         style={{ x: ringX, y: ringY }}
         animate={{
           opacity: visible ? 1 : 0,
