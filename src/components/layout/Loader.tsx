@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -10,15 +11,19 @@ export function Loader() {
   useEffect(() => {
     let frame = 0;
     const startedAt = performance.now();
-    const duration = 1150;
+    const duration = 1400; // 1.4s smooth load
 
     const tick = (time: number) => {
       const elapsed = Math.min(1, (time - startedAt) / duration);
+      // Smooth cubic ease out
       const eased = 1 - Math.pow(1 - elapsed, 3);
       setProgress(Math.round(eased * 100));
 
-      if (elapsed < 1) frame = requestAnimationFrame(tick);
-      else window.setTimeout(() => setDone(true), 140);
+      if (elapsed < 1) {
+        frame = requestAnimationFrame(tick);
+      } else {
+        window.setTimeout(() => setDone(true), 250);
+      }
     };
 
     frame = requestAnimationFrame(tick);
@@ -29,71 +34,109 @@ export function Loader() {
     <AnimatePresence>
       {!done && (
         <motion.div
-          className="fixed inset-0 z-[250] overflow-hidden bg-[#030506]"
+          className="fixed inset-0 z-[250] flex flex-col justify-between overflow-hidden bg-[#030506] px-6 py-8 md:px-12 md:py-10"
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.15, delay: 0.72 }}
+          transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: 0.1 }}
         >
-          <motion.div
-            className="absolute inset-x-0 top-0 h-1/2 bg-[#050708]"
-            exit={{ y: "-101%" }}
-            transition={{ duration: 0.9, ease: [0.76, 0, 0.24, 1] }}
-          />
-          <motion.div
-            className="absolute inset-x-0 bottom-0 h-1/2 bg-[#050708]"
-            exit={{ y: "101%" }}
-            transition={{ duration: 0.9, ease: [0.76, 0, 0.24, 1] }}
-          />
+          {/* Subtle ambient lighting */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(104,231,255,0.06),transparent_60%)]" />
+          <div aria-hidden className="grain opacity-40" />
 
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_48%,rgba(104,231,255,.09),transparent_32%)]" />
-          <div className="grain" />
+          {/* Top Info Bar */}
+          <div className="relative z-10 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.25em] text-white/40 md:text-xs">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <span className="text-white/85">GHOLZAD</span>
+              <span className="ml-2 text-white/40">· Management Group</span>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-right"
+            >
+              <span className="text-cyan-200/70">GLOBAL PORTFOLIO</span>
+            </motion.div>
+          </div>
 
-          <div className="container relative z-10 flex h-full flex-col justify-between py-7 md:py-10">
-            <div className="flex items-start justify-between font-mono text-[9px] uppercase tracking-[.22em] text-white/40 md:text-[10px]">
-              <div>
-                <p className="text-white/85">Ajmal Gholzad</p>
-                <p className="mt-1">Entrepreneur · Founder</p>
-              </div>
-              <div className="text-right">
-                <p>Global portfolio</p>
-                <p className="mt-1 text-cyan-200/70">Est. 2009</p>
-              </div>
-            </div>
-
-            <div className="relative mx-auto grid size-[min(68vw,430px)] place-items-center">
-              <div className="loader-orbit absolute inset-[6%] rounded-full border border-white/10" />
-              <div className="loader-orbit-reverse absolute inset-[17%] rounded-full border border-cyan-200/15" />
-              <div className="absolute left-1/2 top-[6%] size-2 -translate-x-1/2 rounded-full bg-cyan-200 shadow-[0_0_18px_rgba(104,231,255,.9)]" />
-              <motion.p
+          {/* Center Logo Section - Full Logo (Image 2) */}
+          <div className="relative z-10 mx-auto flex w-full max-w-md flex-col items-center justify-center py-12">
+            {/* Animated Logo Container */}
+            <motion.div
+              className="relative flex w-full max-w-[280px] sm:max-w-[340px] items-center justify-center"
+              initial={{ opacity: 0, scale: 0.92, filter: "blur(10px)" }}
+              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {/* Subtle aura ring around logo */}
+              <div 
                 aria-hidden
-                className="select-none text-[clamp(8rem,24vw,19rem)] font-medium leading-none tracking-[-.12em] text-transparent"
-                style={{ WebkitTextStroke: "1px rgba(255,255,255,.18)" }}
-                initial={{ opacity: 0, scale: 0.9, filter: "blur(12px)" }}
-                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-              >
-                AG
-              </motion.p>
-              <div className="absolute grid size-20 place-items-center rounded-full border border-white/20 bg-black/50 text-lg tracking-[.28em] text-white shadow-[0_0_60px_rgba(104,231,255,.08)] backdrop-blur-md md:size-24">
-                AG
+                className="absolute inset-0 -m-8 rounded-full bg-cyan-400/5 blur-3xl" 
+              />
+
+              {/* Second Logo (Full Logo) */}
+              <Image
+                src="/images/logo/logo-full.svg"
+                alt="Gholzad Management Group"
+                width={340}
+                height={260}
+                className="h-auto w-full max-w-[320px] object-contain drop-shadow-[0_0_25px_rgba(255,255,255,0.2)]"
+                priority
+              />
+
+              {/* Sleek metallic shimmer highlight across logo */}
+              <motion.div
+                aria-hidden
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
+                initial={{ x: "-100%" }}
+                animate={{ x: "100%" }}
+                transition={{ duration: 1.6, repeat: Infinity, ease: "linear", repeatDelay: 0.5 }}
+              />
+            </motion.div>
+
+            {/* Subtle animated subtitle indicator */}
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 0.6, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="mt-8 font-mono text-[10px] uppercase tracking-[0.3em] text-white/50"
+            >
+              Initializing Experience
+            </motion.p>
+          </div>
+
+          {/* Bottom Progress Section */}
+          <div className="relative z-10 w-full max-w-5xl mx-auto">
+            <div className="mb-3 flex items-end justify-between font-mono text-xs text-white/60">
+              <div className="flex items-center gap-2">
+                <span className="inline-block size-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                <span className="uppercase tracking-[0.2em] text-[10px] text-white/50">System Loading</span>
               </div>
+              <motion.div 
+                className="font-mono text-3xl font-light tracking-tight text-white sm:text-4xl"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                {String(progress).padStart(3, "0")}
+                <span className="ml-1 text-sm text-cyan-200/70">%</span>
+              </motion.div>
             </div>
 
-            <div>
-              <div className="mb-4 flex items-end justify-between">
-                <div>
-                  <p className="font-mono text-[9px] uppercase tracking-[.2em] text-white/35">Loading experience</p>
-                  <p className="mt-1 text-xs text-white/65">Connecting markets and ideas</p>
-                </div>
-                <p className="font-mono text-4xl font-light tracking-[-.06em] text-white md:text-6xl">
-                  {String(progress).padStart(3, "0")}<span className="ml-1 text-sm text-cyan-200/70">%</span>
-                </p>
-              </div>
-              <div className="h-px overflow-hidden bg-white/12">
-                <motion.div className="h-full origin-left bg-gradient-to-r from-cyan-400 via-cyan-100 to-white" style={{ scaleX: progress / 100 }} />
-              </div>
-              <div className="mt-3 flex justify-between font-mono text-[8px] uppercase tracking-[.18em] text-white/25">
-                <span>Dubai</span><span>Global network</span><span>Future</span>
-              </div>
+            {/* Progress Bar Track */}
+            <div className="h-[2px] w-full overflow-hidden bg-white/10 rounded-full">
+              <motion.div
+                className="h-full origin-left bg-gradient-to-r from-cyan-400 via-white to-cyan-200 shadow-[0_0_12px_rgba(104,231,255,0.8)]"
+                style={{ scaleX: progress / 100 }}
+              />
+            </div>
+
+            <div className="mt-3 flex justify-between font-mono text-[9px] uppercase tracking-[0.25em] text-white/30">
+              <span>Dubai · UAE</span>
+              <span>Global Ventures</span>
+              <span>2026</span>
             </div>
           </div>
         </motion.div>
