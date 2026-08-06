@@ -43,10 +43,42 @@ export const ventures: Venture[] = [
 ];
 
 export const products: Product[] = [
-  { name: "Product 01", category: "Technology Platform", description: "A connected platform designed to make a high-value workflow faster, clearer, and more scalable.", year: "2026", technology: ["Next.js", "AI", "Cloud"], url: "#contact", image: { src: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=2000&q=84", alt: "Placeholder analytics product interface", replacement: "Replace with Product 01 desktop screenshot, 16:10." } },
-  { name: "Product 02", category: "Digital Commerce Product", description: "Commerce infrastructure shaped around customer experience, operational clarity, and growth.", year: "2025", technology: ["Commerce", "Data", "Automation"], url: "#contact", image: { src: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=2000&q=84", alt: "Placeholder commerce dashboard", replacement: "Replace with Product 02 website screenshot, 16:10." } },
-  { name: "Product 03", category: "Business Management Software", description: "A focused workspace that turns everyday business complexity into calm, decisive action.", year: "2025", technology: ["SaaS", "Operations", "Insights"], url: "#contact", image: { src: "https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=2000&q=84", alt: "Placeholder business software presentation", replacement: "Replace with Product 03 interface screenshot, 16:10." } },
-  { name: "Product 04", category: "Global Services Platform", description: "A digital bridge between international opportunities, trusted partners, and execution.", year: "2026", technology: ["Global", "Marketplace", "Services"], url: "#contact", image: { src: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2000&q=84", alt: "Earth with digital connections", replacement: "Replace with Product 04 website screenshot, 16:10." } },
+  {
+    name: "AI Workflow Engine",
+    category: "Artificial Intelligence & Automation",
+    description: "An intelligent platform engineered to automate complex enterprise workflows, accelerating decision-making and operational velocity.",
+    year: "2026",
+    technology: ["Next.js", "AI / LLM", "Cloud Infrastructure"],
+    url: "#contact",
+    image: { src: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=2000&q=84", alt: "AI Workflow Engine dashboard interface", replacement: "AI Workflow Engine preview." }
+  },
+  {
+    name: "Global Commerce Nexus",
+    category: "Digital Commerce Infrastructure",
+    description: "Multi-regional e-commerce ecosystem connecting international suppliers, distributors, and consumers with seamless automated logistics.",
+    year: "2025",
+    technology: ["E-Commerce", "Data Analytics", "Automation"],
+    url: "#contact",
+    image: { src: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=2000&q=84", alt: "Global Commerce Nexus dashboard interface", replacement: "Global Commerce Nexus preview." }
+  },
+  {
+    name: "Enterprise SaaS Workspace",
+    category: "Business Operating System",
+    description: "A focused, high-leverage software environment that simplifies complex operations into clear, decisive business actions.",
+    year: "2025",
+    technology: ["SaaS", "Operations", "Real-Time Insights"],
+    url: "#contact",
+    image: { src: "https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=2000&q=84", alt: "Enterprise SaaS Workspace interface", replacement: "Enterprise SaaS Workspace preview." }
+  },
+  {
+    name: "Cross-Border Trade Network",
+    category: "Global Market Platform",
+    description: "A digital bridge connecting high-growth opportunities across the US, Europe, Middle East, and Asia through trusted partnerships.",
+    year: "2026",
+    technology: ["Global FinTech", "Marketplace", "Trade Services"],
+    url: "#contact",
+    image: { src: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2000&q=84", alt: "Cross-Border Trade Network interface", replacement: "Cross-Border Trade Network preview." }
+  },
 ];
 
 export const partners: Partner[] = ["NORTHSTAR", "ORBITAL", "VERTEX", "ATLAS", "NEXUS", "HORIZON", "PRIME", "UNION"].map((name) => ({ name, monogram: name.slice(0, 2) }));
