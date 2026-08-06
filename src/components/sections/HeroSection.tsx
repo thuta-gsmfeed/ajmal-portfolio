@@ -67,10 +67,10 @@ export function HeroSection() {
           </motion.div>
         </div>
 
-        <h1 className="max-w-[1420px] text-[clamp(3.9rem,9.2vw,10rem)] font-medium leading-[.82] tracking-[-.072em]">
-          <span className="block overflow-hidden pb-[.08em]"><motion.span className="block" variants={reveal} initial="hidden" animate="visible" custom={1.08}>Building businesses.</motion.span></span>
-          <span className="block overflow-hidden pb-[.08em]"><motion.span className="block bg-gradient-to-r from-white/40 via-cyan-100/80 to-white/30 bg-clip-text text-transparent" variants={reveal} initial="hidden" animate="visible" custom={1.2}>Connecting markets.</motion.span></span>
-          <span className="block overflow-hidden pb-[.08em]"><motion.span className="block" variants={reveal} initial="hidden" animate="visible" custom={1.32}>Creating the future.</motion.span></span>
+        <h1 className="max-w-[1420px] text-[clamp(2.6rem,6.2vw,6.8rem)] font-medium leading-[.92] tracking-[-.05em]">
+          <span className="block overflow-hidden pb-[.08em]"><motion.span className="block text-white/95" variants={reveal} initial="hidden" animate="visible" custom={1.08}>An innovative entrepreneur,</motion.span></span>
+          <span className="block overflow-hidden pb-[.08em]"><motion.span className="block bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent" variants={reveal} initial="hidden" animate="visible" custom={1.2}>turning challenges into</motion.span></span>
+          <span className="block overflow-hidden pb-[.08em]"><motion.span className="block text-white/95" variants={reveal} initial="hidden" animate="visible" custom={1.32}>impactful solutions.</motion.span></span>
         </h1>
 
         <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ delay: 1.55, duration: 1.2, ease: [0.22, 1, 0.36, 1] }} className="mt-7 h-px origin-left bg-gradient-to-r from-cyan-200/80 via-white/20 to-transparent" />
