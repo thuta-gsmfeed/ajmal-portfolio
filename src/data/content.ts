@@ -20,7 +20,7 @@ export const nav = [
 ] as const;
 
 export const media = {
-  hero: { src: "https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=2400&q=86", alt: "City lights seen from above at night", replacement: "Replace with final cinematic global-city hero still, 2400×1600 AVIF/WebP." },
+  hero: { src: "/images/banner/gholzad-banner.png", alt: "Gholzad Banner", replacement: "Custom Gholzad Banner Image." },
   portrait: { src: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=1600&q=86", alt: "Placeholder executive portrait", replacement: "Replace with Ajmal's portrait, vertical 4:5, minimum 1600px." },
   manifesto: { src: "https://images.unsplash.com/photo-1517976547714-720226b864c1?auto=format&fit=crop&w=2200&q=80", alt: "Earth viewed from space", replacement: "Replace with subtle global-network background, 2200×1400." },
 } satisfies Record<string, MediaAsset>;

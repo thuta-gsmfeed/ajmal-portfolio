@@ -43,7 +43,7 @@ export function HeroSection() {
     <section ref={ref} id="home" onPointerMove={move} className="relative min-h-[108svh] overflow-hidden bg-[#030506]">
       <motion.div className="absolute -inset-8" style={{ y: scrollY }}>
         <motion.div className="absolute inset-0" style={{ x: imageX, y: imageY }} initial={{ scale: 1.12, filter: "blur(6px)" }} animate={{ scale: 1, filter: "blur(0px)" }} transition={{ duration: 2.2, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}>
-          <Image src={media.hero.src} alt={media.hero.alt} fill priority sizes="100vw" className="object-cover opacity-55 saturate-[.72]" />
+          <Image src={media.hero.src} alt={media.hero.alt} fill priority sizes="100vw" className="object-cover opacity-65" />
         </motion.div>
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(3,5,6,.88)_0%,rgba(3,5,6,.44)_48%,rgba(3,5,6,.22)_100%),linear-gradient(0deg,#050607_0%,transparent_48%,rgba(2,3,4,.35)_100%)]" />
       </motion.div>
