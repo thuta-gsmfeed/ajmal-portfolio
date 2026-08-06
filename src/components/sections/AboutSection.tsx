@@ -16,12 +16,12 @@ export function AboutSection() {
               alt={media.portrait.alt}
               fill
               sizes="(max-width:1024px) 100vw, 42vw"
-              className="object-cover grayscale transition-transform duration-700 hover:scale-105"
+              className="object-cover transition-transform duration-700 hover:scale-105"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
           </div>
-          <p className="mt-3 text-xs text-white/35">
-            Portrait placeholder · Ajmal Gholzad
+          <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.2em] text-white/40">
+            Ajmal Gholzad
           </p>
         </div>
 
