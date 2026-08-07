@@ -80,11 +80,8 @@ export function PhilosophySection() {
         <div className="grain" />
 
         <div className="container relative z-10">
-          <div className="philosophy-intro mb-8 flex items-end justify-between gap-8 border-b border-white/10 pb-5 md:mb-10">
+          <div className="philosophy-intro mb-8 border-b border-white/10 pb-5 md:mb-10">
             <p className="eyebrow">Philosophy</p>
-            <p className="hidden max-w-xs text-right text-sm leading-relaxed text-white/45 md:block">
-              Great businesses are built through four enduring principles.
-            </p>
           </div>
 
           <blockquote aria-label="Great businesses are built through vision, trust, consistency, and execution.">

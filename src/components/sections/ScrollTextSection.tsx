@@ -19,12 +19,10 @@ export function ScrollTextSection() {
 
       if (reducedMotion) {
         gsap.set(wordElements, { color: "#f3f6f7", opacity: 1 });
-        gsap.set(".manifesto-progress", { scaleX: 1 });
         return;
       }
 
       gsap.set(wordElements, { color: "rgba(243,246,247,.13)", opacity: 0.72 });
-      gsap.set(".manifesto-progress", { scaleX: 0 });
 
       const timeline = gsap.timeline({
         scrollTrigger: {
@@ -35,9 +33,7 @@ export function ScrollTextSection() {
         },
       });
 
-      timeline
-        .to(".manifesto-progress", { scaleX: 1, duration: 1, ease: "none" }, 0)
-        .fromTo(".manifesto-light", { xPercent: -42, opacity: 0.2 }, { xPercent: 42, opacity: 0.7, duration: 1, ease: "none" }, 0);
+      timeline.fromTo(".manifesto-light", { xPercent: -42, opacity: 0.2 }, { xPercent: 42, opacity: 0.7, duration: 1, ease: "none" }, 0);
 
       wordElements.forEach((word, index) => {
         const accent = word.dataset.accent === "true";
@@ -83,9 +79,6 @@ export function ScrollTextSection() {
             ))}
           </p>
 
-          <div className="mt-16 h-px overflow-hidden bg-white/10">
-            <div className="manifesto-progress h-full origin-left bg-gradient-to-r from-cyan-300 via-white to-cyan-200" />
-          </div>
         </div>
       </div>
     </section>
