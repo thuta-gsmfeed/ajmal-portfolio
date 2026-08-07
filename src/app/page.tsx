@@ -13,8 +13,9 @@ import { JourneySection } from "@/components/sections/JourneySection";
 // Temporarily hidden. Uncomment together with the render below when the Ventures section is ready.
 // import { VenturesSection } from "@/components/sections/VenturesSection";
 import { ProductsSection } from "@/components/sections/ProductsSection";
+import { GsmfeedMobileSection } from "@/components/sections/GsmfeedMobileSection";
 import { PartnersSection } from "@/components/sections/PartnersSection";
 import { PhilosophySection } from "@/components/sections/PhilosophySection";
 import { ContactSection } from "@/components/sections/ContactSection";
 
-export default function Home(){return <SmoothScroll><a className="skip-link" href="#main">Skip to content</a><Loader/><Header/><CustomCursor/><SectionTransitions/><main id="main"><HeroSection/><AboutSection/><GlobalNetworkSection/><ScrollTextSection/><JourneySection/>{/* <VenturesSection/> */}<ProductsSection/><PartnersSection/><DubaiYachtSection/><PhilosophySection/><ContactSection/></main><Footer/></SmoothScroll>}
+export default function Home(){return <SmoothScroll><a className="skip-link" href="#main">Skip to content</a><Loader/><Header/><CustomCursor/><SectionTransitions/><main id="main"><HeroSection/><AboutSection/><GlobalNetworkSection/><ScrollTextSection/><JourneySection/>{/* <VenturesSection/> */}<ProductsSection/><GsmfeedMobileSection/><PartnersSection/><DubaiYachtSection/><PhilosophySection/><ContactSection/></main><Footer/></SmoothScroll>}

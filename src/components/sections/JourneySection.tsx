@@ -28,7 +28,7 @@ export function JourneySection() {
   const progress = active / (timeline.length - 1);
 
   return (
-    <section className="relative border-y border-black/10 bg-[#edf0ef] text-[#091012]" aria-labelledby="journey-title">
+    <section data-cursor-theme="light" className="relative border-y border-black/10 bg-[#edf0ef] text-[#091012]" aria-labelledby="journey-title">
       <div className="container grid lg:grid-cols-[1.2fr_.8fr]">
         <div className="self-start py-24 lg:sticky lg:top-20 lg:flex lg:min-h-[calc(100svh-5rem)] lg:flex-col lg:py-10">
           <div>
