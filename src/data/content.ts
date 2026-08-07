@@ -2,7 +2,7 @@ export type MediaAsset = { src: string; alt: string; replacement: string };
 export type Product = { name: string; category: string; description: string; year: string; technology: string[]; url: string; image: MediaAsset };
 export type Venture = { category: string; title: string; period: string; description: string; image: MediaAsset };
 export type TimelineMilestone = { year: string; title: string; description: string };
-export type Partner = { name: string; monogram: string };
+export type Partner = { name: string; logo: string };
 export type GlobalRoute = { from: [number, number]; to: [number, number]; label: string };
 
 export const site = {
@@ -81,7 +81,14 @@ export const products: Product[] = [
   },
 ];
 
-export const partners: Partner[] = ["NORTHSTAR", "ORBITAL", "VERTEX", "ATLAS", "NEXUS", "HORIZON", "PRIME", "UNION"].map((name) => ({ name, monogram: name.slice(0, 2) }));
+export const partners: Partner[] = [
+  { name: "DHL", logo: "/images/partners/dhl-logo.png" },
+  { name: "Ebury", logo: "/images/partners/ebury-logo.png" },
+  { name: "Blackbelt 360", logo: "/images/partners/blackbelt-logo.png" },
+  { name: "PCS Wireless", logo: "/images/partners/pcswireless-logo.png" },
+  { name: "Sunstrike", logo: "/images/partners/sunstrike-logo.png" },
+  { name: "Equals Money", logo: "/images/partners/equals-money-logo.png" },
+];
 
 export const routes: GlobalRoute[] = [
   { from: [25.2, 55.3], to: [51.5, -0.1], label: "Dubai — London" },

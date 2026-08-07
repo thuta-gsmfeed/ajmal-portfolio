@@ -33,11 +33,14 @@
     "**/*.tsx",
     ".next-build/types/**/*.ts",
     ".next-hero-build/types/**/*.ts",
+    ".next-horizontal-products/types/**/*.ts",
     ".next-journey-final/types/**/*.ts",
     ".next-light-journey/types/**/*.ts",
+    ".next-partners-build/types/**/*.ts",
+    ".next-products-build/types/**/*.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
-    ".next-products-build/types/**/*.ts"
+    ".next-transitions-build/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
