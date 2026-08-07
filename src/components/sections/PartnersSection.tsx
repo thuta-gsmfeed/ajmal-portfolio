@@ -9,14 +9,14 @@ function Row({ reverse = false }: { reverse?: boolean }) {
         {repeated.map((partner, index) => (
           <div
             key={`${partner.name}-${index}`}
-            className="group flex h-40 w-80 shrink-0 items-center justify-center border-r border-white/10 bg-white/[.012] px-10 transition duration-500 hover:bg-white/[.055]"
+            className="group flex h-32 w-64 shrink-0 items-center justify-center border-r border-white/10 bg-white/[.012] px-8 transition duration-500 hover:bg-white/[.055]"
           >
-            <div className="relative h-16 w-full opacity-55 grayscale transition duration-500 group-hover:scale-105 group-hover:opacity-100 group-hover:grayscale-0">
+            <div className="relative h-12 w-full opacity-55 grayscale transition duration-500 group-hover:scale-[1.04] group-hover:opacity-100 group-hover:grayscale-0">
               <Image
                 src={partner.logo}
                 alt={index < partners.length ? `${partner.name} logo` : ""}
                 fill
-                sizes="320px"
+                sizes="256px"
                 className="object-contain"
               />
             </div>
@@ -37,7 +37,7 @@ export function PartnersSection() {
           <p className="mt-7 max-w-xl text-lg leading-relaxed text-white/45">A network spanning global logistics, international finance, mobile-device distribution, and lifecycle services.</p>
         </div>
       </div>
-      <div className="relative before:pointer-events-none before:absolute before:inset-y-0 before:left-0 before:z-10 before:w-28 before:bg-gradient-to-r before:from-[#050607] after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:z-10 after:w-28 after:bg-gradient-to-l after:from-[#050607]">
+      <div className="relative mx-auto max-w-[1600px] before:pointer-events-none before:absolute before:inset-y-0 before:left-0 before:z-10 before:w-12 before:bg-gradient-to-r before:from-[#050607] md:before:w-16 after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:z-10 after:w-12 after:bg-gradient-to-l after:from-[#050607] md:after:w-16">
         <Row />
         <Row reverse />
       </div>

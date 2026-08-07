@@ -33,7 +33,10 @@ export function JourneySection() {
         <div className="self-start py-24 lg:sticky lg:top-20 lg:flex lg:min-h-[calc(100svh-5rem)] lg:flex-col lg:py-10">
           <div>
             <p className="eyebrow !text-black/45">Entrepreneurial experience</p>
-            <h2 id="journey-title" className="mt-7 max-w-3xl text-[clamp(3rem,5.7vw,6.2rem)] font-medium leading-[.88] tracking-[-.065em]">The climb was never linear.</h2>
+            <h2 id="journey-title" className="section-title mt-7 max-w-3xl">
+              <span className="block">The climb was</span>
+              <span className="block">never linear.</span>
+            </h2>
             <p className="mt-5 max-w-lg text-base leading-relaxed text-black/55 md:text-lg">Every venture added a new capability. Every setback sharpened the next decision. This is the path from first business to global products and technology.</p>
           </div>
 
@@ -58,7 +61,7 @@ export function JourneySection() {
           </div>
 
           <div className="mt-6 flex items-end justify-between border-t border-black/15 pt-4 lg:mt-auto">
-            <div><p className="font-mono text-[10px] uppercase tracking-[.18em] text-black/35">Current chapter</p><p className="mt-1 text-lg">{timeline[active].year} · {timeline[active].title}</p></div>
+            <div><p className="font-mono text-sm uppercase tracking-[.14em] text-black/45">Current chapter</p><p className="mt-1 text-lg">{timeline[active].year} · {timeline[active].title}</p></div>
             <p className="font-mono text-sm text-cyan-700">0{active + 1} / 0{timeline.length}</p>
           </div>
         </div>
@@ -69,15 +72,15 @@ export function JourneySection() {
               key={`${milestone.year}-${milestone.title}`}
               ref={(node) => { steps.current[index] = node; }}
               data-index={index}
-              className="flex min-h-[52vh] items-center border-b border-black/10 py-16 last:border-b-0 lg:min-h-[62vh]"
+              className="group flex min-h-[52vh] items-center border-b border-black/10 py-16 last:border-b-0 lg:min-h-[62vh]"
             >
               <motion.div animate={{ opacity: active === index ? 1 : .48, x: active === index ? 0 : 16 }} transition={{ duration: .45 }} className="w-full">
                 <div className="flex items-center justify-between">
-                  <p className="font-mono text-sm text-cyan-700">{milestone.year}</p>
+                  <p className="font-mono text-sm text-cyan-700 transition-[letter-spacing,color] duration-500 group-hover:tracking-[.08em] group-hover:text-cyan-600">{milestone.year}</p>
                   <span className={`grid size-11 place-items-center rounded-full border transition-colors ${active === index ? "border-[#091012] bg-[#091012] text-white" : "border-black/15 text-black/35"}`}><ArrowUpRight size={16} /></span>
                 </div>
-                <h3 className="mt-8 text-[clamp(2.5rem,5vw,5.5rem)] leading-[.93] tracking-[-.055em]">{milestone.title}</h3>
-                <p className="mt-7 max-w-lg text-base leading-relaxed text-black/55 md:text-lg">{milestone.description}</p>
+                <h3 className="mt-8 text-[clamp(2.4rem,4.6vw,5.1rem)] leading-[1.12] tracking-[-.025em] transition-[color,transform] duration-500 ease-out group-hover:translate-x-2 group-hover:text-cyan-800">{milestone.title}</h3>
+                <p className="mt-7 max-w-xl text-base leading-relaxed text-black/55 transition-[color,transform] duration-500 ease-out group-hover:translate-x-2 group-hover:text-black/75 md:text-lg">{milestone.description}</p>
               </motion.div>
             </article>
           ))}

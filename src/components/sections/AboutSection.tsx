@@ -20,9 +20,6 @@ export function AboutSection() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
           </div>
-          <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.2em] text-white/40">
-            Ajmal Gholzad
-          </p>
         </div>
 
         {/* Content Column */}

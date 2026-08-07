@@ -1,87 +1,246 @@
 "use client";
 
-import { useRef, useState } from "react";
-import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import { ArrowDown, ArrowUpRight, Layers, X } from "lucide-react";
+import { ArrowUpRight, X } from "lucide-react";
 import { Product, products } from "@/data/content";
+
+function ProductPreview({ product, compact = false }: { product: Product; compact?: boolean }) {
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-[#090c0e] shadow-[0_35px_90px_rgba(0,0,0,.55)]">
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-label={`${product.name} product preview`}
+        className={`w-full object-cover ${compact ? "aspect-[16/10]" : "aspect-video"}`}
+      >
+        <source src={product.video.webm} type="video/webm" />
+        <source src={product.video.mov} type="video/quicktime" />
+      </video>
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-cyan-200/[.08]" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/80 to-transparent px-4 pb-3 pt-10 font-mono text-sm uppercase tracking-[.12em] text-white/55">
+        <span>{product.name}</span>
+        <span>Live product</span>
+      </div>
+    </div>
+  );
+}
 
 export function ProductsSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const [selected, setSelected] = useState<Product | null>(null);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end end"] });
-  const trackX = useTransform(scrollYProgress, [0, 1], ["0vw", "-300vw"]);
-  const headlineScale = useTransform(scrollYProgress, [0, .15], [1, .82]);
-  const headlineOpacity = useTransform(scrollYProgress, [0, .18], [1, .38]);
+  const trackX = useTransform(scrollYProgress, [0, 1], ["0vw", `-${(products.length - 1) * 100}vw`]);
+  const headlineOpacity = useTransform(scrollYProgress, [0, 0.1, 0.16], [1, 1, 0.22]);
 
   return (
-    <section ref={sectionRef} id="products" className="relative bg-[#030506] lg:h-[430vh]">
+    <section ref={sectionRef} id="products" className="relative bg-[#030506] lg:h-[320vh]">
       <div className="hidden h-screen overflow-hidden lg:sticky lg:top-0 lg:block">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_65%_55%,rgba(55,207,232,.09),transparent_32%)]" />
-        <div className="hero-grid pointer-events-none absolute inset-0 opacity-20" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_68%_55%,rgba(55,207,232,.075),transparent_34%)]" />
+        <div className="hero-grid pointer-events-none absolute inset-0 opacity-15" />
         <div className="grain" />
 
-        <motion.div style={{ scale: headlineScale, opacity: headlineOpacity, transformOrigin: "left top" }} className="products-sticky-head container absolute inset-x-0 top-20 z-20">
-          <p className="eyebrow">Featured products</p>
-          <h2 className="products-sticky-title mt-4 text-[clamp(3.2rem,5.4vw,5.8rem)] font-medium leading-[.86] tracking-[-.065em]">
-            Explore Our<br /><span className="bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">Vision in Action.</span>
-          </h2>
-        </motion.div>
+        <motion.header
+          style={{ opacity: headlineOpacity }}
+          className="container absolute inset-x-0 top-[92px] z-20 flex items-end justify-between gap-8 border-b border-white/10 pb-4"
+        >
+          <div>
+            <p className="eyebrow">Featured products</p>
+            <h2 className="mt-3 text-[clamp(2.25rem,3.2vw,3.125rem)] font-medium leading-[1.08] tracking-[.005em]">
+              Explore Our <span className="text-cyan-200">Vision in Action.</span>
+            </h2>
+          </div>
+        </motion.header>
 
-        <motion.div style={{ x: trackX }} className="products-horizontal-track flex h-full w-[400vw] pt-[300px]">
+        <motion.div
+          style={{ x: trackX, width: `${products.length * 100}vw` }}
+          className="flex h-full pt-[220px]"
+        >
           {products.map((product, index) => (
-            <article key={product.name} className="products-horizontal-slide flex h-full w-screen shrink-0 items-start px-[max(24px,calc((100vw-1380px)/2))] pb-24">
-              <div className="grid w-full grid-cols-[.72fr_1.28fr] items-center gap-12">
-                <div>
-                  <div className="flex items-center gap-4 font-mono text-[10px] uppercase tracking-[.2em] text-cyan-200"><span>0{index + 1}</span><span className="h-px w-12 bg-cyan-200/50" /><span>{product.year}</span></div>
-                  <h3 className="product-stage-title mt-5 text-[clamp(3.2rem,4.8vw,5.5rem)] font-medium leading-[.84] tracking-[-.065em]">{product.name}</h3>
-                  <p className="mt-5 text-xs uppercase tracking-[.18em] text-white/35">{product.category}</p>
-                  <p className="product-stage-copy mt-6 max-w-lg text-base leading-relaxed text-white/55 xl:text-lg">{product.description}</p>
-                  <div className="mt-7 flex flex-wrap gap-2">{product.technology.map(tech => <span key={tech} className="rounded-full border border-white/15 px-3 py-1.5 font-mono text-[9px] uppercase tracking-wider text-white/45">{tech}</span>)}</div>
-                  <button onClick={() => setSelected(product)} className="pill mt-9">Explore product <ArrowUpRight size={16} /></button>
+            <article
+              key={product.name}
+              className="flex h-full w-screen shrink-0 items-center px-[max(24px,calc((100vw-1380px)/2))] pb-28"
+            >
+              <div className="grid w-full grid-cols-[.82fr_1.18fr] items-center gap-10 xl:gap-16">
+                <div className="max-w-xl">
+                  <div className="flex items-center gap-4 font-mono text-sm uppercase tracking-[.14em] text-cyan-200">
+                    <span>0{index + 1}</span>
+                    <span className="h-px w-10 bg-cyan-200/45" />
+                    <span>{product.category}</span>
+                  </div>
+                  <h3 className="mt-5 text-[clamp(2.5rem,3.25vw,3.125rem)] font-medium leading-[1.08] tracking-[.01em]">
+                    {product.name}
+                  </h3>
+                  <p className="mt-4 max-w-lg text-[clamp(1.15rem,1.45vw,1.5rem)] leading-snug tracking-[.005em] text-white/78">
+                    {product.tagline}
+                  </p>
+                  <p className="mt-5 max-w-lg text-sm leading-relaxed text-white/48 xl:text-base">
+                    {product.description}
+                  </p>
+                  <button onClick={() => setSelected(product)} className="pill mt-7">
+                    Read more <ArrowUpRight size={15} />
+                  </button>
                 </div>
 
                 <motion.button
                   type="button"
-                  data-cursor="Open"
+                  data-cursor="View"
                   onClick={() => setSelected(product)}
-                  whileHover={{ scale: 1.018, rotateY: -1.2, rotateX: .8 }}
-                  transition={{ duration: .45, ease: [0.22, 1, 0.36, 1] }}
-                  className="product-preview group relative w-full max-w-[820px] justify-self-end text-left [perspective:1400px]"
+                  whileHover={{ scale: 1.012 }}
+                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                  className="group relative w-full max-w-[620px] justify-self-end text-left xl:max-w-[700px]"
+                  aria-label={`Read more about ${product.name}`}
                 >
-                  <div className="absolute -inset-12 rounded-full bg-cyan-300/[.075] blur-[100px]" />
-                  <div className="relative overflow-hidden rounded-[1.75rem] border border-white/20 bg-[#101416] p-2 shadow-[0_45px_110px_rgba(0,0,0,.72)]">
-                    <div className="flex h-10 items-center gap-2 border-b border-white/10 px-3"><i className="size-2 rounded-full bg-white/25" /><i className="size-2 rounded-full bg-white/15" /><i className="size-2 rounded-full bg-white/10" /><span className="ml-3 h-4 flex-1 rounded-full bg-white/[.035]" /><span className="font-mono text-[8px] uppercase tracking-[.15em] text-white/25">Live preview</span></div>
-                    <div className="relative aspect-[16/10] overflow-hidden rounded-b-[1.25rem]"><Image src={product.image.src} alt={product.image.alt} fill sizes="62vw" className="object-cover transition duration-700 group-hover:scale-[1.035]" /><div className="absolute inset-0 bg-gradient-to-tr from-black/30 via-transparent to-cyan-200/10" /></div>
-                  </div>
-                  <div className="absolute -bottom-5 -right-5 grid size-24 place-items-center rounded-full border border-white/20 bg-black/75 text-center font-mono text-[8px] uppercase tracking-[.16em] text-cyan-100 backdrop-blur-xl">View<br />case study</div>
+                  <div className="absolute -inset-10 rounded-full bg-cyan-300/[.06] blur-[90px]" />
+                  <ProductPreview product={product} />
                 </motion.button>
               </div>
             </article>
           ))}
         </motion.div>
 
-        <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-[#030506] via-[#030506]/90 to-transparent pb-6 pt-16">
+        <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-[#030506] via-[#030506]/95 to-transparent pb-5 pt-12">
           <div className="container">
-            <div className="mb-4 flex items-center justify-between font-mono text-[9px] uppercase tracking-[.18em] text-white/30"><span className="flex items-center gap-2"><ArrowDown size={12} />Scroll to move horizontally</span><span>04 projects · One vision</span></div>
-            <div className="h-px bg-white/10"><motion.div style={{ scaleX: scrollYProgress }} className="h-full origin-left bg-cyan-200" /></div>
-            <div className="mt-3 grid grid-cols-4">{products.map((product, index) => <div key={product.name} className="font-mono text-[8px] uppercase tracking-[.14em] text-white/25">0{index + 1} · {product.name}</div>)}</div>
+            <div className="h-px bg-white/10">
+              <motion.div style={{ scaleX: scrollYProgress }} className="h-full origin-left bg-cyan-200" />
+            </div>
           </div>
         </div>
       </div>
 
       <div className="container py-28 lg:hidden">
         <p className="eyebrow">Featured products</p>
-        <h2 className="mt-7 text-[clamp(3.4rem,15vw,6rem)] font-medium leading-[.86] tracking-[-.065em]">Explore Our<br /><span className="text-cyan-200">Vision in Action.</span></h2>
-        <p className="mt-7 max-w-xl leading-relaxed text-white/55">Digital products designed to simplify complex operations, connect international markets, and create practical leverage.</p>
-        <div className="mt-20 space-y-24">{products.map((product, index) => <article key={product.name}><p className="font-mono text-[10px] uppercase tracking-[.18em] text-cyan-200">0{index + 1} / {product.year}</p><h3 className="mt-5 text-5xl leading-[.9] tracking-[-.06em]">{product.name}</h3><p className="mt-5 leading-relaxed text-white/50">{product.description}</p><button data-cursor="Open" onClick={() => setSelected(product)} className="relative mt-8 block aspect-[16/10] w-full overflow-hidden rounded-2xl border border-white/15"><Image src={product.image.src} alt={product.image.alt} fill sizes="100vw" className="object-cover" /></button><button onClick={() => setSelected(product)} className="pill mt-7">Explore product <ArrowUpRight size={15} /></button></article>)}</div>
+        <h2 className="mt-5 text-[clamp(2.25rem,11vw,3.125rem)] font-medium leading-[1.08] tracking-[.005em]">
+          Explore Our<br /><span className="text-cyan-200">Vision in Action.</span>
+        </h2>
+        <div className="mt-16 space-y-24">
+          {products.map((product, index) => (
+            <article key={product.name}>
+              <p className="font-mono text-sm uppercase tracking-[.14em] text-cyan-200">
+                0{index + 1} / {product.category}
+              </p>
+              <h3 className="mt-4 text-[clamp(2.5rem,12vw,3.125rem)] font-medium leading-[1.08] tracking-[.01em]">
+                {product.name}
+              </h3>
+              <p className="mt-4 text-xl leading-snug text-white/75">{product.tagline}</p>
+              <button
+                data-cursor="View"
+                onClick={() => setSelected(product)}
+                className="relative mt-7 block w-full text-left"
+                aria-label={`Read more about ${product.name}`}
+              >
+                <ProductPreview product={product} compact />
+              </button>
+              <p className="mt-5 leading-relaxed text-white/48">{product.description}</p>
+              <button onClick={() => setSelected(product)} className="pill mt-7">
+                Read more <ArrowUpRight size={15} />
+              </button>
+            </article>
+          ))}
+        </div>
       </div>
 
-      <AnimatePresence>{selected && <ProductModal product={selected} onClose={() => setSelected(null)} />}</AnimatePresence>
+      <AnimatePresence>
+        {selected && <ProductModal product={selected} onClose={() => setSelected(null)} />}
+      </AnimatePresence>
     </section>
   );
 }
 
 function ProductModal({ product, onClose }: { product: Product; onClose: () => void }) {
-  return <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="fixed inset-0 z-[350] grid place-items-center bg-black/80 p-4 backdrop-blur-xl md:p-8"><motion.div role="dialog" aria-modal="true" aria-label={`${product.name} overview`} initial={{ opacity: 0, y: 40, scale: .96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: .97 }} onClick={event => event.stopPropagation()} className="relative max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-[2rem] border border-white/20 bg-[#090c0e] p-6 shadow-2xl md:p-10"><button onClick={onClose} aria-label="Close product overview" className="absolute right-5 top-5 z-10 grid size-11 place-items-center rounded-full border border-white/20 bg-black/50 transition hover:bg-white hover:text-black"><X size={17} /></button><div className="grid gap-8 lg:grid-cols-2 lg:items-center"><div><div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[.18em] text-cyan-200"><Layers size={14} />Product overview</div><h3 className="mt-6 text-5xl tracking-[-.06em] md:text-7xl">{product.name}</h3><p className="mt-6 text-lg leading-relaxed text-white/55">{product.description}</p><div className="mt-7 flex flex-wrap gap-2">{product.technology.map(tech => <span key={tech} className="rounded-full border border-white/15 px-3 py-1 text-xs text-white/50">{tech}</span>)}</div><a href={product.url} className="pill mt-9">Visit website <ArrowUpRight size={16} /></a></div><div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-white/15"><Image src={product.image.src} alt={product.image.alt} fill sizes="(max-width:1024px) 100vw, 50vw" className="object-cover" /></div></div></motion.div></motion.div>;
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => event.key === "Escape" && onClose();
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [onClose]);
+
+  return createPortal(
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+      className="fixed inset-0 z-[350] grid place-items-center bg-black/90 p-3 md:p-7"
+    >
+      <motion.div
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${product.name} overview`}
+        initial={{ opacity: 0, y: 36, scale: 0.975 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 20, scale: 0.98 }}
+        onClick={(event) => event.stopPropagation()}
+        className="relative max-h-[92vh] w-full max-w-6xl overflow-y-auto rounded-[1.5rem] border border-white/15 bg-[#090c0e] shadow-2xl"
+      >
+        <button
+          onClick={onClose}
+          aria-label="Close product overview"
+          className="sticky right-4 top-4 z-20 ml-auto mr-4 mt-4 grid size-11 place-items-center rounded-full border border-white/20 bg-black/70 transition hover:bg-white hover:text-black"
+        >
+          <X size={17} />
+        </button>
+
+        <div className="px-6 pb-10 md:px-10 md:pb-12 lg:px-14">
+          <div className="font-mono text-sm uppercase tracking-[.14em] text-cyan-200">{product.category}</div>
+          <h3 className="mt-4 text-[clamp(2.5rem,5vw,3.125rem)] font-medium leading-[1.08] tracking-[.01em]">{product.name}</h3>
+          <p className="mt-4 max-w-3xl text-xl leading-snug text-white/78 md:text-2xl">{product.tagline}</p>
+
+          <div className="mt-9 grid gap-10 lg:grid-cols-[.9fr_1.1fr]">
+            <div>
+              <p className="text-base leading-relaxed text-white/65 md:text-lg">{product.description}</p>
+              <div className="mt-6 space-y-5 text-sm leading-relaxed text-white/52 md:text-base">
+                {product.details.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+              </div>
+
+              {product.features && (
+                <div className="mt-8 border-t border-white/10 pt-6">
+                  <h4 className="text-sm font-medium text-white/85">Our platform offers powerful tools like:</h4>
+                  <dl className="mt-5 grid gap-4 sm:grid-cols-2">
+                    {product.features.map((feature) => (
+                      <div key={feature.title} className="border-l border-cyan-200/35 pl-4">
+                        <dt className="text-sm font-medium text-cyan-100">{feature.title}</dt>
+                        <dd className="mt-1 text-sm leading-relaxed text-white/52">{feature.description}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )}
+
+              <a href={product.url} target="_blank" rel="noreferrer" className="pill mt-9">
+                Visit website <ArrowUpRight size={15} />
+              </a>
+            </div>
+
+            <div className="lg:sticky lg:top-8 lg:h-fit">
+              {product.youtubeId ? (
+                <div className="aspect-video overflow-hidden rounded-2xl border border-white/15 bg-black">
+                  <iframe
+                    className="size-full"
+                    src={`https://www.youtube.com/embed/${product.youtubeId}`}
+                    title={`${product.name} video`}
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                  />
+                </div>
+              ) : (
+                <ProductPreview product={product} />
+              )}
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>,
+    document.body,
+  );
 }

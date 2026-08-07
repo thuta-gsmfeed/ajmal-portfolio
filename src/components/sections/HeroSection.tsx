@@ -3,9 +3,8 @@
 import Image from "next/image";
 import { motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
 import { useRef } from "react";
-import { ArrowDown } from "lucide-react";
-import { media } from "@/data/content";
-import { MagneticButton } from "@/components/ui/MagneticButton";
+import { ArrowDown, ArrowUpRight } from "lucide-react";
+import { currentVentures, media } from "@/data/content";
 
 const reveal = {
   hidden: { y: "115%", opacity: 0 },
@@ -61,32 +60,57 @@ export function HeroSection() {
           <div className="overflow-hidden">
             <motion.p variants={reveal} initial="hidden" animate="visible" custom={1.02} className="eyebrow">Entrepreneur · Business Builder · Founder</motion.p>
           </div>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.75, duration: .8 }} className="hidden items-center gap-3 font-mono text-[9px] uppercase tracking-[.2em] text-white/35 md:flex">
-            <span className="relative flex size-2"><span className="absolute inline-flex size-full animate-ping rounded-full bg-cyan-300 opacity-50" /><span className="relative inline-flex size-2 rounded-full bg-cyan-300" /></span>
-            Global · Active
-          </motion.div>
         </div>
 
-        <h1 className="max-w-[1420px] text-[clamp(2.6rem,6.2vw,6.8rem)] font-medium leading-[.92] tracking-[-.05em]">
-          <span className="block overflow-hidden pb-[.08em]"><motion.span className="block text-white/95" variants={reveal} initial="hidden" animate="visible" custom={1.08}>An innovative entrepreneur,</motion.span></span>
-          <span className="block overflow-hidden pb-[.08em]"><motion.span className="block bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent" variants={reveal} initial="hidden" animate="visible" custom={1.2}>turning challenges into</motion.span></span>
-          <span className="block overflow-hidden pb-[.08em]"><motion.span className="block text-white/95" variants={reveal} initial="hidden" animate="visible" custom={1.32}>impactful solutions.</motion.span></span>
+        <h1 className="section-title max-w-[1320px]">
+          <span className="block"><motion.span className="block text-white/95" variants={reveal} initial="hidden" animate="visible" custom={1.08}>An innovative entrepreneur,</motion.span></span>
+          <span className="block"><motion.span className="block bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent" variants={reveal} initial="hidden" animate="visible" custom={1.2}>turning challenges into</motion.span></span>
+          <span className="block"><motion.span className="block text-white/95" variants={reveal} initial="hidden" animate="visible" custom={1.32}>impactful solutions.</motion.span></span>
         </h1>
 
         <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ delay: 1.55, duration: 1.2, ease: [0.22, 1, 0.36, 1] }} className="mt-7 h-px origin-left bg-gradient-to-r from-cyan-200/80 via-white/20 to-transparent" />
 
-        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.72, duration: .85, ease: [0.22, 1, 0.36, 1] }} className="mt-5 grid gap-8 md:grid-cols-[1.3fr_1fr_auto] md:items-end">
-          <p className="max-w-xl text-base leading-relaxed text-white/60 md:text-lg">Ajmal Gholzad has spent more than fifteen years turning opportunity into global businesses, trusted partnerships, and technology products.</p>
-          <div className="grid grid-cols-3 gap-5 border-l border-white/15 pl-5">
-            <div><strong className="block text-xl font-medium md:text-2xl">2009</strong><span className="mt-1 block text-[9px] uppercase tracking-[.16em] text-white/35">Started</span></div>
-            <div><strong className="block text-xl font-medium md:text-2xl">$100M+</strong><span className="mt-1 block text-[9px] uppercase tracking-[.16em] text-white/35">Generated</span></div>
-            <div><strong className="block text-xl font-medium md:text-2xl">Global</strong><span className="mt-1 block text-[9px] uppercase tracking-[.16em] text-white/35">Network</span></div>
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.95, duration: .9, ease: [0.22, 1, 0.36, 1] }}
+          className="mt-6 border-y border-white/10 bg-black/10 backdrop-blur-sm"
+        >
+          <div className="grid md:grid-cols-[170px_1fr]">
+            <div className="flex items-center border-b border-white/10 px-4 py-3 md:border-b-0 md:border-r md:px-5">
+              <span className="font-mono text-sm uppercase tracking-[.14em] text-white/50">Current ventures</span>
+            </div>
+            <div className="grid grid-cols-3">
+              {currentVentures.map((venture, index) => (
+                <motion.a
+                  key={venture.name}
+                  href={venture.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={`Visit ${venture.name} website (opens in a new tab)`}
+                  data-cursor="Visit"
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 2.08 + index * .1, duration: .65, ease: [0.22, 1, 0.36, 1] }}
+                  className="group relative flex min-h-16 items-center gap-3 overflow-hidden border-r border-white/10 px-3 py-3 transition-colors duration-500 last:border-r-0 hover:bg-white/[.06] focus-visible:z-10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-cyan-300 md:min-h-[74px] md:px-5"
+                >
+                  <span aria-hidden className="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-cyan-300 transition-transform duration-500 ease-out group-hover:scale-x-100 group-focus-visible:scale-x-100" />
+                  <span className="grid size-8 shrink-0 place-items-center md:size-9">
+                    <Image src={venture.logo} alt="" width={116} height={106} className="max-h-7 w-auto max-w-8 object-contain opacity-65 transition duration-500 group-hover:scale-105 group-hover:opacity-100 md:max-h-8 md:max-w-9" />
+                  </span>
+                  <span className="min-w-0">
+                    <strong className="block truncate text-sm font-medium tracking-wide text-white/75 transition-colors group-hover:text-white md:text-base">{venture.name}</strong>
+                    <span className="mt-1 hidden truncate text-sm uppercase tracking-[.1em] text-white/40 lg:block">{venture.descriptor}</span>
+                  </span>
+                  <ArrowUpRight aria-hidden size={13} className="ml-auto hidden shrink-0 text-white/30 transition duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-cyan-200 sm:block" />
+                </motion.a>
+              ))}
+            </div>
           </div>
-          <MagneticButton href="#about">Discover the story</MagneticButton>
         </motion.div>
       </motion.div>
 
-      <motion.a href="#about" aria-label="Scroll to About" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.1 }} className="absolute bottom-8 left-5 z-20 hidden items-center gap-3 font-mono text-[8px] uppercase tracking-[.2em] text-white/35 xl:flex">
+      <motion.a href="#about" aria-label="Scroll to About" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.1 }} className="absolute bottom-8 left-5 z-20 hidden items-center gap-3 font-mono text-sm uppercase tracking-[.14em] text-white/45 xl:flex">
         <span className="grid size-10 place-items-center rounded-full border border-white/20"><motion.span animate={{ y: [0, 5, 0] }} transition={{ duration: 1.8, repeat: Infinity }}><ArrowDown size={13} /></motion.span></span>Scroll to explore
       </motion.a>
     </section>

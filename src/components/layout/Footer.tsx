@@ -3,6 +3,8 @@ import { ArrowUp } from "lucide-react";
 import { nav, site } from "@/data/content";
 
 export function Footer() {
+  const whatsappUrl = `https://wa.me/${site.whatsapp.phone}?text=${encodeURIComponent(site.whatsapp.message)}`;
+
   return (
     <footer className="border-t border-white/10 py-12">
       <div className="container">
@@ -47,6 +49,15 @@ export function Footer() {
               className="mt-2 inline-block text-sm text-white/45"
             >
               LinkedIn
+            </a>
+            <br />
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-2 inline-block text-sm text-white/45"
+            >
+              WhatsApp
             </a>
           </div>
         </div>

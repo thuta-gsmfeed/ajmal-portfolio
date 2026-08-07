@@ -37,10 +37,18 @@
     ".next-journey-final/types/**/*.ts",
     ".next-light-journey/types/**/*.ts",
     ".next-partners-build/types/**/*.ts",
+    ".next-philosophy-build/types/**/*.ts",
+    ".next-philosophy-v2-build/types/**/*.ts",
     ".next-products-build/types/**/*.ts",
+    ".next-transitions-build/types/**/*.ts",
+    ".next-ventures-build/types/**/*.ts",
+    ".next-yacht-brand-build/types/**/*.ts",
+    ".next-yacht-build/types/**/*.ts",
+    ".next-yacht-v2-build/types/**/*.ts",
+    ".next-yacht-video-build/types/**/*.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
-    ".next-transitions-build/types/**/*.ts"
+    ".next-globe-build/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

@@ -6,6 +6,7 @@ import { Loader } from "@/components/layout/Loader";
 import { Footer } from "@/components/layout/Footer";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { GlobalNetworkSection } from "@/components/sections/GlobalNetworkSection";
+import { DubaiYachtSection } from "@/components/sections/DubaiYachtSection";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { ScrollTextSection } from "@/components/sections/ScrollTextSection";
 import { JourneySection } from "@/components/sections/JourneySection";
@@ -16,4 +17,4 @@ import { PartnersSection } from "@/components/sections/PartnersSection";
 import { PhilosophySection } from "@/components/sections/PhilosophySection";
 import { ContactSection } from "@/components/sections/ContactSection";
 
-export default function Home(){return <SmoothScroll><a className="skip-link" href="#main">Skip to content</a><Loader/><Header/><CustomCursor/><SectionTransitions/><main id="main"><HeroSection/><AboutSection/><GlobalNetworkSection/><ScrollTextSection/><JourneySection/>{/* <VenturesSection/> */}<ProductsSection/><PartnersSection/><PhilosophySection/><ContactSection/></main><Footer/></SmoothScroll>}
+export default function Home(){return <SmoothScroll><a className="skip-link" href="#main">Skip to content</a><Loader/><Header/><CustomCursor/><SectionTransitions/><main id="main"><HeroSection/><AboutSection/><GlobalNetworkSection/><ScrollTextSection/><JourneySection/>{/* <VenturesSection/> */}<ProductsSection/><PartnersSection/><DubaiYachtSection/><PhilosophySection/><ContactSection/></main><Footer/></SmoothScroll>}
