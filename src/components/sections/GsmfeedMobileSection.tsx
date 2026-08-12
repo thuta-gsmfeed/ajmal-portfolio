@@ -23,9 +23,9 @@ function AppleMark() {
 
 function AppStoreButton() {
   return (
-    <a href={APP_STORE_URL} target="_blank" rel="noreferrer" data-cursor="Get app" data-cursor-theme="dark" aria-label="Download gsmfeed on the App Store" className="group inline-flex min-h-[64px] items-center gap-3 rounded-xl bg-[#090d10] px-5 text-white shadow-[0_16px_40px_rgba(7,13,16,.18)] transition duration-500 hover:-translate-y-1 hover:bg-[#151b20]">
+    <a href={APP_STORE_URL} target="_blank" rel="noreferrer" aria-label="Download gsmfeed on the App Store" className="group inline-flex min-h-[64px] items-center gap-3 rounded-xl bg-[#090d10] px-5 text-white shadow-[0_16px_40px_rgba(7,13,16,.18)] transition duration-500 hover:-translate-y-1 hover:bg-[#151b20]">
       <AppleMark />
-      <span><span className="block text-sm leading-none tracking-wide text-white/65">Available on the</span><strong className="mt-1 block text-xl font-medium leading-none tracking-[-.02em]">App Store</strong></span>
+      <span><span className="block text-sm leading-none tracking-wide text-white/65">Available on the</span><strong className="mt-1 block text-base font-medium leading-none tracking-[-.02em] md:text-xl">App Store</strong></span>
       <ArrowUpRight size={17} className="ml-2 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
     </a>
   );
@@ -37,7 +37,7 @@ export function GsmfeedMobileSection() {
   const reducedMotion = useReducedMotion();
 
   useEffect(() => {
-    if (paused || reducedMotion) return;
+    if (paused || reducedMotion || window.matchMedia("(max-width: 767px)").matches) return;
     const timer = window.setInterval(() => setActive((current) => (current + 1) % features.length), 4600);
     return () => window.clearInterval(timer);
   }, [paused, reducedMotion]);
@@ -45,36 +45,108 @@ export function GsmfeedMobileSection() {
   const selected = features[active];
 
   return (
-    <section data-cursor-theme="light" className="relative overflow-hidden bg-[#f1f2f7] py-28 text-[#090d10] md:py-40" aria-labelledby="gsmfeed-mobile-title">
+    <section className="relative overflow-hidden bg-[#f1f2f7] py-16 text-[#090d10] md:py-40" aria-labelledby="gsmfeed-mobile-title">
       <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_76%_45%,rgba(55,96,255,.085),transparent_30%)]" />
-      <div aria-hidden className="absolute -right-[12vw] -top-32 h-80 w-[62vw] rotate-[13deg] bg-white/65" />
+      <div aria-hidden className="absolute -right-[12vw] -top-32 hidden h-80 w-[62vw] rotate-[13deg] bg-white/65 md:block" />
 
-      <div className="container relative z-10">
-        <div className="mb-16 flex items-end justify-between gap-8 border-b border-black/10 pb-5">
+      <div className="container relative z-10 md:hidden">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[.13em] text-[#3d68ff]">Features</p>
+          <h2 id="gsmfeed-mobile-title" className="mt-4 text-[clamp(2.35rem,10vw,3rem)] font-semibold leading-[1.04] tracking-[-.035em]">
+            <span className="block">Everything You Need</span>
+            <span className="block text-[#3d68ff]">in One App</span>
+          </h2>
+        </div>
+
+        <div className="relative mt-8 grid place-items-center py-4">
+          <motion.div
+            animate={reducedMotion ? undefined : { rotate: active % 2 === 0 ? -1 : 1, y: active % 2 === 0 ? -3 : 3 }}
+            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+            className="relative h-[400px] w-[195px] overflow-hidden rounded-[2.25rem] border-[7px] border-[#090c0e] bg-black shadow-[0_32px_75px_rgba(20,31,71,.22)]"
+          >
+            <div className="absolute left-1/2 top-1.5 z-20 h-4 w-16 -translate-x-1/2 rounded-full bg-black" />
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={`mobile-${selected.image}`}
+                initial={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 1.035, y: 12 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.98, y: -8 }}
+                transition={{ duration: reducedMotion ? 0.15 : 0.48, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute inset-0"
+              >
+                <Image src={`${ASSET_ROOT}/${selected.image}`} alt={`gsmfeed — ${selected.name}`} fill sizes="195px" className="object-cover" priority={active === 0} />
+              </motion.div>
+            </AnimatePresence>
+            <div aria-hidden className="pointer-events-none absolute inset-0 z-10 rounded-[2rem] ring-1 ring-inset ring-white/15" />
+          </motion.div>
+        </div>
+
+        <div className="-mx-3.5 mt-6 overflow-x-auto px-3.5 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex w-max gap-2">
+            {features.map((feature, index) => {
+              const isActive = index === active;
+              return (
+                <button
+                  key={`mobile-${feature.name}`}
+                  type="button"
+                  onClick={() => setActive(index)}
+                  aria-pressed={isActive}
+                  className={`flex min-h-12 shrink-0 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition-[border-color,background-color,color,box-shadow] duration-300 ${isActive ? "border-[#3d68ff] bg-[#3d68ff] text-white shadow-[0_10px_28px_rgba(61,104,255,.2)]" : "border-black/10 bg-white/70 text-black/50"}`}
+                >
+                  <Image src={`${ASSET_ROOT}/${feature.icon}`} alt="" width={20} height={20} className={`size-5 ${isActive ? "brightness-0 invert" : "opacity-55"}`} />
+                  {feature.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={selected.name}
+            initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
+            transition={{ duration: reducedMotion ? 0.15 : 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-5 rounded-2xl border border-black/10 bg-white/75 p-5 shadow-[0_18px_50px_rgba(30,45,90,.07)] backdrop-blur-sm"
+          >
+            <div className="flex items-center justify-between gap-4">
+              <strong className="text-base font-semibold">{selected.name}</strong>
+              <span className="font-mono text-sm text-[#3d68ff]">0{active + 1} / 06</span>
+            </div>
+            <p className="mt-3 text-base leading-7 text-black/60">{selected.description}</p>
+          </motion.div>
+        </AnimatePresence>
+
+        <div className="mt-7 flex justify-center"><AppStoreButton /></div>
+      </div>
+
+      <div className="container relative z-10 hidden md:block">
+        <div className="mb-10 flex items-end justify-between gap-8 border-b border-black/10 pb-4 md:mb-16 md:pb-5">
           <p className="eyebrow !normal-case !text-black/50">gsmfeed for iPhone</p>
           <div className="hidden items-center gap-3 md:flex"><span className="size-2 rounded-full bg-[#3d68ff]" /><span className="font-mono text-sm uppercase tracking-[.12em] text-black/40">Available on the App Store</span></div>
         </div>
 
-        <div className="grid items-center gap-16 lg:grid-cols-[.92fr_1.08fr] xl:gap-24">
+        <div className="grid items-center gap-12 md:gap-16 lg:grid-cols-[.92fr_1.08fr] xl:gap-24">
           <div className="max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-[.13em] text-[#3d68ff]">Features</p>
-            <h2 id="gsmfeed-mobile-title" className="mt-6 max-w-xl text-[clamp(2.7rem,4.7vw,5rem)] font-semibold leading-[1.1] tracking-[-.025em]">Everything You<br />Need in One App</h2>
+            <h2 className="mt-5 max-w-xl text-[clamp(2.35rem,10vw,5rem)] font-semibold leading-[1.1] tracking-[-.025em] md:mt-6 md:text-[clamp(2.7rem,4.7vw,5rem)]">Everything You<br />Need in One App</h2>
 
-            <div className="relative mt-11 pl-7 before:absolute before:inset-y-0 before:left-0 before:w-1 before:rounded-full before:bg-black/8" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+            <div className="relative mt-8 pl-4 before:absolute before:inset-y-0 before:left-0 before:w-1 before:rounded-full before:bg-black/8 md:mt-11 md:pl-7" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
               <motion.span aria-hidden className="absolute left-0 top-0 w-1 rounded-full bg-[#3d68ff]" animate={{ y: `${active * 100}%` }} style={{ height: `${100 / features.length}%` }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }} />
 
               <div className="space-y-3">
                 {features.map((feature, index) => {
                   const isActive = index === active;
                   return (
-                    <button key={feature.name} type="button" onClick={() => setActive(index)} aria-pressed={isActive} className={`group block text-left transition-all duration-500 ${isActive ? "w-full" : "w-fit"}`}>
+                    <button key={feature.name} type="button" onClick={() => setActive(index)} aria-pressed={isActive} className={`group block min-h-11 text-left transition-all duration-500 md:min-h-0 ${isActive ? "w-full" : "w-fit"}`}>
                       <span className={`block rounded-xl border bg-white transition-[border-color,box-shadow,padding,color] duration-500 ${isActive ? "border-[#3d68ff] px-5 py-4 text-black shadow-[0_16px_45px_rgba(56,86,180,.09)]" : "border-black/10 px-4 py-2.5 text-black/40 hover:border-black/25 hover:text-black/70"}`}>
                         <span className="flex items-center gap-3">
                           <Image src={`${ASSET_ROOT}/${feature.icon}`} alt="" width={24} height={24} className={`size-6 transition-opacity ${isActive ? "opacity-90" : "opacity-40 group-hover:opacity-65"}`} />
                           <strong className="text-base font-semibold">{feature.name}</strong>
                         </span>
-                        <span className={`grid transition-[grid-template-rows,opacity,margin] duration-500 ${isActive ? "mt-4 grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
-                          <span className="overflow-hidden text-base leading-relaxed text-black/65">{feature.description}</span>
+                        <span className={`grid transition-[grid-template-rows,opacity,margin] duration-500 ${isActive ? "mt-3 grid-rows-[1fr] opacity-100 md:mt-4" : "grid-rows-[0fr] opacity-0"}`}>
+                          <span className="overflow-hidden text-base leading-7 text-black/65 md:leading-relaxed">{feature.description}</span>
                         </span>
                       </span>
                     </button>
@@ -86,16 +158,16 @@ export function GsmfeedMobileSection() {
             <div className="mt-10"><AppStoreButton /></div>
           </div>
 
-          <div className="relative flex min-h-[680px] items-center justify-center" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
-            <div aria-hidden className="absolute size-[540px] rounded-full border border-black/[.07]" />
-            <div aria-hidden className="absolute size-[410px] rounded-full border border-[#3d68ff]/15" />
+          <div className="relative flex min-h-[540px] items-center justify-center md:min-h-[680px]" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+            <div aria-hidden className="absolute size-[390px] rounded-full border border-black/[.07] md:size-[540px]" />
+            <div aria-hidden className="absolute size-[320px] rounded-full border border-[#3d68ff]/15 md:size-[410px]" />
             <div aria-hidden className="absolute bottom-12 left-1/2 h-16 w-72 -translate-x-1/2 rounded-[50%] bg-[#13204e]/20 blur-2xl" />
 
-            <motion.div animate={reducedMotion ? undefined : { rotate: active % 2 === 0 ? -1 : 1, y: active % 2 === 0 ? -4 : 4 }} transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }} className="relative h-[610px] w-[298px] overflow-hidden rounded-[3.25rem] border-[9px] border-[#090c0e] bg-black shadow-[0_45px_100px_rgba(20,31,71,.24)]">
+            <motion.div animate={reducedMotion ? undefined : { rotate: active % 2 === 0 ? -1 : 1, y: active % 2 === 0 ? -4 : 4 }} transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }} className="relative h-[510px] w-[249px] overflow-hidden rounded-[2.75rem] border-[8px] border-[#090c0e] bg-black shadow-[0_45px_100px_rgba(20,31,71,.24)] md:h-[610px] md:w-[298px] md:rounded-[3.25rem] md:border-[9px]">
               <div className="absolute left-1/2 top-2 z-20 h-5 w-20 -translate-x-1/2 rounded-full bg-black" />
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div key={selected.image} initial={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 1.025, y: 14 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.985, y: -10 }} transition={{ duration: reducedMotion ? 0.15 : 0.58, ease: [0.22, 1, 0.36, 1] }} className="absolute inset-0">
-                  <Image src={`${ASSET_ROOT}/${selected.image}`} alt={`gsmfeed — ${selected.name}`} fill sizes="298px" className="object-cover" priority={active === 0} />
+                  <Image src={`${ASSET_ROOT}/${selected.image}`} alt={`gsmfeed — ${selected.name}`} fill sizes="(max-width: 767px) 249px, 298px" className="object-cover" priority={active === 0} />
                 </motion.div>
               </AnimatePresence>
               <div aria-hidden className="pointer-events-none absolute inset-0 z-10 rounded-[2.7rem] ring-1 ring-inset ring-white/15" />

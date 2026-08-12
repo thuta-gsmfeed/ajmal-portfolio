@@ -9,9 +9,10 @@ export function Loader() {
   const reduceMotion = useReducedMotion();
 
   useEffect(() => {
+    const mobile = window.matchMedia("(max-width: 767px)").matches;
     const timeout = window.setTimeout(
       () => setDone(true),
-      reduceMotion ? 350 : 1550,
+      reduceMotion ? 350 : mobile ? 700 : 1550,
     );
 
     return () => window.clearTimeout(timeout);

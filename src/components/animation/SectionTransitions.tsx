@@ -6,10 +6,9 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export function SectionTransitions() {
   useLayoutEffect(() => {
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (matchMedia("(prefers-reduced-motion: reduce), (max-width: 767px)").matches) return;
 
     gsap.registerPlugin(ScrollTrigger);
-    const isMobile = matchMedia("(max-width: 767px)").matches;
     const context = gsap.context(() => {
       const sections = gsap.utils.toArray<HTMLElement>("main > section");
 
@@ -17,8 +16,8 @@ export function SectionTransitions() {
         gsap.fromTo(
           section,
           {
-            opacity: isMobile ? 0.72 : 0.48,
-            filter: `blur(${isMobile ? 4 : 10}px)`,
+            opacity: 0.48,
+            filter: "blur(10px)",
           },
           {
             opacity: 1,

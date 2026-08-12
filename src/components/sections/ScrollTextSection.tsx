@@ -10,12 +10,14 @@ const accentWords = new Set(["connect", "products,", "markets,", "technology."])
 
 export function ScrollTextSection() {
   const section = useRef<HTMLElement>(null);
+  const stage = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
       gsap.registerPlugin(ScrollTrigger);
       const wordElements = gsap.utils.toArray<HTMLElement>(".fill-word");
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const mobileViewport = window.matchMedia("(max-width: 767px)").matches;
 
       if (reducedMotion) {
         gsap.set(wordElements, { color: "#f3f6f7", opacity: 1 });
@@ -29,7 +31,11 @@ export function ScrollTextSection() {
           trigger: section.current,
           start: "top top",
           end: "bottom bottom",
-          scrub: 0.65,
+          scrub: mobileViewport ? 0.2 : 0.65,
+          pin: mobileViewport ? stage.current : false,
+          pinSpacing: false,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
         },
       });
 
@@ -54,14 +60,14 @@ export function ScrollTextSection() {
   );
 
   return (
-    <section ref={section} className="relative min-h-[180vh] overflow-clip bg-[#030506]">
-      <div className="sticky top-0 flex min-h-screen items-center overflow-hidden py-28">
+    <section ref={section} className="relative min-h-[180svh] overflow-x-clip bg-[#030506] md:min-h-[180vh]">
+      <div ref={stage} className="flex min-h-svh items-center overflow-hidden py-20 md:sticky md:top-0 md:min-h-screen md:py-28">
         <div aria-hidden className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.035)_1px,transparent_1px)] [background-size:88px_88px] [mask-image:radial-gradient(circle_at_center,black,transparent_78%)]" />
         <div aria-hidden className="manifesto-light absolute left-1/2 top-1/2 h-[70vh] w-[42vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-300/[.07] blur-[110px]" />
         <div className="grain" />
 
         <div className="container relative z-10">
-          <div className="mb-14 flex items-center justify-between border-b border-white/10 pb-5">
+          <div className="mb-9 flex items-center justify-between border-b border-white/10 pb-4 md:mb-14 md:pb-5">
             <p className="eyebrow">A connected vision</p>
             <p className="hidden font-mono text-sm uppercase tracking-[.12em] text-white/35 md:block">Scroll to reveal</p>
           </div>

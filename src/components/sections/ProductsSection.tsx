@@ -1,16 +1,55 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 import { ArrowUpRight, X } from "lucide-react";
 import { Product, products } from "@/data/content";
 
+function ProductTitle({ product, className }: { product: Product; className: string }) {
+  return (
+    <h3 className={`flex items-center gap-4 ${className}`}>
+      <span className="grid h-11 min-w-10 shrink-0 place-items-center md:h-12 md:min-w-11">
+        <Image src={product.logo} alt="" width={116} height={106} className="h-9 w-auto max-w-[76px] object-contain md:h-10 md:max-w-[86px]" />
+      </span>
+      <span>{product.name}</span>
+    </h3>
+  );
+}
+
 function ProductPreview({ product, compact = false }: { product: Product; compact?: boolean }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    const element = videoRef.current;
+    if (!element) return;
+    if (reducedMotion) {
+      element.pause();
+      return;
+    }
+
+    if (!window.matchMedia("(max-width: 767px)").matches) {
+      void element.play().catch(() => undefined);
+      return () => element.pause();
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) void element.play().catch(() => undefined);
+      else element.pause();
+    }, { threshold: 0.45 });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [reducedMotion]);
+
   return (
     <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-[#090c0e] shadow-[0_35px_90px_rgba(0,0,0,.55)]">
       <video
-        autoPlay
+        ref={videoRef}
         muted
         loop
         playsInline
@@ -32,13 +71,32 @@ function ProductPreview({ product, compact = false }: { product: Product; compac
 
 export function ProductsSection() {
   const sectionRef = useRef<HTMLElement>(null);
+  const mobileStageRef = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState<Product | null>(null);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end end"] });
   const trackX = useTransform(scrollYProgress, [0, 1], ["0vw", `-${(products.length - 1) * 100}vw`]);
   const headlineOpacity = useTransform(scrollYProgress, [0, 0.1, 0.16], [1, 1, 0.22]);
 
+  useGSAP(
+    () => {
+      if (!window.matchMedia("(max-width: 767px)").matches) return;
+
+      gsap.registerPlugin(ScrollTrigger);
+      ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: "top top",
+        end: "bottom bottom",
+        pin: mobileStageRef.current,
+        pinSpacing: false,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+      });
+    },
+    { scope: sectionRef },
+  );
+
   return (
-    <section ref={sectionRef} id="products" className="relative bg-[#030506] lg:h-[320vh]">
+    <section ref={sectionRef} id="products" className="relative h-[320svh] bg-[#030506] md:h-auto lg:h-[320vh]">
       <div className="hidden h-screen overflow-hidden lg:sticky lg:top-0 lg:block">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_68%_55%,rgba(55,207,232,.075),transparent_34%)]" />
         <div className="hero-grid pointer-events-none absolute inset-0 opacity-15" />
@@ -72,9 +130,7 @@ export function ProductsSection() {
                     <span className="h-px w-10 bg-cyan-200/45" />
                     <span>{product.category}</span>
                   </div>
-                  <h3 className="mt-5 text-[clamp(2.5rem,3.25vw,3.125rem)] font-medium leading-[1.08] tracking-[.01em]">
-                    {product.name}
-                  </h3>
+                  <ProductTitle product={product} className="mt-5 text-[clamp(2.5rem,3.25vw,3.125rem)] font-medium leading-[1.08] tracking-[.01em]" />
                   <p className="mt-4 max-w-lg text-[clamp(1.15rem,1.45vw,1.5rem)] leading-snug tracking-[.005em] text-white/78">
                     {product.tagline}
                   </p>
@@ -88,7 +144,6 @@ export function ProductsSection() {
 
                 <motion.button
                   type="button"
-                  data-cursor="View"
                   onClick={() => setSelected(product)}
                   whileHover={{ scale: 1.012 }}
                   transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
@@ -112,30 +167,64 @@ export function ProductsSection() {
         </div>
       </div>
 
-      <div className="container py-28 lg:hidden">
+      <div ref={mobileStageRef} className="h-svh overflow-hidden md:hidden">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_62%_55%,rgba(55,207,232,.08),transparent_42%)]" />
+        <div className="hero-grid pointer-events-none absolute inset-0 opacity-15" />
+        <div className="grain" />
+
+        <header className="container absolute inset-x-0 top-20 z-20 border-b border-white/10 pb-4">
+          <p className="eyebrow">Featured products</p>
+          <h2 className="mt-3 text-[2rem] font-medium leading-[1.06] tracking-[.005em]">
+            <span className="block">Explore Our</span>
+            <span className="block text-cyan-200">Vision in Action.</span>
+          </h2>
+        </header>
+
+        <motion.div
+          style={{ x: trackX, width: `${products.length * 100}vw` }}
+          className="flex h-full pt-[190px]"
+        >
+          {products.map((product) => (
+            <article key={`mobile-horizontal-${product.name}`} className="flex h-full w-screen shrink-0 items-center px-3.5 pb-16">
+              <div className="w-full">
+                <ProductTitle product={product} className="text-[2.15rem] font-medium leading-[1.06] tracking-[.01em]" />
+                <button
+                  onClick={() => setSelected(product)}
+                  className="relative mt-5 block w-full text-left"
+                  aria-label={`Read more about ${product.name}`}
+                >
+                  <ProductPreview product={product} />
+                </button>
+                <button onClick={() => setSelected(product)} className="pill mt-5">
+                  Read more <ArrowUpRight size={15} />
+                </button>
+              </div>
+            </article>
+          ))}
+        </motion.div>
+      </div>
+
+      <div className="container hidden py-20 md:block lg:hidden">
         <p className="eyebrow">Featured products</p>
         <h2 className="mt-5 text-[clamp(2.25rem,11vw,3.125rem)] font-medium leading-[1.08] tracking-[.005em]">
           Explore Our<br /><span className="text-cyan-200">Vision in Action.</span>
         </h2>
-        <div className="mt-16 space-y-24">
+        <div className="mt-12 space-y-16 sm:space-y-20">
           {products.map((product, index) => (
             <article key={product.name}>
               <p className="font-mono text-sm uppercase tracking-[.14em] text-cyan-200">
                 0{index + 1} / {product.category}
               </p>
-              <h3 className="mt-4 text-[clamp(2.5rem,12vw,3.125rem)] font-medium leading-[1.08] tracking-[.01em]">
-                {product.name}
-              </h3>
-              <p className="mt-4 text-xl leading-snug text-white/75">{product.tagline}</p>
+              <ProductTitle product={product} className="mt-4 text-[clamp(2.15rem,9vw,3.125rem)] font-medium leading-[1.08] tracking-[.01em] sm:text-[clamp(2.5rem,12vw,3.125rem)]" />
+              <p className="mt-4 text-base leading-relaxed text-white/75 md:text-xl md:leading-snug">{product.tagline}</p>
               <button
-                data-cursor="View"
                 onClick={() => setSelected(product)}
-                className="relative mt-7 block w-full text-left"
+                className="relative mt-6 block w-full text-left sm:mt-7"
                 aria-label={`Read more about ${product.name}`}
               >
                 <ProductPreview product={product} compact />
               </button>
-              <p className="mt-5 leading-relaxed text-white/48">{product.description}</p>
+              <p className="mt-5 text-sm leading-7 text-white/55 sm:leading-relaxed sm:text-white/48 md:text-base">{product.description}</p>
               <button onClick={() => setSelected(product)} className="pill mt-7">
                 Read more <ArrowUpRight size={15} />
               </button>
@@ -191,8 +280,8 @@ function ProductModal({ product, onClose }: { product: Product; onClose: () => v
 
         <div className="px-6 pb-10 md:px-10 md:pb-12 lg:px-14">
           <div className="font-mono text-sm uppercase tracking-[.14em] text-cyan-200">{product.category}</div>
-          <h3 className="mt-4 text-[clamp(2.5rem,5vw,3.125rem)] font-medium leading-[1.08] tracking-[.01em]">{product.name}</h3>
-          <p className="mt-4 max-w-3xl text-xl leading-snug text-white/78 md:text-2xl">{product.tagline}</p>
+          <ProductTitle product={product} className="mt-4 text-[clamp(2.5rem,5vw,3.125rem)] font-medium leading-[1.08] tracking-[.01em]" />
+          <p className="mt-4 max-w-3xl text-base leading-relaxed text-white/78 md:text-2xl md:leading-snug">{product.tagline}</p>
 
           <div className="mt-9 grid gap-10 lg:grid-cols-[.9fr_1.1fr]">
             <div>

@@ -2,6 +2,7 @@ export type MediaAsset = { src: string; alt: string; replacement: string };
 export type ProductFeature = { title: string; description: string };
 export type Product = {
   name: string;
+  logo: string;
   category: string;
   tagline: string;
   description: string;
@@ -16,7 +17,7 @@ export type TimelineMilestone = { year: string; title: string; description: stri
 export type Partner = { name: string; logo: string };
 export type GlobalRoute = { from: [number, number]; to: [number, number]; label: string };
 export type GlobalLocation = { name: string; coordinates: [number, number]; labelOffset?: [number, number]; showLabel?: boolean };
-export type CurrentVenture = { name: string; url: string; logo: string; descriptor: string };
+export type CurrentVenture = { name: string; url: string; logo: string };
 
 export const site = {
   name: "Ajmal Gholzad",
@@ -43,9 +44,9 @@ export const media = {
 } satisfies Record<string, MediaAsset>;
 
 export const currentVentures: CurrentVenture[] = [
-  { name: "Coolmix", url: "https://coolmix.eu/", logo: "/images/logo/coolmix-logo.svg", descriptor: "Global mobile commerce" },
-  { name: "Projectmix", url: "https://projectmix.ai/", logo: "/images/logo/projectmix-logo.svg", descriptor: "AI-powered technology" },
-  { name: "gsmfeed", url: "https://gsmfeed.com/", logo: "/images/logo/gsmfeed-logo.svg", descriptor: "Mobile industry intelligence" },
+  { name: "Coolmix", url: "https://coolmix.eu/", logo: "/images/logo/coolmix-logo.svg" },
+  { name: "Projectmix", url: "https://projectmix.ai/", logo: "/images/logo/projectmix-logo.svg" },
+  { name: "gsmfeed", url: "https://gsmfeed.com/", logo: "/images/logo/gsmfeed-logo.svg" },
 ];
 
 export const timeline: TimelineMilestone[] = [
@@ -68,6 +69,7 @@ export const ventures: Venture[] = [
 export const products: Product[] = [
   {
     name: "gsmfeed",
+    logo: "/images/logo/gsmfeed-logo.svg",
     category: "Global Electronics Marketplace",
     tagline: "Simplifying Global Electronic Trading with AI",
     description: "An AI-powered platform connecting verified traders, distributors, and retailers across the global consumer electronics market.",
@@ -87,6 +89,7 @@ export const products: Product[] = [
   },
   {
     name: "Projectmix",
+    logo: "/images/logo/projectmix-logo.svg",
     category: "Trading ERP & Automation",
     tagline: "Revolutionizing Your Trading Business with Smart Automation",
     description: "The world’s first advanced ERP solution designed to streamline trading operations effortlessly.",
@@ -101,6 +104,7 @@ export const products: Product[] = [
   },
   {
     name: "Coolmix",
+    logo: "/images/logo/coolmix-logo.svg",
     category: "Apple Device Distribution",
     tagline: "Your Trusted Partner for Used Apple Devices",
     description: "A leading distributor providing consistent access to a substantial inventory of used Apple devices.",

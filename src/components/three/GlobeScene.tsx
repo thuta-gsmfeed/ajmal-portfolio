@@ -4,7 +4,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Html, Line, OrbitControls, Sparkles } from "@react-three/drei";
 import { feature } from "topojson-client";
 import countries from "world-atlas/countries-110m.json";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { globalLocations, GlobalLocation, GlobalRoute, routes } from "@/data/content";
 
@@ -91,7 +91,7 @@ function AnimatedRoute({ route, index }: { route: GlobalRoute; index: number }) 
   );
 }
 
-function LocationMarker({ location, index }: { location: GlobalLocation; index: number }) {
+function LocationMarker({ location, index, mobile }: { location: GlobalLocation; index: number; mobile: boolean }) {
   const group = useRef<THREE.Group>(null);
   const pulse = useRef<THREE.Mesh>(null);
   const label = useRef<HTMLDivElement>(null);
@@ -127,11 +127,11 @@ function LocationMarker({ location, index }: { location: GlobalLocation; index: 
         <meshBasicMaterial color="#68e7ff" transparent opacity={0.16} depthWrite={false} />
       </mesh>
       {location.showLabel !== false && (
-        <Html center position={[0, 0, 0]} distanceFactor={6.2} zIndexRange={[30, 0]}>
+        <Html center position={[0, 0, 0]} distanceFactor={mobile ? 4 : 6.2} zIndexRange={[30, 0]}>
           <div
             ref={label}
             style={{ transform: `translate(${labelX}px, ${labelY}px)` }}
-            className="pointer-events-none whitespace-nowrap rounded-sm border border-white/15 bg-[#061014]/88 px-1.5 py-1 font-mono text-[6px] uppercase tracking-[.15em] text-white/75 shadow-[0_6px_24px_rgba(0,0,0,.4)] backdrop-blur-sm transition-opacity duration-300"
+            className="pointer-events-none whitespace-nowrap rounded-sm border border-white/15 bg-[#061014]/88 px-1.5 py-1 font-mono text-sm uppercase tracking-[.08em] text-white/75 shadow-[0_6px_24px_rgba(0,0,0,.4)] backdrop-blur-sm transition-opacity duration-300 md:text-[6px] md:tracking-[.15em]"
           >
             {location.name}
           </div>
@@ -141,7 +141,7 @@ function LocationMarker({ location, index }: { location: GlobalLocation; index: 
   );
 }
 
-function NetworkGlobe() {
+function NetworkGlobe({ mobile }: { mobile: boolean }) {
   const group = useRef<THREE.Group>(null);
 
   useFrame((state, delta) => {
@@ -154,7 +154,7 @@ function NetworkGlobe() {
   return (
     <group ref={group} rotation={[-0.08, -1.38, 0]}>
       <mesh receiveShadow>
-        <sphereGeometry args={[GLOBE_RADIUS, 72, 72]} />
+        <sphereGeometry args={[GLOBE_RADIUS, mobile ? 56 : 72, mobile ? 56 : 72]} />
         <meshPhysicalMaterial color="#041116" roughness={0.72} metalness={0.5} clearcoat={0.2} />
       </mesh>
       <CountryOutlines />
@@ -163,23 +163,33 @@ function NetworkGlobe() {
         <meshBasicMaterial color="#68e7ff" transparent opacity={0.045} side={THREE.BackSide} />
       </mesh>
       {routes.map((route, index) => <AnimatedRoute key={route.label} route={route} index={index} />)}
-      {globalLocations.map((location, index) => <LocationMarker key={location.name} location={location} index={index} />)}
+      {globalLocations.map((location, index) => <LocationMarker key={location.name} location={location} index={index} mobile={mobile} />)}
     </group>
   );
 }
 
 export default function GlobeScene() {
+  const [mobile, setMobile] = useState(false);
+
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 767px)");
+    const update = () => setMobile(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+
   return (
     <Canvas
-      dpr={[1, 1.5]}
+      dpr={mobile ? [1, 1.25] : [1, 1.5]}
       camera={{ position: [0, 0.15, 7.55], fov: 38 }}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
     >
       <ambientLight intensity={0.55} color="#bdeaf0" />
       <directionalLight position={[4, 4, 5]} intensity={3.2} color="#c9f6ff" />
       <directionalLight position={[-4, -1, 2]} intensity={1.2} color="#d4c997" />
-      <NetworkGlobe />
-      <Sparkles count={55} scale={[8, 7, 5]} size={0.75} speed={0.08} opacity={0.18} />
+      <NetworkGlobe mobile={mobile} />
+      <Sparkles count={mobile ? 36 : 55} scale={[8, 7, 5]} size={0.75} speed={0.08} opacity={0.18} />
       <OrbitControls
         enablePan={false}
         enableZoom={false}

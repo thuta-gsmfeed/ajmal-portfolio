@@ -6,7 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export function SmoothScroll({children}:{children:React.ReactNode}) {
   useEffect(()=>{
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (matchMedia("(prefers-reduced-motion: reduce), (max-width: 767px)").matches) return;
     gsap.registerPlugin(ScrollTrigger);
     const lenis = new Lenis({ duration:1.15, smoothWheel:true });
     const onScroll = () => ScrollTrigger.update();

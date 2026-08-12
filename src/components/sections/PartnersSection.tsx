@@ -9,9 +9,9 @@ function Row({ reverse = false }: { reverse?: boolean }) {
         {repeated.map((partner, index) => (
           <div
             key={`${partner.name}-${index}`}
-            className="group flex h-32 w-64 shrink-0 items-center justify-center border-r border-white/10 bg-white/[.012] px-8 transition duration-500 hover:bg-white/[.055]"
+            className="group flex h-24 w-48 shrink-0 items-center justify-center border-r border-white/10 bg-white/[.012] px-6 transition duration-500 hover:bg-white/[.055] md:h-32 md:w-64 md:px-8"
           >
-            <div className="relative h-12 w-full opacity-55 grayscale transition duration-500 group-hover:scale-[1.04] group-hover:opacity-100 group-hover:grayscale-0">
+            <div className="relative h-10 w-full opacity-70 grayscale transition duration-500 group-hover:scale-[1.04] group-hover:opacity-100 group-hover:grayscale-0 md:h-12 md:opacity-55">
               <Image
                 src={partner.logo}
                 alt={index < partners.length ? `${partner.name} logo` : ""}
@@ -29,12 +29,12 @@ function Row({ reverse = false }: { reverse?: boolean }) {
 
 export function PartnersSection() {
   return (
-    <section className="overflow-hidden py-28 md:py-40">
-      <div className="container mb-16 grid gap-8 lg:grid-cols-[1fr_2fr]">
+    <section className="overflow-hidden py-20 md:py-40">
+      <div className="container mb-10 grid gap-6 md:mb-16 md:gap-8 lg:grid-cols-[1fr_2fr]">
         <p className="eyebrow">Partnerships</p>
         <div>
           <h2 className="section-title max-w-5xl">Global connections,<br />trusted partnerships.</h2>
-          <p className="mt-7 max-w-xl text-lg leading-relaxed text-white/45">A network spanning global logistics, international finance, mobile-device distribution, and lifecycle services.</p>
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-white/50 md:mt-7 md:text-lg md:text-white/45">A network spanning global logistics, international finance, mobile-device distribution, and lifecycle services.</p>
         </div>
       </div>
       <div className="relative mx-auto max-w-[1600px] before:pointer-events-none before:absolute before:inset-y-0 before:left-0 before:z-10 before:w-12 before:bg-gradient-to-r before:from-[#050607] md:before:w-16 after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:z-10 after:w-12 after:bg-gradient-to-l after:from-[#050607] md:after:w-16">

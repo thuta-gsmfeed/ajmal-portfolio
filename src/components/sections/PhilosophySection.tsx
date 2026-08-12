@@ -14,7 +14,7 @@ export function PhilosophySection() {
     () => {
       gsap.registerPlugin(ScrollTrigger);
 
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      if (window.matchMedia("(prefers-reduced-motion: reduce), (max-width: 767px)").matches) {
         gsap.set(".principle-row", { opacity: 1, x: 0 });
         gsap.set(".philosophy-progress", { scaleX: 1 });
         return;
@@ -22,11 +22,13 @@ export function PhilosophySection() {
 
       const rows = gsap.utils.toArray<HTMLElement>(".principle-row");
       const timeline = gsap.timeline({
+        defaults: { ease: "none", force3D: true },
         scrollTrigger: {
           trigger: section.current,
           start: "top top",
           end: "bottom bottom",
-          scrub: 0.9,
+          scrub: 0.45,
+          invalidateOnRefresh: true,
         },
       });
 
@@ -34,12 +36,12 @@ export function PhilosophySection() {
         .fromTo(
           ".philosophy-intro",
           { opacity: 0, y: 24 },
-          { opacity: 1, y: 0, duration: 0.14, ease: "none" },
+          { opacity: 1, y: 0, duration: 0.14 },
         )
         .fromTo(
           ".philosophy-progress",
           { scaleX: 0 },
-          { scaleX: 1, duration: 0.82, ease: "none" },
+          { scaleX: 1, duration: 0.82 },
           0.1,
         );
 
@@ -49,14 +51,11 @@ export function PhilosophySection() {
           {
             opacity: 0.12,
             x: index % 2 === 0 ? -70 : 70,
-            color: "rgba(243,246,247,.18)",
           },
           {
             opacity: 1,
             x: 0,
-            color: index === rows.length - 1 ? "#a9f2ff" : "#f3f6f7",
             duration: 0.22,
-            ease: "none",
           },
           0.12 + index * 0.17,
         );
@@ -65,7 +64,7 @@ export function PhilosophySection() {
       timeline.fromTo(
         ".philosophy-signoff",
         { opacity: 0, y: 18 },
-        { opacity: 1, y: 0, duration: 0.16, ease: "none" },
+        { opacity: 1, y: 0, duration: 0.16 },
         0.78,
       );
     },
@@ -73,8 +72,8 @@ export function PhilosophySection() {
   );
 
   return (
-    <section ref={section} className="relative min-h-[170vh] bg-[#030506]">
-      <div className="sticky top-0 flex min-h-screen items-center overflow-hidden py-24">
+    <section ref={section} className="relative min-h-[120svh] bg-[#030506] md:min-h-[170vh]">
+      <div className="sticky top-0 flex min-h-svh items-center overflow-hidden py-16 md:min-h-screen md:py-24">
         <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(104,231,255,.07),transparent_46%)]" />
         <div aria-hidden className="absolute inset-y-0 left-1/2 w-px bg-gradient-to-b from-transparent via-white/[.07] to-transparent" />
         <div className="grain" />
@@ -90,15 +89,17 @@ export function PhilosophySection() {
               {principles.map((principle, index) => (
                 <span
                   key={principle}
-                  className="principle-row group relative grid cursor-default grid-cols-[42px_1fr_auto] items-center overflow-hidden border-b border-white/10 py-2 transition-[opacity,transform,background-color] duration-500 ease-out before:absolute before:inset-0 before:origin-left before:scale-x-0 before:bg-gradient-to-r before:from-cyan-300/[.12] before:via-cyan-200/[.035] before:to-transparent before:transition-transform before:duration-700 before:ease-out hover:translate-x-2 hover:before:scale-x-100 md:grid-cols-[72px_1fr_auto] md:py-3"
+                  className="principle-row block will-change-[transform,opacity]"
                 >
-                  <span className="relative z-10 font-mono text-sm tracking-[.14em] text-cyan-200/65 transition-colors duration-500 group-hover:text-cyan-100">0{index + 1}</span>
-                  <span className="section-title relative z-10 block text-left uppercase transition-[color,transform,text-shadow] duration-500 ease-out group-hover:translate-x-3 group-hover:text-cyan-100 group-hover:[text-shadow:0_0_32px_rgba(104,231,255,.18)]">{principle}</span>
-                  <span className="relative z-10 hidden font-mono text-sm uppercase tracking-[.12em] text-white/40 transition-[color,transform] duration-500 group-hover:-translate-x-2 group-hover:text-white/75 sm:block">
-                    {index === 0 && "See beyond"}
-                    {index === 1 && "Build together"}
-                    {index === 2 && "Keep moving"}
-                    {index === 3 && "Make it real"}
+                  <span className="group relative grid cursor-default grid-cols-[36px_1fr_auto] items-center overflow-hidden border-b border-white/10 py-3 transition-transform duration-500 ease-out before:absolute before:inset-0 before:origin-left before:scale-x-0 before:bg-gradient-to-r before:from-cyan-300/[.12] before:via-cyan-200/[.035] before:to-transparent before:transition-transform before:duration-700 before:ease-out hover:translate-x-2 hover:before:scale-x-100 md:grid-cols-[72px_1fr_auto]">
+                    <span className="relative z-10 font-mono text-sm tracking-[.14em] text-cyan-200/65 transition-colors duration-500 group-hover:text-cyan-100">0{index + 1}</span>
+                    <span className="section-title relative z-10 block text-left uppercase transition-[color,transform,text-shadow] duration-500 ease-out group-hover:translate-x-3 group-hover:text-cyan-100 group-hover:[text-shadow:0_0_32px_rgba(104,231,255,.18)]">{principle}</span>
+                    <span className="relative z-10 hidden font-mono text-sm uppercase tracking-[.12em] text-white/40 transition-[color,transform] duration-500 group-hover:-translate-x-2 group-hover:text-white/75 sm:block">
+                      {index === 0 && "See beyond"}
+                      {index === 1 && "Build together"}
+                      {index === 2 && "Keep moving"}
+                      {index === 3 && "Make it real"}
+                    </span>
                   </span>
                 </span>
               ))}

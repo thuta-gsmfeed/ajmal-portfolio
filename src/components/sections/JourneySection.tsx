@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useSpring } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { timeline } from "@/data/content";
 
@@ -10,9 +10,28 @@ const points = [
   [55, 430], [220, 348], [350, 330], [485, 286], [615, 194], [730, 118], [862, 48],
 ];
 
+const mobileTitleLines: Record<string, [string, string]> = {
+  "Premium mobile products": ["Premium", "mobile products"],
+  "Resilience under pressure": ["Resilience", "under pressure"],
+  "A new chapter in Dubai": ["A new chapter", "in Dubai"],
+  "Building what comes next": ["Building what", "comes next"],
+};
+
+function MobileMilestoneTitle({ title }: { title: string }) {
+  const lines = mobileTitleLines[title];
+
+  if (!lines) return title;
+
+  return lines.map((line) => <span key={line} className="block">{line}</span>);
+}
+
 export function JourneySection() {
   const [active, setActive] = useState(0);
+  const section = useRef<HTMLElement>(null);
   const steps = useRef<Array<HTMLElement | null>>([]);
+  const reducedMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: section, offset: ["start 85%", "end 35%"] });
+  const journeyProgress = useSpring(scrollYProgress, { stiffness: 110, damping: 28, mass: 0.35 });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -28,12 +47,63 @@ export function JourneySection() {
   const progress = active / (timeline.length - 1);
 
   return (
-    <section data-cursor-theme="light" className="relative border-y border-black/10 bg-[#edf0ef] text-[#091012]" aria-labelledby="journey-title">
-      <div className="container grid lg:grid-cols-[1.2fr_.8fr]">
-        <div className="self-start py-24 lg:sticky lg:top-20 lg:flex lg:min-h-[calc(100svh-5rem)] lg:flex-col lg:py-10">
+    <section ref={section} className="relative border-y border-black/10 bg-[#edf0ef] text-[#091012]" aria-label="Entrepreneurial experience: The climb was never linear.">
+      <div className="container py-16 md:hidden">
+        <div className="border-b border-black/15 pb-7">
+          <p className="eyebrow !text-black/45">Entrepreneurial experience</p>
+          <h2 className="section-title mt-6">
+            The climb was<br />never linear.
+          </h2>
+          <div className="mt-6 flex items-center justify-between font-mono text-sm uppercase tracking-[.1em] text-black/45">
+            <span>2009 — Today</span>
+            <span>{timeline.length} chapters</span>
+          </div>
+        </div>
+
+        <div className="relative mt-4">
+          <div aria-hidden className="absolute bottom-10 left-[7px] top-5 w-px bg-black/15" />
+          <motion.div
+            aria-hidden
+            className="absolute bottom-10 left-[7px] top-5 w-px origin-top bg-cyan-700"
+            style={{ scaleY: reducedMotion ? 1 : journeyProgress }}
+          />
+
+          {timeline.map((milestone, index) => (
+            <motion.article
+              key={`mobile-${milestone.year}-${milestone.title}`}
+              initial={reducedMotion ? false : { opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.32 }}
+              transition={{ duration: 0.65, delay: index === 0 ? 0 : 0.04, ease: [0.22, 1, 0.36, 1] }}
+              className="relative border-b border-black/10 py-8 pl-9 last:border-b-0 last:pb-2"
+            >
+              <motion.span
+                aria-hidden
+                initial={reducedMotion ? false : { scale: 0.55, backgroundColor: "#edf0ef" }}
+                whileInView={{ scale: 1, backgroundColor: "#008fab" }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute left-0 top-[2.3rem] size-[15px] rounded-full border-[3px] border-[#edf0ef] ring-1 ring-cyan-800/30"
+              />
+              <p className="font-mono text-sm tracking-[.12em] text-cyan-800">
+                0{index + 1} · {milestone.year}
+              </p>
+              <h3 className="mt-3 text-[clamp(2rem,9vw,2.75rem)] font-medium leading-[1.08] tracking-[-.03em]">
+                <MobileMilestoneTitle title={milestone.title} />
+              </h3>
+              <p className="mt-4 text-base leading-7 text-black/60">
+                {milestone.description}
+              </p>
+            </motion.article>
+          ))}
+        </div>
+      </div>
+
+      <div className="container hidden md:grid lg:grid-cols-[1.2fr_.8fr]">
+        <div className="self-start py-20 lg:sticky lg:top-20 lg:flex lg:min-h-[calc(100svh-5rem)] lg:flex-col lg:py-10">
           <div>
             <p className="eyebrow !text-black/45">Entrepreneurial experience</p>
-            <h2 id="journey-title" className="section-title mt-7 max-w-3xl">
+            <h2 className="section-title mt-7 max-w-3xl">
               <span className="block">The climb was</span>
               <span className="block">never linear.</span>
             </h2>
@@ -61,26 +131,26 @@ export function JourneySection() {
           </div>
 
           <div className="mt-6 flex items-end justify-between border-t border-black/15 pt-4 lg:mt-auto">
-            <div><p className="font-mono text-sm uppercase tracking-[.14em] text-black/45">Current chapter</p><p className="mt-1 text-lg">{timeline[active].year} · {timeline[active].title}</p></div>
+            <div><p className="font-mono text-sm uppercase tracking-[.14em] text-black/45">Current chapter</p><p className="mt-1 text-base md:text-lg">{timeline[active].year} · {timeline[active].title}</p></div>
             <p className="font-mono text-sm text-cyan-700">0{active + 1} / 0{timeline.length}</p>
           </div>
         </div>
 
-        <div className="border-l border-black/10 lg:pl-10">
+        <div className="border-t border-black/10 lg:border-l lg:border-t-0 lg:pl-10">
           {timeline.map((milestone, index) => (
             <article
               key={`${milestone.year}-${milestone.title}`}
               ref={(node) => { steps.current[index] = node; }}
               data-index={index}
-              className="group flex min-h-[52vh] items-center border-b border-black/10 py-16 last:border-b-0 lg:min-h-[62vh]"
+              className="group flex items-center border-b border-black/10 py-8 last:border-b-0 sm:min-h-[38vh] sm:py-12 lg:min-h-[62vh] lg:py-16"
             >
               <motion.div animate={{ opacity: active === index ? 1 : .48, x: active === index ? 0 : 16 }} transition={{ duration: .45 }} className="w-full">
                 <div className="flex items-center justify-between">
                   <p className="font-mono text-sm text-cyan-700 transition-[letter-spacing,color] duration-500 group-hover:tracking-[.08em] group-hover:text-cyan-600">{milestone.year}</p>
                   <span className={`grid size-11 place-items-center rounded-full border transition-colors ${active === index ? "border-[#091012] bg-[#091012] text-white" : "border-black/15 text-black/35"}`}><ArrowUpRight size={16} /></span>
                 </div>
-                <h3 className="mt-8 text-[clamp(2.4rem,4.6vw,5.1rem)] leading-[1.12] tracking-[-.025em] transition-[color,transform] duration-500 ease-out group-hover:translate-x-2 group-hover:text-cyan-800">{milestone.title}</h3>
-                <p className="mt-7 max-w-xl text-base leading-relaxed text-black/55 transition-[color,transform] duration-500 ease-out group-hover:translate-x-2 group-hover:text-black/75 md:text-lg">{milestone.description}</p>
+                <h3 className="mt-5 text-[clamp(2rem,9vw,5.1rem)] leading-[1.12] tracking-[-.025em] transition-[color,transform] duration-500 ease-out group-hover:translate-x-2 group-hover:text-cyan-800 md:mt-8">{milestone.title}</h3>
+                <p className="mt-4 line-clamp-2 max-w-xl text-base leading-7 text-black/60 transition-[color,transform] duration-500 ease-out group-hover:translate-x-2 group-hover:text-black/75 sm:line-clamp-none md:mt-7 md:text-lg md:leading-relaxed">{milestone.description}</p>
               </motion.div>
             </article>
           ))}

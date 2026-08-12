@@ -44,6 +44,15 @@ img { user-select:none; }
 .loader-orbit::before { content:""; position:absolute; left:11%; top:11%; width:5px; height:5px; border-radius:999px; background:#68e7ff; box-shadow:0 0 16px rgba(104,231,255,.8); }
 .loader-orbit-reverse { animation:loader-orbit-reverse 12s linear infinite; }
 .loader-orbit-reverse::after { content:""; position:absolute; bottom:5%; right:21%; width:3px; height:3px; border-radius:999px; background:rgba(255,255,255,.8); }
-@media (max-width:767px) { .container{width:min(100% - 28px,1380px)} .display{font-size:clamp(3.1rem,17vw,5.7rem)} }
-@media (pointer:fine) { .has-cursor, .has-cursor a, .has-cursor button { cursor:none; } }
+@media (max-width:767px) {
+  html { overflow-x:clip; }
+  body { font-size:16px; }
+  .container { width:min(100% - 28px,1380px); }
+  .display { font-size:clamp(3.1rem,17vw,5.7rem); }
+  .section-title { font-size:clamp(2.15rem,9.5vw,3.25rem); line-height:1.12; letter-spacing:-.03em; }
+  .eyebrow { gap:.6rem; font-size:.875rem; letter-spacing:.1em; }
+  .eyebrow::before { width:22px; }
+  .pill { min-height:48px; padding-inline:1.1rem; }
+  main > section::after { width:calc(100% - 28px); }
+}
 @media (prefers-reduced-motion:reduce) { html{scroll-behavior:auto} *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important} }

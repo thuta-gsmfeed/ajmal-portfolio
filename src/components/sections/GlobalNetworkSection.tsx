@@ -13,7 +13,7 @@ const Globe = dynamic(() => import("@/components/three/GlobeScene"), {
 
 export function GlobalNetworkSection() {
   return (
-    <section id="network" className="relative overflow-hidden py-28 md:py-40">
+    <section id="network" className="relative overflow-hidden py-20 md:py-40">
       <div className="pointer-events-none absolute left-1/2 top-[62%] size-[min(85vw,900px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-300/[.035] blur-[100px]" />
       <div className="container relative">
         <SectionTitle
@@ -22,9 +22,9 @@ export function GlobalNetworkSection() {
           body="Connecting trusted mobile phone and consumer electronics partners across Belgium, Poland, Italy, Spain, Ukraine, the Middle East, Hong Kong, and the wider European market."
         />
 
-        <div className="relative mt-10 grid min-h-[680px] place-items-center py-8 md:min-h-[780px] md:py-12">
+        <div className="relative mt-8 grid min-h-[480px] place-items-center py-4 md:mt-10 md:min-h-[780px] md:py-12">
           <div className="absolute inset-x-0 top-1/2 h-px bg-gradient-to-r from-transparent via-cyan-300/20 to-transparent" />
-          <div data-cursor="Drag" className="absolute left-1/2 top-1/2 h-[min(80vw,680px)] w-[min(88vw,680px)] -translate-x-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing">
+          <div className="absolute left-1/2 top-1/2 h-[min(92vw,470px)] w-[min(96vw,470px)] -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none active:cursor-grabbing md:h-[min(80vw,680px)] md:w-[min(88vw,680px)]">
             <Globe />
           </div>
 

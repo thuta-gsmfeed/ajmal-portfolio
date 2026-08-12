@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
 import { useRef } from "react";
-import { ArrowDown, ArrowUpRight } from "lucide-react";
+import { ArrowDown } from "lucide-react";
 import { currentVentures, media } from "@/data/content";
 
 const reveal = {
@@ -29,6 +29,7 @@ export function HeroSection() {
   const opacity = useTransform(scrollYProgress, [0, 0.78], [1, 0]);
 
   const move = (event: React.PointerEvent<HTMLElement>) => {
+    if (event.pointerType !== "mouse") return;
     const bounds = event.currentTarget.getBoundingClientRect();
     const x = (event.clientX - bounds.left) / bounds.width;
     const y = (event.clientY - bounds.top) / bounds.height;
@@ -58,14 +59,29 @@ export function HeroSection() {
       <motion.div style={{ opacity, y: contentY }} className="container relative z-10 flex min-h-[100svh] flex-col justify-end pb-10 pt-32 md:pb-12">
         <div className="mb-8 flex items-end justify-between">
           <div className="overflow-hidden">
-            <motion.p variants={reveal} initial="hidden" animate="visible" custom={1.02} className="eyebrow">Entrepreneur · Business Builder · Founder</motion.p>
+            <motion.p
+              variants={reveal}
+              initial="hidden"
+              animate="visible"
+              custom={1.02}
+              className="eyebrow whitespace-nowrap !gap-2 !text-sm !tracking-[-.02em] sm:!gap-[.6rem] sm:!tracking-[.08em] md:!gap-3 md:!tracking-[.16em]"
+            >
+              Entrepreneur · Business Builder · Founder
+            </motion.p>
           </div>
         </div>
 
         <h1 className="section-title max-w-[1320px]">
-          <span className="block"><motion.span className="block text-white/95" variants={reveal} initial="hidden" animate="visible" custom={1.08}>An innovative entrepreneur,</motion.span></span>
-          <span className="block"><motion.span className="block bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent" variants={reveal} initial="hidden" animate="visible" custom={1.2}>turning challenges into</motion.span></span>
-          <span className="block"><motion.span className="block text-white/95" variants={reveal} initial="hidden" animate="visible" custom={1.32}>impactful solutions.</motion.span></span>
+          <span className="block overflow-hidden md:hidden">
+            <motion.span className="block text-white/95" variants={reveal} initial="hidden" animate="visible" custom={1.08}>
+              An innovative <span className="bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">entrepreneur.</span>
+            </motion.span>
+          </span>
+          <span className="hidden md:block">
+            <span className="block"><motion.span className="block text-white/95" variants={reveal} initial="hidden" animate="visible" custom={1.08}>An innovative entrepreneur,</motion.span></span>
+            <span className="block"><motion.span className="block bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent" variants={reveal} initial="hidden" animate="visible" custom={1.2}>turning challenges into</motion.span></span>
+            <span className="block"><motion.span className="block text-white/95" variants={reveal} initial="hidden" animate="visible" custom={1.32}>impactful solutions.</motion.span></span>
+          </span>
         </h1>
 
         <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ delay: 1.55, duration: 1.2, ease: [0.22, 1, 0.36, 1] }} className="mt-7 h-px origin-left bg-gradient-to-r from-cyan-200/80 via-white/20 to-transparent" />
@@ -88,21 +104,15 @@ export function HeroSection() {
                   target="_blank"
                   rel="noreferrer"
                   aria-label={`Visit ${venture.name} website (opens in a new tab)`}
-                  data-cursor="Visit"
                   initial={{ opacity: 0, x: -12 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 2.08 + index * .1, duration: .65, ease: [0.22, 1, 0.36, 1] }}
-                  className="group relative flex min-h-16 items-center gap-3 overflow-hidden border-r border-white/10 px-3 py-3 transition-colors duration-500 last:border-r-0 hover:bg-white/[.06] focus-visible:z-10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-cyan-300 md:min-h-[74px] md:px-5"
+                  className="group relative flex min-h-16 items-center justify-center overflow-hidden border-r border-white/10 px-3 py-3 transition-colors duration-500 last:border-r-0 hover:bg-white/[.06] focus-visible:z-10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-cyan-300 md:min-h-[74px] md:px-5"
                 >
                   <span aria-hidden className="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-cyan-300 transition-transform duration-500 ease-out group-hover:scale-x-100 group-focus-visible:scale-x-100" />
-                  <span className="grid size-8 shrink-0 place-items-center md:size-9">
-                    <Image src={venture.logo} alt="" width={116} height={106} className="max-h-7 w-auto max-w-8 object-contain opacity-65 transition duration-500 group-hover:scale-105 group-hover:opacity-100 md:max-h-8 md:max-w-9" />
+                  <span className="grid h-10 w-full place-items-center md:h-12">
+                    <Image src={venture.logo} alt="" width={116} height={106} className="h-9 w-auto max-w-[96px] object-contain opacity-70 transition duration-500 group-hover:scale-105 group-hover:opacity-100 md:h-11 md:max-w-[124px]" />
                   </span>
-                  <span className="min-w-0">
-                    <strong className="block truncate text-sm font-medium tracking-wide text-white/75 transition-colors group-hover:text-white md:text-base">{venture.name}</strong>
-                    <span className="mt-1 hidden truncate text-sm uppercase tracking-[.1em] text-white/40 lg:block">{venture.descriptor}</span>
-                  </span>
-                  <ArrowUpRight aria-hidden size={13} className="ml-auto hidden shrink-0 text-white/30 transition duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-cyan-200 sm:block" />
                 </motion.a>
               ))}
             </div>
