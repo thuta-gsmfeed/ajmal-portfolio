@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
 import { useRef } from "react";
-import { ArrowDown, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { currentVentures, media } from "@/data/content";
 
 const reveal = {
@@ -131,9 +131,6 @@ export function HeroSection() {
         </motion.div>
       </motion.div>
 
-      <motion.a href="#about" aria-label="Scroll to About" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.1 }} className="absolute bottom-8 left-5 z-20 hidden items-center gap-3 font-mono text-sm uppercase tracking-[.14em] text-white/45 xl:flex">
-        <span className="grid size-10 place-items-center rounded-full border border-white/20"><motion.span animate={{ y: [0, 5, 0] }} transition={{ duration: 1.8, repeat: Infinity }}><ArrowDown size={13} /></motion.span></span>Scroll to explore
-      </motion.a>
     </section>
   );
 }

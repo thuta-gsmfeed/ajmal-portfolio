@@ -35,13 +35,15 @@ function BrandFinale() {
 
 export function Footer() {
   const whatsappUrl = `https://wa.me/${site.whatsapp.phone}?text=${encodeURIComponent(site.whatsapp.message)}`;
+  // Temporarily hidden; switch to true to restore the Gholzad Management Group finale.
+  const showBrandFinale = false;
 
   return (
     <footer className="relative overflow-hidden border-t border-white/10 bg-[#030506]">
       <div aria-hidden className="absolute -right-40 top-0 size-[520px] rounded-full bg-cyan-300/[.045] blur-[110px]" />
       <div aria-hidden className="hero-grid pointer-events-none absolute inset-0 opacity-10" />
 
-      <BrandFinale />
+      {showBrandFinale && <BrandFinale />}
 
       <div className="container relative z-10">
         <div className="grid gap-8 border-b border-white/10 py-12 md:grid-cols-[1fr_auto] md:items-end md:py-16 lg:py-20">

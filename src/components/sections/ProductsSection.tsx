@@ -11,6 +11,14 @@ import { ArrowUpRight, X } from "lucide-react";
 import { Product, products } from "@/data/content";
 import { CinematicLink } from "@/components/navigation/CinematicLink";
 
+const GSMFEED_APP_STORE_URL = "https://apps.apple.com/us/app/gsmfeed/id6759554515";
+const GSMFEED_APP_ASSET_ROOT = "/images/content/everything-u-need";
+const gsmfeedAppScreens = [
+  { name: "Trading Feed", image: "Tradingfeed.png" },
+  { name: "Marketplace", image: "marketplace.png" },
+  { name: "Trade Alerts", image: "Alert.png" },
+] as const;
+
 function ProductTitle({ product, className }: { product: Product; className: string }) {
   return (
     <h3 className={`flex items-center gap-4 ${className}`}>
@@ -115,7 +123,7 @@ export function ProductsSection() {
   );
 
   return (
-    <section ref={sectionRef} id="products" className="relative h-[320svh] bg-[#030506] md:h-auto lg:h-[320vh]">
+    <section ref={sectionRef} id="products" className="relative h-[270svh] bg-[#030506] md:h-auto lg:h-[260vh]">
       <div className="hidden h-screen overflow-hidden lg:sticky lg:top-0 lg:block">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_68%_55%,rgba(55,207,232,.075),transparent_34%)]" />
         <div className="hero-grid pointer-events-none absolute inset-0 opacity-15" />
@@ -352,6 +360,40 @@ function ProductModal({ product, onClose }: { product: Product; onClose: () => v
               )}
             </div>
           </div>
+
+          {product.slug === "gsmfeed" && (
+            <section className="mt-12 border-t border-white/10 pt-9 md:mt-14 md:pt-11" aria-labelledby="gsmfeed-app-title">
+              <div className="grid gap-8 lg:grid-cols-[.72fr_1.28fr] lg:items-center">
+                <div className="max-w-lg">
+                  <p className="font-mono text-sm uppercase tracking-[.14em] text-cyan-200">gsmfeed for iPhone</p>
+                  <h3 id="gsmfeed-app-title" className="mt-4 text-[clamp(2rem,4vw,3.125rem)] font-medium leading-[1.04] tracking-[-.04em]">
+                    The global market,<br />in your pocket.
+                  </h3>
+                  <p className="mt-5 text-base leading-relaxed text-white/58 md:text-lg">
+                    Follow live opportunities, verified contacts, marketplace activity, and trade alerts from one mobile workspace.
+                  </p>
+                  <a href={GSMFEED_APP_STORE_URL} target="_blank" rel="noreferrer" className="pill mt-7 bg-white text-black hover:!bg-cyan-100">
+                    View on the App Store <ArrowUpRight size={15} />
+                  </a>
+                </div>
+
+                <div className="-mx-6 overflow-x-auto px-6 pb-3 pt-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:-mx-10 md:px-10 lg:mx-0 lg:px-0">
+                  <div className="flex w-max gap-4 lg:w-full lg:justify-end">
+                    {gsmfeedAppScreens.map((screen, index) => (
+                      <figure key={screen.name} className={`w-[158px] shrink-0 ${index === 1 ? "lg:-translate-y-5" : ""} md:w-[190px]`}>
+                        <div className="relative aspect-[.49/1] overflow-hidden rounded-[2rem] border-[6px] border-black bg-black shadow-[0_26px_65px_rgba(0,0,0,.42)]">
+                          <span className="absolute left-1/2 top-1.5 z-10 h-4 w-16 -translate-x-1/2 rounded-full bg-black" />
+                          <Image src={`${GSMFEED_APP_ASSET_ROOT}/${screen.image}`} alt={`gsmfeed ${screen.name} mobile screen`} fill sizes="190px" className="object-cover" />
+                          <span className="pointer-events-none absolute inset-0 rounded-[1.65rem] ring-1 ring-inset ring-white/15" />
+                        </div>
+                        <figcaption className="mt-3 text-center font-mono text-[11px] uppercase tracking-[.12em] text-white/45">{screen.name}</figcaption>
+                      </figure>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
         </div>
       </motion.div>
     </motion.div>,

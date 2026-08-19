@@ -122,7 +122,7 @@ export function DubaiYachtSection() {
     <section
       ref={section}
       id="yachts"
-      className={`relative bg-[#02070a] ${reducedMotion ? "min-h-[110svh] lg:min-h-screen" : "h-[280svh] lg:h-[330vh]"}`}
+      className={`relative bg-[#02070a] ${reducedMotion ? "min-h-[110svh] lg:min-h-screen" : "h-[220svh] lg:h-[250vh]"}`}
       aria-label="Dubai Marina Yachts story"
     >
       <div ref={stage} className={`${reducedMotion ? "relative min-h-[110svh] lg:min-h-screen" : "h-svh lg:sticky lg:top-0 lg:h-screen"} overflow-hidden`}>

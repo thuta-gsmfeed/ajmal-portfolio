@@ -10,7 +10,9 @@ export function SectionTransitions() {
 
     gsap.registerPlugin(ScrollTrigger);
     const context = gsap.context(() => {
-      const sections = gsap.utils.toArray<HTMLElement>("main > section");
+      const sections = gsap.utils
+        .toArray<HTMLElement>("main > section")
+        .filter((section) => !section.hasAttribute("data-no-section-transition"));
 
       sections.slice(1).forEach((section) => {
         gsap.fromTo(

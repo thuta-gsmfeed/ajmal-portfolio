@@ -56,7 +56,6 @@ export function Header() {
             </a>
 
             <nav aria-label="Primary" className="hidden items-center gap-7 lg:flex">
-              {nav.slice(0, -1).map(([label, id]) => <a className="nav-link" href={`#${id}`} onClick={(event) => scrollToSection(event, id)} key={id}>{label}</a>)}
               <a className="pill !min-h-10 text-xs" href="#contact" onClick={(event) => scrollToSection(event, "contact")}>Let&apos;s talk</a>
             </nav>
 

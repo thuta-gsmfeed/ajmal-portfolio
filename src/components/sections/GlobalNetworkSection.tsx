@@ -1,10 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
-import { globalLocations, routes } from "@/data/content";
+import { globalLocations, partners, routes } from "@/data/content";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 
 const Globe = dynamic(() => import("@/components/three/GlobeScene"), {
@@ -71,6 +72,24 @@ export function GlobalNetworkSection() {
               </motion.aside>
             )}
           </AnimatePresence>
+        </div>
+
+        <div className="mt-10 border-y border-white/10 py-5 md:mt-14 md:py-7" aria-label="Trusted global partners">
+          <div className="mb-5 flex items-center justify-between gap-4 md:mb-7">
+            <p className="eyebrow">Trusted partnerships</p>
+            <p className="hidden font-mono text-sm uppercase tracking-[.12em] text-white/35 sm:block">Built across markets</p>
+          </div>
+          <div className="marquee -mx-4 overflow-hidden sm:-mx-6 lg:-mx-8">
+            <div className="marquee-track flex w-max">
+              {[...partners, ...partners].map((partner, index) => (
+                <div key={`${partner.name}-${index}`} className="group flex h-20 w-44 shrink-0 items-center justify-center border-r border-white/10 px-7 md:h-24 md:w-56 md:px-9">
+                  <div className="relative h-9 w-full opacity-55 grayscale transition duration-500 group-hover:scale-[1.03] group-hover:opacity-100 group-hover:grayscale-0 md:h-11">
+                    <Image src={partner.logo} alt={index < partners.length ? `${partner.name} logo` : ""} fill sizes="224px" className="object-contain" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
