@@ -283,11 +283,12 @@ function ProductModal({ product, onClose }: { product: Product; onClose: () => v
         role="dialog"
         aria-modal="true"
         aria-label={`${product.name} overview`}
+        data-lenis-prevent
         initial={{ opacity: 0, y: 36, scale: 0.975 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 20, scale: 0.98 }}
         onClick={(event) => event.stopPropagation()}
-        className="relative max-h-[92vh] w-full max-w-6xl overflow-y-auto rounded-[1.5rem] border border-white/15 bg-[#090c0e] shadow-2xl"
+        className="relative max-h-[92dvh] w-full max-w-6xl touch-pan-y overflow-y-auto overscroll-contain rounded-[1.5rem] border border-white/15 bg-[#090c0e] shadow-2xl [scrollbar-gutter:stable]"
       >
         <button
           onClick={onClose}

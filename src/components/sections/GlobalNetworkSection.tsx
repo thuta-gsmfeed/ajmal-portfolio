@@ -37,8 +37,9 @@ export function GlobalNetworkSection() {
       <div className="container relative">
         <SectionTitle
           kicker="International distribution network"
-          title="Connecting Mobile Markets Worldwide."
+          title={<><span className="block">Connecting Mobile</span><span className="block">Markets Worldwide.</span></>}
           body="Connecting trusted mobile phone and consumer electronics partners across Belgium, Poland, Italy, Spain, Ukraine, the Middle East, Hong Kong, and the wider European market."
+          bodyClassName="!max-w-4xl"
         />
 
         <div className="relative mt-8 grid min-h-[480px] place-items-center py-4 md:mt-10 md:min-h-[780px] md:py-12">
