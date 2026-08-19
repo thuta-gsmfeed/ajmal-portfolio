@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { SoundProvider } from "@/components/audio/SoundSystem";
 
 export const viewport: Viewport = {
   themeColor: "#030506",
@@ -49,10 +50,10 @@ export const metadata: Metadata = {
     siteName: "Ajmal Gholzad Official Portfolio",
     images: [
       {
-        url: "/images/banner/gholzad-banner.png",
+        url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "Ajmal Gholzad — Global Portfolio Banner",
+        alt: "Ajmal Gholzad — Entrepreneur and Technology Founder",
       },
     ],
     locale: "en_US",
@@ -63,7 +64,7 @@ export const metadata: Metadata = {
     title: "Ajmal Gholzad — Innovative Entrepreneur & Technology Founder",
     description:
       "An innovative entrepreneur, turning challenges into impactful solutions across global markets.",
-    images: ["/images/banner/gholzad-banner.png"],
+    images: ["/og.png"],
   },
   robots: {
     index: true,
@@ -117,7 +118,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body>{children}</body>
+      <body><SoundProvider>{children}</SoundProvider></body>
     </html>
   );
 }

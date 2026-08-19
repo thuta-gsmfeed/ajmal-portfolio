@@ -1,6 +1,7 @@
 export type MediaAsset = { src: string; alt: string; replacement: string };
 export type ProductFeature = { title: string; description: string };
 export type Product = {
+  slug: string;
   name: string;
   logo: string;
   category: string;
@@ -9,14 +10,15 @@ export type Product = {
   details: string[];
   features?: ProductFeature[];
   url: string;
-  video: { webm: string; mov: string };
+  video: { webm: string; mp4: string };
   youtubeId?: string;
+  metrics: Array<{ value: string; label: string }>;
 };
 export type Venture = { category: string; title: string; period: string; description: string; image: MediaAsset };
 export type TimelineMilestone = { year: string; title: string; description: string };
 export type Partner = { name: string; logo: string };
 export type GlobalRoute = { from: [number, number]; to: [number, number]; label: string };
-export type GlobalLocation = { name: string; coordinates: [number, number]; labelOffset?: [number, number]; showLabel?: boolean };
+export type GlobalLocation = { name: string; coordinates: [number, number]; focus: string; description: string; labelOffset?: [number, number]; showLabel?: boolean };
 export type CurrentVenture = { name: string; url: string; logo: string };
 
 export const site = {
@@ -28,7 +30,7 @@ export const site = {
     message: "Hello, I am interested to have business with you",
   },
   location: "Global · Dubai", // Replace with confirmed business location.
-  linkedin: "https://www.linkedin.com/", // Replace with Ajmal's profile.
+  linkedin: null as string | null,
   availability: "Open to select global partnerships",
 };
 
@@ -38,8 +40,8 @@ export const nav = [
 ] as const;
 
 export const media = {
-  hero: { src: "/images/banner/gholzad-banner.png", alt: "Gholzad Banner", replacement: "Custom Gholzad Banner Image." },
-  portrait: { src: "/images/about/about.JPG", alt: "Ajmal Gholzad", replacement: "Ajmal Gholzad Portrait Image." },
+  hero: { src: "/images/banner/gholzad-banner.webp", alt: "Ajmal Gholzad in Dubai", replacement: "Verified Ajmal Gholzad portfolio banner." },
+  portrait: { src: "/images/about/about.webp", alt: "Ajmal Gholzad", replacement: "Verified Ajmal Gholzad portrait." },
   manifesto: { src: "https://images.unsplash.com/photo-1517976547714-720226b864c1?auto=format&fit=crop&w=2200&q=80", alt: "Earth viewed from space", replacement: "Replace with subtle global-network background, 2200×1400." },
 } satisfies Record<string, MediaAsset>;
 
@@ -68,6 +70,7 @@ export const ventures: Venture[] = [
 
 export const products: Product[] = [
   {
+    slug: "gsmfeed",
     name: "gsmfeed",
     logo: "/images/logo/gsmfeed-logo.svg",
     category: "Global Electronics Marketplace",
@@ -84,10 +87,16 @@ export const products: Product[] = [
       { title: "Trade Alerts", description: "Automated notifications through WhatsApp" },
     ],
     url: "https://gsmfeed.com/",
-    video: { webm: "/images/content/gsmfeed.WEBM", mov: "/images/content/gsmfeed.mov" },
+    video: { webm: "/images/content/gsmfeed.WEBM", mp4: "/images/content/gsmfeed.mp4" },
     youtubeId: "3nHuIYHbQxk",
+    metrics: [
+      { value: "170+", label: "Leading brands" },
+      { value: "150K", label: "Verified leads" },
+      { value: "145+", label: "Countries represented" },
+    ],
   },
   {
+    slug: "projectmix",
     name: "Projectmix",
     logo: "/images/logo/projectmix-logo.svg",
     category: "Trading ERP & Automation",
@@ -99,10 +108,16 @@ export const products: Product[] = [
       "Supercharge your trading business with automation, machine learning, and autopilot capabilities, all seamlessly embedded in our powerful Projectmix software.",
     ],
     url: "https://projectmix.ai/",
-    video: { webm: "/images/content/projectmix.WEBM", mov: "/images/content/projectmix.mov" },
+    video: { webm: "/images/content/projectmix.WEBM", mp4: "/images/content/projectmix.mp4" },
     youtubeId: "BXFt-ehckd0",
+    metrics: [
+      { value: "All-in-one", label: "Trading operations" },
+      { value: "KYC", label: "Customer workflows" },
+      { value: "AI", label: "Automation layer" },
+    ],
   },
   {
+    slug: "coolmix",
     name: "Coolmix",
     logo: "/images/logo/coolmix-logo.svg",
     category: "Apple Device Distribution",
@@ -113,8 +128,13 @@ export const products: Product[] = [
       "Recognized as one of the most trusted European distributors, Coolmix® proudly participates in key exhibitions and events across multiple countries, showcasing our commitment to quality and reliability.",
     ],
     url: "https://coolmix.eu/",
-    video: { webm: "/images/content/coolmix.WEBM", mov: "/images/content/Coolmix.mov" },
+    video: { webm: "/images/content/coolmix.WEBM", mp4: "/images/content/coolmix.mp4" },
     youtubeId: "ruvEDGUYbY8",
+    metrics: [
+      { value: "10+", label: "Years of experience" },
+      { value: "Apple", label: "Device specialization" },
+      { value: "Europe", label: "Distribution network" },
+    ],
   },
 ];
 
@@ -128,14 +148,14 @@ export const partners: Partner[] = [
 ];
 
 export const globalLocations: GlobalLocation[] = [
-  { name: "Europe", coordinates: [50.11, 8.68], showLabel: false },
-  { name: "Belgium", coordinates: [50.85, 4.35], labelOffset: [-10, -20] },
-  { name: "Poland", coordinates: [52.23, 21.01], labelOffset: [0, -24] },
-  { name: "Italy", coordinates: [41.9, 12.5], labelOffset: [6, 16] },
-  { name: "Spain", coordinates: [40.42, -3.7], labelOffset: [-8, 14] },
-  { name: "Ukraine", coordinates: [50.45, 30.52], labelOffset: [10, -20] },
-  { name: "Middle East", coordinates: [25.2, 55.27], labelOffset: [12, -16] },
-  { name: "Hong Kong", coordinates: [22.32, 114.17], labelOffset: [12, -16] },
+  { name: "Europe", coordinates: [50.11, 8.68], focus: "Regional network", description: "A connected base for long-term mobile phone and consumer-electronics relationships across the wider European market.", showLabel: false },
+  { name: "Belgium", coordinates: [50.85, 4.35], focus: "European connection", description: "Part of the trusted European network connecting products, partners, and cross-market opportunities.", labelOffset: [-10, -20] },
+  { name: "Poland", coordinates: [52.23, 21.01], focus: "European connection", description: "A key point in the wider network of established mobile and consumer-electronics market relationships.", labelOffset: [0, -24] },
+  { name: "Italy", coordinates: [41.9, 12.5], focus: "Southern Europe", description: "A relationship-led market connection extending the distribution network across Southern Europe.", labelOffset: [6, 16] },
+  { name: "Spain", coordinates: [40.42, -3.7], focus: "Southern Europe", description: "A connected European market supported by trusted commercial relationships and international reach.", labelOffset: [-8, 14] },
+  { name: "Ukraine", coordinates: [50.45, 30.52], focus: "Eastern Europe", description: "An Eastern European connection within the broader network of mobile product and market relationships.", labelOffset: [10, -20] },
+  { name: "Middle East", coordinates: [25.2, 55.27], focus: "Dubai growth base", description: "A strategic base for building new technology, distribution, and partnership opportunities across the region.", labelOffset: [12, -16] },
+  { name: "Hong Kong", coordinates: [22.32, 114.17], focus: "Asian market connection", description: "A bridge into Asian mobile and consumer-electronics markets through long-term international relationships.", labelOffset: [12, -16] },
 ];
 
 export const routes: GlobalRoute[] = [

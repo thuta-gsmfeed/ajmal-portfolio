@@ -116,6 +116,9 @@ export function DubaiYachtSection() {
   return (
     <section
       ref={section}
+      id="yachts"
+      data-cursor="SCROLL"
+      data-soundscape="ocean"
       className={`relative bg-[#02070a] ${reducedMotion ? "min-h-[110svh] lg:min-h-screen" : "h-[280svh] lg:h-[330vh]"}`}
       aria-label="Dubai Marina Yachts story"
     >
@@ -124,11 +127,11 @@ export function DubaiYachtSection() {
           ref={video}
           muted
           playsInline
-          preload="auto"
+          preload="metadata"
           aria-label="A silver and black luxury yacht cruising from a side view into an aerial view"
           className="absolute inset-0 size-full object-cover"
         >
-          <source src="/videos/yachts-scroll.mp4" type="video/mp4" />
+          <source src="/videos/yachts-scroll.optimized.mp4" type="video/mp4" />
         </video>
 
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(2,7,10,.76)_0%,rgba(2,7,10,.22)_46%,transparent_70%),linear-gradient(0deg,rgba(2,7,10,.78)_0%,transparent_36%,rgba(2,7,10,.3)_100%)]" />

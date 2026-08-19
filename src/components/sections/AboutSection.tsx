@@ -1,12 +1,60 @@
 "use client";
 
 import Image from "next/image";
+import { useRef } from "react";
 import { ChevronDown } from "lucide-react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 import { media } from "@/data/content";
+import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
+
+const asciiPortrait = `01001101 01000001 01010010 01001011 01000101 01010100
+// VISION  EXECUTION  NETWORK  TECHNOLOGY //
+00110101 00110011 00110100 00110001 00110100 00111001
+BUILD::CONNECT::CREATE::MOVE::LEAD::GROW
+▓▓▒▒░░▓▓▒▒░░▓▓▒▒░░▓▓▒▒░░▓▓▒▒░░▓▓▒▒░░
+01100111 01101000 01101111 01101100 01111010 01100001 01100100`;
+
+function PortraitDecode() {
+  return (
+    <div aria-hidden className="about-ascii absolute inset-0 z-[2] overflow-hidden bg-[#030708] text-cyan-100">
+      <pre className="absolute inset-0 flex items-center whitespace-pre-wrap break-all p-5 font-mono text-[10px] leading-[1.9] tracking-[.18em] opacity-80 md:p-8 md:text-xs">{asciiPortrait.repeat(7)}</pre>
+      <div className="absolute inset-0 bg-[linear-gradient(transparent_48%,rgba(104,231,255,.16)_50%,transparent_52%)] bg-[length:100%_9px]" />
+      <div className="absolute inset-y-0 left-0 w-px bg-cyan-100 shadow-[0_0_24px_rgba(104,231,255,.9)]" />
+    </div>
+  );
+}
 
 export function AboutSection() {
+  const section = useRef<HTMLElement>(null);
+
+  useGSAP(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      gsap.set(".about-ascii", { clipPath: "inset(100% 0 0 0)" });
+      gsap.set(".about-stat", { opacity: 1, y: 0 });
+      return;
+    }
+
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: section.current,
+        start: "top 78%",
+        end: "top 24%",
+        scrub: 0.6,
+        invalidateOnRefresh: true,
+      },
+    });
+
+    timeline
+      .fromTo(".about-photo", { scale: 1.075 }, { scale: 1, duration: 1, ease: "none" }, 0)
+      .fromTo(".about-ascii", { clipPath: "inset(0% 0 0 0)" }, { clipPath: "inset(100% 0 0 0)", duration: 0.82, ease: "power2.inOut" }, 0.05)
+      .fromTo(".about-stat", { opacity: 0, y: 18 }, { opacity: 1, y: 0, stagger: 0.08, duration: 0.28, ease: "power2.out" }, 0.58);
+  }, { scope: section });
+
   return (
-    <section id="about" className="overflow-hidden py-16 md:py-40">
+    <section ref={section} id="about" className="overflow-hidden py-16 md:py-40">
       <div className="container md:hidden">
         <p className="eyebrow mb-5">About me</p>
 
@@ -17,21 +65,22 @@ export function AboutSection() {
               alt={media.portrait.alt}
               fill
               sizes="calc(100vw - 28px)"
-              className="object-cover object-top"
+              className="about-photo object-cover object-top"
             />
+            <PortraitDecode />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
             <div aria-hidden className="absolute -right-12 -top-12 size-40 rounded-full bg-cyan-300/10 blur-3xl" />
 
             <div className="absolute inset-x-3 bottom-3 grid grid-cols-3 divide-x divide-white/10 rounded-xl border border-white/10 bg-black/45 px-2 py-3 backdrop-blur-md">
-              <div className="text-center">
-                <strong className="block text-base font-medium text-white">15+</strong>
+              <div className="about-stat text-center">
+                <strong className="block text-base font-medium text-white"><AnimatedCounter value={15} suffix="+" /></strong>
                 <span className="mt-0.5 block font-mono text-sm uppercase tracking-[.04em] text-white/50">Years</span>
               </div>
-              <div className="text-center">
-                <strong className="block text-base font-medium text-cyan-100">$100M+</strong>
+              <div className="about-stat text-center">
+                <strong className="block text-base font-medium text-cyan-100">$<AnimatedCounter value={100} suffix="M+" /></strong>
                 <span className="mt-0.5 block font-mono text-sm uppercase tracking-[.04em] text-white/50">Sales</span>
               </div>
-              <div className="text-center">
+              <div className="about-stat text-center">
                 <strong className="block text-base font-medium text-white">Global</strong>
                 <span className="mt-0.5 block font-mono text-sm uppercase tracking-[.04em] text-white/50">Network</span>
               </div>
@@ -94,9 +143,15 @@ export function AboutSection() {
               alt={media.portrait.alt}
               fill
               sizes="(max-width:1024px) 100vw, 42vw"
-              className="object-cover transition-transform duration-700 hover:scale-105"
+              className="about-photo object-cover"
             />
+            <PortraitDecode />
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+            <div className="absolute inset-x-3 bottom-3 z-10 grid grid-cols-3 divide-x divide-white/10 rounded-xl border border-white/10 bg-black/50 px-2 py-3 backdrop-blur-md">
+              <div className="about-stat text-center"><strong className="block text-base font-medium text-white"><AnimatedCounter value={15} suffix="+" /></strong><span className="mt-0.5 block font-mono text-sm uppercase text-white/45">Years</span></div>
+              <div className="about-stat text-center"><strong className="block text-base font-medium text-cyan-100">$<AnimatedCounter value={100} suffix="M+" /></strong><span className="mt-0.5 block font-mono text-sm uppercase text-white/45">Sales</span></div>
+              <div className="about-stat text-center"><strong className="block text-base font-medium text-white">Global</strong><span className="mt-0.5 block font-mono text-sm uppercase text-white/45">Network</span></div>
+            </div>
           </div>
         </div>
 

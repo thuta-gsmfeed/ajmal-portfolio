@@ -45,7 +45,7 @@ export function GsmfeedMobileSection() {
   const selected = features[active];
 
   return (
-    <section className="relative overflow-hidden bg-[#f1f2f7] py-16 text-[#090d10] md:py-40" aria-labelledby="gsmfeed-mobile-title">
+    <section id="gsmfeed-app" className="relative overflow-hidden bg-[#f1f2f7] py-16 text-[#090d10] md:py-40" aria-labelledby="gsmfeed-mobile-title">
       <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_76%_45%,rgba(55,96,255,.085),transparent_30%)]" />
       <div aria-hidden className="absolute -right-[12vw] -top-32 hidden h-80 w-[62vw] rotate-[13deg] bg-white/65 md:block" />
 
@@ -158,20 +158,45 @@ export function GsmfeedMobileSection() {
             <div className="mt-10"><AppStoreButton /></div>
           </div>
 
-          <div className="relative flex min-h-[540px] items-center justify-center md:min-h-[680px]" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+          <div data-cursor="SWIPE" className="relative flex min-h-[540px] items-center justify-center [perspective:1200px] md:min-h-[680px]" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
             <div aria-hidden className="absolute size-[390px] rounded-full border border-black/[.07] md:size-[540px]" />
             <div aria-hidden className="absolute size-[320px] rounded-full border border-[#3d68ff]/15 md:size-[410px]" />
             <div aria-hidden className="absolute bottom-12 left-1/2 h-16 w-72 -translate-x-1/2 rounded-[50%] bg-[#13204e]/20 blur-2xl" />
 
-            <motion.div animate={reducedMotion ? undefined : { rotate: active % 2 === 0 ? -1 : 1, y: active % 2 === 0 ? -4 : 4 }} transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }} className="relative h-[510px] w-[249px] overflow-hidden rounded-[2.75rem] border-[8px] border-[#090c0e] bg-black shadow-[0_45px_100px_rgba(20,31,71,.24)] md:h-[610px] md:w-[298px] md:rounded-[3.25rem] md:border-[9px]">
-              <div className="absolute left-1/2 top-2 z-20 h-5 w-20 -translate-x-1/2 rounded-full bg-black" />
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.div key={selected.image} initial={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 1.025, y: 14 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.985, y: -10 }} transition={{ duration: reducedMotion ? 0.15 : 0.58, ease: [0.22, 1, 0.36, 1] }} className="absolute inset-0">
-                  <Image src={`${ASSET_ROOT}/${selected.image}`} alt={`gsmfeed — ${selected.name}`} fill sizes="(max-width: 767px) 249px, 298px" className="object-cover" priority={active === 0} />
-                </motion.div>
-              </AnimatePresence>
-              <div aria-hidden className="pointer-events-none absolute inset-0 z-10 rounded-[2.7rem] ring-1 ring-inset ring-white/15" />
-            </motion.div>
+            <div className="relative h-[510px] w-[249px] md:h-[610px] md:w-[298px]">
+              {features.map((feature, index) => {
+                const rawDelta = (index - active + features.length) % features.length;
+                const delta = rawDelta > features.length / 2 ? rawDelta - features.length : rawDelta;
+                const nearby = Math.abs(delta) <= 1;
+                const isActive = delta === 0;
+
+                return (
+                  <motion.button
+                    type="button"
+                    key={feature.name}
+                    aria-label={isActive ? `${feature.name} selected` : `Show ${feature.name}`}
+                    aria-pressed={isActive}
+                    onClick={() => setActive(index)}
+                    initial={false}
+                    animate={reducedMotion ? { opacity: isActive ? 1 : 0 } : {
+                      x: delta * 176,
+                      y: isActive ? 0 : 34,
+                      rotateY: delta * -17,
+                      rotateZ: delta * 3.5,
+                      scale: isActive ? 1 : 0.78,
+                      opacity: nearby ? (isActive ? 1 : 0.46) : 0,
+                    }}
+                    transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+                    style={{ zIndex: isActive ? 20 : nearby ? 10 : 0, pointerEvents: nearby ? "auto" : "none" }}
+                    className="absolute inset-0 overflow-hidden rounded-[2.75rem] border-[8px] border-[#090c0e] bg-black text-left shadow-[0_45px_100px_rgba(20,31,71,.24)] md:rounded-[3.25rem] md:border-[9px]"
+                  >
+                    <span className="absolute left-1/2 top-2 z-20 h-5 w-20 -translate-x-1/2 rounded-full bg-black" />
+                    <Image src={`${ASSET_ROOT}/${feature.image}`} alt={`gsmfeed — ${feature.name}`} fill sizes="298px" className="object-cover" priority={index === 0} />
+                    <span aria-hidden className="pointer-events-none absolute inset-0 z-10 rounded-[2.7rem] ring-1 ring-inset ring-white/15" />
+                  </motion.button>
+                );
+              })}
+            </div>
 
             <AnimatePresence mode="wait" initial={false}>
               <motion.div key={selected.name} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }} className="absolute bottom-4 right-0 hidden border-l border-black/15 pl-4 xl:block">

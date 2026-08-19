@@ -1,14 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { ArrowUpRight, X } from "lucide-react";
 import { Product, products } from "@/data/content";
+import { CinematicLink } from "@/components/navigation/CinematicLink";
 
 function ProductTitle({ product, className }: { product: Product; className: string }) {
   return (
@@ -58,7 +59,7 @@ function ProductPreview({ product, compact = false }: { product: Product; compac
         className={`w-full object-cover ${compact ? "aspect-[16/10]" : "aspect-video"}`}
       >
         <source src={product.video.webm} type="video/webm" />
-        <source src={product.video.mov} type="video/quicktime" />
+        <source src={product.video.mp4} type="video/mp4" />
       </video>
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-cyan-200/[.08]" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/80 to-transparent px-4 pb-3 pt-10 font-mono text-sm uppercase tracking-[.12em] text-white/55">
@@ -66,6 +67,24 @@ function ProductPreview({ product, compact = false }: { product: Product; compac
         <span>Live product</span>
       </div>
     </div>
+  );
+}
+
+function DepthProductSlide({ progress, index, total, children }: { progress: MotionValue<number>; index: number; total: number; children: ReactNode }) {
+  const center = total <= 1 ? 0 : index / (total - 1);
+  const range = 0.42;
+  const input = index === 0 ? [0, range] : index === total - 1 ? [1 - range, 1] : [center - range, center, center + range];
+  const scale = useTransform(progress, input, index === 0 ? [1, 0.9] : index === total - 1 ? [0.9, 1] : [0.9, 1, 0.9]);
+  const rotateY = useTransform(progress, input, index === 0 ? [0, -8] : index === total - 1 ? [8, 0] : [8, 0, -8]);
+  const opacity = useTransform(progress, input, index === 0 ? [1, 0.56] : index === total - 1 ? [0.56, 1] : [0.56, 1, 0.56]);
+
+  return (
+    <motion.article
+      style={{ scale, rotateY, opacity, transformPerspective: 1200 }}
+      className="flex h-full w-screen shrink-0 items-center px-[max(24px,calc((100vw-1380px)/2))] pb-28 will-change-transform"
+    >
+      {children}
+    </motion.article>
   );
 }
 
@@ -119,10 +138,7 @@ export function ProductsSection() {
           className="flex h-full pt-[220px]"
         >
           {products.map((product, index) => (
-            <article
-              key={product.name}
-              className="flex h-full w-screen shrink-0 items-center px-[max(24px,calc((100vw-1380px)/2))] pb-28"
-            >
+            <DepthProductSlide key={product.name} progress={scrollYProgress} index={index} total={products.length}>
               <div className="grid w-full grid-cols-[.82fr_1.18fr] items-center gap-10 xl:gap-16">
                 <div className="max-w-xl">
                   <div className="flex items-center gap-4 font-mono text-sm uppercase tracking-[.14em] text-cyan-200">
@@ -144,6 +160,7 @@ export function ProductsSection() {
 
                 <motion.button
                   type="button"
+                  data-cursor="VIEW"
                   onClick={() => setSelected(product)}
                   whileHover={{ scale: 1.012 }}
                   transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
@@ -154,7 +171,7 @@ export function ProductsSection() {
                   <ProductPreview product={product} />
                 </motion.button>
               </div>
-            </article>
+            </DepthProductSlide>
           ))}
         </motion.div>
 
@@ -190,6 +207,7 @@ export function ProductsSection() {
                 <ProductTitle product={product} className="text-[2.15rem] font-medium leading-[1.06] tracking-[.01em]" />
                 <button
                   onClick={() => setSelected(product)}
+                  data-cursor="VIEW"
                   className="relative mt-5 block w-full text-left"
                   aria-label={`Read more about ${product.name}`}
                 >
@@ -219,6 +237,7 @@ export function ProductsSection() {
               <p className="mt-4 text-base leading-relaxed text-white/75 md:text-xl md:leading-snug">{product.tagline}</p>
               <button
                 onClick={() => setSelected(product)}
+                data-cursor="VIEW"
                 className="relative mt-6 block w-full text-left sm:mt-7"
                 aria-label={`Read more about ${product.name}`}
               >
@@ -304,9 +323,14 @@ function ProductModal({ product, onClose }: { product: Product; onClose: () => v
                 </div>
               )}
 
-              <a href={product.url} target="_blank" rel="noreferrer" className="pill mt-9">
-                Visit website <ArrowUpRight size={15} />
-              </a>
+              <div className="mt-9 flex flex-wrap gap-3">
+                <CinematicLink href={`/work/${product.slug}`} className="pill bg-white text-black hover:!bg-cyan-100">
+                  Explore case study <ArrowUpRight size={15} />
+                </CinematicLink>
+                <a href={product.url} target="_blank" rel="noreferrer" className="pill">
+                  Visit website <ArrowUpRight size={15} />
+                </a>
+              </div>
             </div>
 
             <div className="lg:sticky lg:top-8 lg:h-fit">

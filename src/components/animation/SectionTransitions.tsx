@@ -16,17 +16,17 @@ export function SectionTransitions() {
         gsap.fromTo(
           section,
           {
-            opacity: 0.48,
-            filter: "blur(10px)",
+            opacity: 0.7,
+            y: 34,
           },
           {
             opacity: 1,
-            filter: "blur(0px)",
+            y: 0,
             ease: "none",
             scrollTrigger: {
               trigger: section,
               start: "top 96%",
-              end: "top 68%",
+              end: "top 72%",
               scrub: 0.65,
               invalidateOnRefresh: true,
             },

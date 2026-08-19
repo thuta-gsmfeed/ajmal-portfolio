@@ -1,11 +1,37 @@
+"use client";
+
 import Image from "next/image";
-import { ArrowUp, ArrowUpRight, Linkedin, Mail, MapPin, MessageCircle } from "lucide-react";
+import { ArrowUp, ArrowUpRight, Mail, MapPin, MessageCircle } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 import { nav, site } from "@/data/content";
 
 const contactLinks = [
   { label: "Email", value: site.email, href: `mailto:${site.email}`, icon: Mail, external: false },
-  { label: "LinkedIn", value: "Connect professionally", href: site.linkedin, icon: Linkedin, external: true },
 ] as const;
+
+const logoPath = "M62.093,6.183c-.025.882,0,3.758,0,3.758h2.04V6.183s-.194-2.113-3.37-3.068A2.982,2.982,0,0,0,57.85,0H44.543s-3.289-.088-3.289,3.147a3.352,3.352,0,0,0-3.142,3.036l.028,13.793c0,2.286,3.21,3.028,3.21,3.028a3.126,3.126,0,0,0,3.16,3.176H57.831c2.822,0,3.2-3.2,3.2-3.2,3-.55,3.1-2.876,3.1-2.876V12.312H51.1v2.039h4.786v3.435h-9.54V8.215h9.46V9.979h2.037v-3.8H44.3l-.01,13.634H57.927v-5.5h1.035v6.6H43.294L43.287,5.156H58.971l0,4.784h2.04V5.156s1.068.253,1.078,1.027M41.24,20.908c-1.074.06-1.074-1.1-1.074-1.1V6.183A1.106,1.106,0,0,1,41.24,5.156V20.908Zm19.781-6.6h1.072v5.5a1.465,1.465,0,0,1-1.072,1.1Zm-2.049,8.643c-.125.794-1.121,1.007-1.121,1.007H44.285a1.393,1.393,0,0,1-.99-1.019ZM43.294,3.115s.032-1.074.99-1.074H57.851a1.17,1.17,0,0,1,1.121,1.074Z";
+
+function BrandFinale() {
+  const reducedMotion = useReducedMotion();
+  return (
+    <section aria-label="Gholzad Management Group" className="relative flex min-h-[68svh] items-center overflow-hidden border-b border-white/10 py-20">
+      <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(104,231,255,.09),transparent_42%)]" />
+      <div className="hero-grid absolute inset-0 opacity-15" />
+      <div className="grain" />
+      <div className="container relative z-10 grid place-items-center text-center">
+        <motion.svg viewBox="0 0 26.021 26.18" className="h-[clamp(140px,24vw,300px)] w-auto overflow-visible" initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.55 }}>
+          <motion.path d={logoPath} transform="translate(-38.112 0)" fill="none" stroke="#9aeeff" strokeWidth=".16" strokeLinecap="round" strokeLinejoin="round" variants={{ hidden: { pathLength: reducedMotion ? 1 : 0, opacity: 0.2 }, visible: { pathLength: 1, opacity: 1 } }} transition={{ pathLength: { duration: reducedMotion ? 0.01 : 2.2, ease: [0.22, 1, 0.36, 1] }, opacity: { duration: 0.4 } }} />
+          <motion.path d={logoPath} transform="translate(-38.112 0)" fill="#f3f6f7" variants={{ hidden: { opacity: 0 }, visible: { opacity: 0.94 } }} transition={{ delay: reducedMotion ? 0 : 1.45, duration: 0.85 }} />
+        </motion.svg>
+        <motion.div initial={reducedMotion ? false : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.7 }} transition={{ delay: reducedMotion ? 0 : 1.1, duration: 0.9, ease: [0.22, 1, 0.36, 1] }} className="mt-10">
+          <p className="font-mono text-[10px] uppercase tracking-[.35em] text-cyan-100/65 md:text-xs">Vision · Trust · Consistency · Execution</p>
+          <h2 className="mt-5 text-[clamp(2.8rem,7vw,7.5rem)] font-medium leading-[.92] tracking-[-.055em]">Building what<br /><span className="text-cyan-100">comes next.</span></h2>
+        </motion.div>
+        <motion.div aria-hidden initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }} transition={{ delay: reducedMotion ? 0 : 1.55, duration: 1.2 }} className="mt-12 h-px w-[min(560px,76vw)] origin-center bg-gradient-to-r from-transparent via-cyan-200/75 to-transparent" />
+      </div>
+    </section>
+  );
+}
 
 export function Footer() {
   const whatsappUrl = `https://wa.me/${site.whatsapp.phone}?text=${encodeURIComponent(site.whatsapp.message)}`;
@@ -14,6 +40,8 @@ export function Footer() {
     <footer className="relative overflow-hidden border-t border-white/10 bg-[#030506]">
       <div aria-hidden className="absolute -right-40 top-0 size-[520px] rounded-full bg-cyan-300/[.045] blur-[110px]" />
       <div aria-hidden className="hero-grid pointer-events-none absolute inset-0 opacity-10" />
+
+      <BrandFinale />
 
       <div className="container relative z-10">
         <div className="grid gap-8 border-b border-white/10 py-12 md:grid-cols-[1fr_auto] md:items-end md:py-16 lg:py-20">

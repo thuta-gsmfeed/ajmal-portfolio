@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
 import { useRef } from "react";
-import { ArrowDown } from "lucide-react";
+import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { currentVentures, media } from "@/data/content";
 
 const reveal = {
@@ -69,6 +69,17 @@ export function HeroSection() {
               Entrepreneur · Business Builder · Founder
             </motion.p>
           </div>
+          <motion.a
+            data-cursor="EXPLORE"
+            href="#journey"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.75, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="hero-reveal-cta group hidden items-center gap-3 md:inline-flex"
+          >
+            <span className="hero-reveal-cta__text font-mono text-sm uppercase tracking-[.12em] text-white/60">Explore the journey</span>
+            <span className="grid size-12 place-items-center rounded-full border border-white/25 bg-black/25 backdrop-blur-sm transition-transform duration-500 group-hover:rotate-45 group-hover:bg-white group-hover:text-black"><ArrowUpRight size={16} /></span>
+          </motion.a>
         </div>
 
         <h1 className="section-title max-w-[1320px]">

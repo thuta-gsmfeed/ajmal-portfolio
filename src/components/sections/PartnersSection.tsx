@@ -4,12 +4,16 @@ import { partners } from "@/data/content";
 function Row({ reverse = false }: { reverse?: boolean }) {
   const repeated = [...partners, ...partners];
   return (
-    <div className="marquee overflow-hidden border-t border-white/10">
+    <div className="marquee overflow-hidden border-t border-white/10 py-6 [perspective:1000px]">
       <div className="marquee-track flex" style={reverse ? { animationDirection: "reverse" } : undefined}>
-        {repeated.map((partner, index) => (
-          <div
+        {repeated.map((partner, index) => {
+          const position = index % partners.length;
+          const center = (partners.length - 1) / 2;
+          const distance = Math.abs(position - center) / Math.max(1, center);
+          return <div
             key={`${partner.name}-${index}`}
-            className="group flex h-24 w-48 shrink-0 items-center justify-center border-r border-white/10 bg-white/[.012] px-6 transition duration-500 hover:bg-white/[.055] md:h-32 md:w-64 md:px-8"
+            style={{ transform: `translateY(${Math.round(distance * 18)}px) rotateZ(${(position - center) * 0.45}deg)` }}
+            className="partner-tile group flex h-24 w-48 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/[.018] px-6 transition duration-500 hover:bg-white/[.06] md:h-32 md:w-64 md:px-8"
           >
             <div className="relative h-10 w-full opacity-70 grayscale transition duration-500 group-hover:scale-[1.04] group-hover:opacity-100 group-hover:grayscale-0 md:h-12 md:opacity-55">
               <Image
@@ -20,8 +24,8 @@ function Row({ reverse = false }: { reverse?: boolean }) {
                 className="object-contain"
               />
             </div>
-          </div>
-        ))}
+          </div>;
+        })}
       </div>
     </div>
   );

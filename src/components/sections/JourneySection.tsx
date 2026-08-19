@@ -47,7 +47,7 @@ export function JourneySection() {
   const progress = active / (timeline.length - 1);
 
   return (
-    <section ref={section} className="relative border-y border-black/10 bg-[#edf0ef] text-[#091012]" aria-label="Entrepreneurial experience: The climb was never linear.">
+    <section ref={section} id="journey" className="relative border-y border-black/10 bg-[#edf0ef] text-[#091012]" aria-label="Entrepreneurial experience: The climb was never linear.">
       <div className="container py-16 md:hidden">
         <div className="border-b border-black/15 pb-7">
           <p className="eyebrow !text-black/45">Entrepreneurial experience</p>
@@ -142,9 +142,20 @@ export function JourneySection() {
               key={`${milestone.year}-${milestone.title}`}
               ref={(node) => { steps.current[index] = node; }}
               data-index={index}
+              data-cursor="CHAPTER"
               className="group flex items-center border-b border-black/10 py-8 last:border-b-0 sm:min-h-[38vh] sm:py-12 lg:min-h-[62vh] lg:py-16"
             >
-              <motion.div animate={{ opacity: active === index ? 1 : .48, x: active === index ? 0 : 16 }} transition={{ duration: .45 }} className="w-full">
+              <motion.div
+                animate={{
+                  opacity: active === index ? 1 : 0.5,
+                  x: active === index ? 0 : 16,
+                  rotate: active === index ? 0 : index % 2 === 0 ? -1.15 : 1.15,
+                  scale: active === index ? 1 : 0.965,
+                }}
+                transition={{ duration: .52, ease: [0.22, 1, 0.36, 1] }}
+                className="relative w-full rounded-[1.75rem] border border-black/10 bg-white/55 p-6 shadow-[0_24px_70px_rgba(9,16,18,.08)] backdrop-blur-sm md:p-8"
+              >
+                <span aria-hidden className="absolute left-1/2 top-0 h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full border-[7px] border-[#edf0ef] bg-cyan-700 shadow-[0_5px_12px_rgba(0,80,96,.22)]" />
                 <div className="flex items-center justify-between">
                   <p className="font-mono text-sm text-cyan-700 transition-[letter-spacing,color] duration-500 group-hover:tracking-[.08em] group-hover:text-cyan-600">{milestone.year}</p>
                   <span className={`grid size-11 place-items-center rounded-full border transition-colors ${active === index ? "border-[#091012] bg-[#091012] text-white" : "border-black/15 text-black/35"}`}><ArrowUpRight size={16} /></span>
