@@ -38,7 +38,7 @@ export function PartnersSection() {
         <p className="eyebrow">Partnerships</p>
         <div>
           <h2 className="section-title max-w-5xl">Global connections,<br />trusted partnerships.</h2>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-white/50 md:mt-7 md:text-lg md:text-white/45">A network spanning global logistics, international finance, mobile-device distribution, and lifecycle services.</p>
+          <p className="section-description mt-5 md:mt-7">A network spanning global logistics, international finance, mobile-device distribution, and lifecycle services.</p>
         </div>
       </div>
       <div className="relative mx-auto max-w-[1600px] before:pointer-events-none before:absolute before:inset-y-0 before:left-0 before:z-10 before:w-12 before:bg-gradient-to-r before:from-[#050607] md:before:w-16 after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:z-10 after:w-12 after:bg-gradient-to-l after:from-[#050607] md:after:w-16">

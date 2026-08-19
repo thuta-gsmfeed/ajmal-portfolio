@@ -127,7 +127,7 @@ export function ProductsSection() {
         >
           <div>
             <p className="eyebrow">Featured products</p>
-            <h2 className="mt-3 text-[clamp(2.25rem,3.2vw,3.125rem)] font-medium leading-[1.08] tracking-[.005em]">
+            <h2 className="section-title mt-3">
               Explore Our <span className="text-cyan-200">Vision in Action.</span>
             </h2>
           </div>
@@ -191,7 +191,7 @@ export function ProductsSection() {
 
         <header className="container absolute inset-x-0 top-20 z-20 border-b border-white/10 pb-4">
           <p className="eyebrow">Featured products</p>
-          <h2 className="mt-3 text-[2rem] font-medium leading-[1.06] tracking-[.005em]">
+          <h2 className="section-title mt-3">
             <span className="block">Explore Our</span>
             <span className="block text-cyan-200">Vision in Action.</span>
           </h2>
@@ -224,7 +224,7 @@ export function ProductsSection() {
 
       <div className="container hidden py-20 md:block lg:hidden">
         <p className="eyebrow">Featured products</p>
-        <h2 className="mt-5 text-[clamp(2.25rem,11vw,3.125rem)] font-medium leading-[1.08] tracking-[.005em]">
+        <h2 className="section-title mt-5">
           Explore Our<br /><span className="text-cyan-200">Vision in Action.</span>
         </h2>
         <div className="mt-12 space-y-16 sm:space-y-20">

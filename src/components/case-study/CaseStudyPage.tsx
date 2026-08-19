@@ -76,7 +76,7 @@ export function CaseStudyPage({ product }: { product: Product }) {
         <div className="container grid gap-14 lg:grid-cols-[.72fr_1.28fr] lg:gap-24">
           <div className="lg:sticky lg:top-28 lg:h-fit">
             <p className="eyebrow">The platform</p>
-            <h2 className="mt-7 max-w-[9ch] text-[clamp(2.6rem,4.8vw,5.4rem)] font-medium leading-[.98] tracking-[-.045em]">Complexity, simplified.</h2>
+            <h2 className="section-title mt-7 max-w-[10ch]">Complexity, simplified.</h2>
             <a href={product.url} target="_blank" rel="noreferrer" className="pill mt-9">Visit {product.name}<ArrowUpRight size={16} /></a>
           </div>
           <div>

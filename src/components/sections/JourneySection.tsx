@@ -107,7 +107,7 @@ export function JourneySection() {
               <span className="block">The climb was</span>
               <span className="block">never linear.</span>
             </h2>
-            <p className="mt-5 max-w-lg text-base leading-relaxed text-black/55 md:text-lg">Every venture added a new capability. Every setback sharpened the next decision. This is the path from first business to global products and technology.</p>
+            <p className="section-description section-description--dark mt-5">Every venture added a new capability. Every setback sharpened the next decision. This is the path from first business to global products and technology.</p>
           </div>
 
           <div className="relative mt-3 hidden h-[clamp(300px,39vh,430px)] max-w-4xl overflow-hidden lg:block">

@@ -52,7 +52,7 @@ export function GsmfeedMobileSection() {
       <div className="container relative z-10 md:hidden">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[.13em] text-[#3d68ff]">Features</p>
-          <h2 id="gsmfeed-mobile-title" className="mt-4 text-[clamp(2.35rem,10vw,3rem)] font-semibold leading-[1.04] tracking-[-.035em]">
+          <h2 id="gsmfeed-mobile-title" className="section-title mt-4">
             <span className="block">Everything You Need</span>
             <span className="block text-[#3d68ff]">in One App</span>
           </h2>
@@ -130,7 +130,7 @@ export function GsmfeedMobileSection() {
         <div className="grid items-center gap-12 md:gap-16 lg:grid-cols-[.92fr_1.08fr] xl:gap-24">
           <div className="max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-[.13em] text-[#3d68ff]">Features</p>
-            <h2 className="mt-5 max-w-xl text-[clamp(2.35rem,10vw,5rem)] font-semibold leading-[1.1] tracking-[-.025em] md:mt-6 md:text-[clamp(2.7rem,4.7vw,5rem)]">Everything You<br />Need in One App</h2>
+            <h2 className="section-title mt-5 max-w-xl md:mt-6">Everything You<br />Need in One App</h2>
 
             <div className="relative mt-8 pl-4 before:absolute before:inset-y-0 before:left-0 before:w-1 before:rounded-full before:bg-black/8 md:mt-11 md:pl-7" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
               <motion.span aria-hidden className="absolute left-0 top-0 w-1 rounded-full bg-[#3d68ff]" animate={{ y: `${active * 100}%` }} style={{ height: `${100 / features.length}%` }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }} />

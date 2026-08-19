@@ -37,7 +37,7 @@ export function ContactSection() {
         <h2 className="section-title mt-6 max-w-6xl md:mt-8">Let&apos;s build the future together.</h2>
         <div className="mt-12 grid gap-12 md:mt-20 md:gap-20 lg:grid-cols-[.7fr_1.3fr]">
           <div>
-            <p className="max-w-md text-base leading-7 text-black/65 md:text-xl md:leading-relaxed md:text-black/60">Whether you&apos;re building a business, launching a product, entering a new market, or exploring a technology partnership, let&apos;s create something meaningful.</p>
+            <p className="section-description section-description--dark max-w-md">Whether you&apos;re building a business, launching a product, entering a new market, or exploring a technology partnership, let&apos;s create something meaningful.</p>
             <dl className="mt-8 space-y-1 border-t border-black/20 pt-4 text-sm md:mt-12 md:space-y-5 md:pt-7">
               <div><dt className="text-black/40">Email</dt><dd className="md:mt-1"><a data-cursor="EMAIL" className="inline-flex min-h-11 items-center md:min-h-0" href={`mailto:${site.email}`}>{site.email}</a></dd></div>
               <div><dt className="text-black/40">WhatsApp</dt><dd className="md:mt-1"><a data-cursor="CHAT" className="inline-flex min-h-11 items-center md:min-h-0" href={whatsappUrl} target="_blank" rel="noreferrer">Start a conversation <ArrowUpRight className="ml-1" size={13} /></a></dd></div>

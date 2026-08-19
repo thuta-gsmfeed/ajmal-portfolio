@@ -148,8 +148,8 @@ export function DubaiYachtSection() {
         <div className="container relative z-10 flex min-h-svh items-end pb-20 pt-36 lg:hidden">
           <div>
             <p className="font-mono text-sm uppercase tracking-[.14em] text-cyan-200">Dubai Marina Yachts</p>
-            <h2 className="mt-4 text-[clamp(2.35rem,10vw,4rem)] font-medium uppercase leading-[1.08] tracking-[-.025em]">No. 1 yacht rental<br />in Dubai.</h2>
-            <p className="mt-5 max-w-xl text-base leading-7 text-white/75">Exclusive yacht experiences with dedicated crew, tailored packages, privacy, and premium service on Dubai&apos;s waters.</p>
+            <h2 className="section-title mt-4 max-w-4xl uppercase">No. 1 yacht rental<br />in Dubai.</h2>
+            <p className="section-description mt-5">Exclusive yacht experiences with dedicated crew, tailored packages, privacy, and premium service on Dubai&apos;s waters.</p>
             <a href="https://dubaimarinayachts.ae/" target="_blank" rel="noreferrer" className="pill mt-7 bg-black/35 backdrop-blur-sm">Explore the fleet <ArrowUpRight size={15} /></a>
           </div>
         </div>
@@ -158,8 +158,8 @@ export function DubaiYachtSection() {
           <div className="container relative z-10 hidden min-h-screen items-end pb-24 pt-40 lg:flex">
             <div>
               <p className="font-mono text-sm uppercase tracking-[.14em] text-cyan-200">Dubai Marina Yachts</p>
-              <h2 className="mt-5 max-w-4xl text-[clamp(2.6rem,5vw,5.5rem)] font-medium uppercase leading-[1.08] tracking-[-.025em]">No. 1 yacht rental<br />in Dubai.</h2>
-              <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/75 md:text-lg">Exclusive yacht rental in Dubai with dedicated crew, tailored packages and the best service.</p>
+              <h2 className="section-title mt-5 max-w-4xl uppercase">No. 1 yacht rental<br />in Dubai.</h2>
+              <p className="section-description mt-6">Exclusive yacht rental in Dubai with dedicated crew, tailored packages and the best service.</p>
               <a href="https://dubaimarinayachts.ae/" target="_blank" rel="noreferrer" className="pill mt-8 bg-black/25">Explore the fleet <ArrowUpRight size={15} /></a>
             </div>
           </div>
@@ -167,22 +167,22 @@ export function DubaiYachtSection() {
           <>
             <motion.div style={{ opacity: introOpacity, y: introY }} className="container pointer-events-none absolute inset-x-0 bottom-[12vh] z-10 hidden lg:block">
               <p className="font-mono text-sm uppercase tracking-[.14em] text-cyan-200">01 · Dubai Marina Yachts</p>
-              <h2 className="mt-5 max-w-4xl text-[clamp(2.6rem,5vw,5.5rem)] font-medium uppercase leading-[1.08] tracking-[-.025em]">No. 1 yacht rental<br />in Dubai.</h2>
-              <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/75 md:text-lg">Exclusive yacht rental in Dubai with dedicated crew, tailored packages and the best service.</p>
+              <h2 className="section-title mt-5 max-w-4xl uppercase">No. 1 yacht rental<br />in Dubai.</h2>
+              <p className="section-description mt-6">Exclusive yacht rental in Dubai with dedicated crew, tailored packages and the best service.</p>
             </motion.div>
 
             <motion.div style={{ opacity: occasionsOpacity, y: occasionsY }} className="container pointer-events-none absolute inset-x-0 bottom-[12vh] z-10 hidden justify-end lg:flex">
               <div className="max-w-2xl text-right">
                 <p className="font-mono text-sm uppercase tracking-[.14em] text-cyan-200">02 · Every occasion</p>
-                <h3 className="mt-5 text-[clamp(2.6rem,5vw,5.5rem)] font-medium leading-[1.08] tracking-[-.025em]">Your moment.<br />Your horizon.</h3>
-                <p className="ml-auto mt-6 max-w-xl text-base leading-relaxed text-white/70 md:text-lg">Weddings, engagements, celebrations, parties, sea adventures, and fishing—made unforgettable on the water.</p>
+                <h3 className="section-title mt-5">Your moment.<br />Your horizon.</h3>
+                <p className="section-description ml-auto mt-6">Weddings, engagements, celebrations, parties, sea adventures, and fishing—made unforgettable on the water.</p>
               </div>
             </motion.div>
 
             <motion.div style={{ opacity: seaOpacity, y: seaY }} className="container absolute inset-x-0 bottom-[12vh] z-10 hidden lg:block">
               <p className="font-mono text-sm uppercase tracking-[.14em] text-cyan-200">03 · Open water</p>
-              <h3 className="mt-5 max-w-4xl text-[clamp(2.6rem,5vw,5.5rem)] font-medium leading-[1.08] tracking-[-.025em]">The Arabian Sea,<br />entirely yours.</h3>
-              <p className="mt-6 max-w-xl text-base leading-relaxed text-white/70 md:text-lg">Exclusive yacht rental services created for freedom, privacy, and unparalleled luxury on Dubai&apos;s pristine waters.</p>
+              <h3 className="section-title mt-5 max-w-4xl">The Arabian Sea,<br />entirely yours.</h3>
+              <p className="section-description mt-6">Exclusive yacht rental services created for freedom, privacy, and unparalleled luxury on Dubai&apos;s pristine waters.</p>
               <a href="https://dubaimarinayachts.ae/" target="_blank" rel="noreferrer" className="pill mt-8 bg-black/25 backdrop-blur-sm">Explore the fleet <ArrowUpRight size={15} /></a>
             </motion.div>
 
