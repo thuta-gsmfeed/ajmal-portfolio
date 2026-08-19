@@ -197,8 +197,11 @@ img { user-select:none; }
 .immersive-robot-logo-wordmark {
   display:block;
   width:auto;
-  opacity:.94;
-  filter:drop-shadow(0 2px 3px rgba(0,0,0,.75)) drop-shadow(0 0 7px rgba(255,255,255,.1));
+  opacity:.78;
+  filter:brightness(.86) contrast(1.04);
+  mix-blend-mode:screen;
+  -webkit-mask-image:linear-gradient(105deg,rgba(0,0,0,.62),#000 42%,rgba(0,0,0,.68));
+  mask-image:linear-gradient(105deg,rgba(0,0,0,.62),#000 42%,rgba(0,0,0,.68));
 }
 .immersive-robot-logo-symbol { height:clamp(13px,1.05vw,18px); }
 .immersive-robot-logo-wordmark { height:clamp(18px,1.45vw,24px); }
@@ -312,10 +315,9 @@ img { user-select:none; }
   .immersive-robot-logo {
     top:47%;
     left:50%;
-    gap:5px;
   }
-  .immersive-robot-logo-symbol { height:clamp(11px,3vw,14px); }
-  .immersive-robot-logo-wordmark { height:clamp(15px,4vw,19px); }
+  .immersive-robot-logo-symbol { height:clamp(17px,4.7vw,22px); }
+  .immersive-robot-logo-wordmark { display:none; }
   .immersive-cursor-light { display:none; }
 }
 
