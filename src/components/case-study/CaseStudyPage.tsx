@@ -6,7 +6,6 @@ import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion
 import { ArrowLeft, ArrowUpRight, Check, Share2 } from "lucide-react";
 import { Product, products } from "@/data/content";
 import { CinematicLink } from "@/components/navigation/CinematicLink";
-import { ContextCursor } from "@/components/ui/ContextCursor";
 
 export function CaseStudyPage({ product }: { product: Product }) {
   const [shared, setShared] = useState(false);
@@ -27,16 +26,15 @@ export function CaseStudyPage({ product }: { product: Product }) {
   };
 
   return (
-    <main data-soundscape="technology" className="min-h-screen overflow-hidden bg-[#030506] text-white">
-      <ContextCursor />
+    <main className="min-h-screen overflow-hidden bg-[#030506] text-white">
       <div className="fixed inset-x-0 top-0 z-50 px-4 pt-4 md:px-7">
-        <div className="mx-auto flex h-14 max-w-[1380px] items-center justify-between rounded-full border border-white/12 bg-black/55 px-3 backdrop-blur-xl md:h-16 md:px-5">
-          <CinematicLink href="/#products" ariaLabel="Back to products" className="group inline-flex items-center gap-3 text-sm text-white/65 transition-colors hover:text-white">
+        <div className="mx-auto grid h-14 max-w-[1380px] grid-cols-[1fr_auto_1fr] items-center rounded-full border border-white/12 bg-black/55 px-3 backdrop-blur-xl md:h-16 md:px-5">
+          <CinematicLink href="/#products" ariaLabel="Back to products" className="group inline-flex items-center justify-self-start gap-3 text-sm text-white/65 transition-colors hover:text-white">
             <span className="grid size-9 place-items-center rounded-full border border-white/15 transition-transform group-hover:-translate-x-1"><ArrowLeft size={15} /></span>
             <span className="hidden font-mono uppercase tracking-[.1em] sm:block">Back to portfolio</span>
           </CinematicLink>
           <Image src={product.logo} alt={`${product.name} logo`} width={120} height={44} className="h-8 w-auto max-w-[108px] object-contain" />
-          <button type="button" onClick={share} aria-label={`Share ${product.name} case study`} className="inline-flex min-h-9 items-center gap-2 rounded-full border border-white/12 px-3 font-mono text-[10px] uppercase tracking-[.1em] text-white/55 transition-colors hover:border-cyan-200/35 hover:text-cyan-100">
+          <button type="button" onClick={share} aria-label={`Share ${product.name} case study`} className="inline-flex min-h-9 items-center justify-self-end gap-2 rounded-full border border-white/12 px-3 font-mono text-[10px] uppercase tracking-[.1em] text-white/55 transition-colors hover:border-cyan-200/35 hover:text-cyan-100">
             {shared ? <Check size={13} /> : <Share2 size={13} />}<span className="hidden sm:inline">{shared ? "Copied" : "Share"}</span>
           </button>
         </div>
@@ -78,8 +76,8 @@ export function CaseStudyPage({ product }: { product: Product }) {
         <div className="container grid gap-14 lg:grid-cols-[.72fr_1.28fr] lg:gap-24">
           <div className="lg:sticky lg:top-28 lg:h-fit">
             <p className="eyebrow">The platform</p>
-            <h2 className="section-title mt-7">Built to turn complexity into momentum.</h2>
-            <a data-cursor="VISIT" href={product.url} target="_blank" rel="noreferrer" className="pill mt-9">Visit {product.name}<ArrowUpRight size={16} /></a>
+            <h2 className="mt-7 max-w-[9ch] text-[clamp(2.6rem,4.8vw,5.4rem)] font-medium leading-[.98] tracking-[-.045em]">Complexity, simplified.</h2>
+            <a href={product.url} target="_blank" rel="noreferrer" className="pill mt-9">Visit {product.name}<ArrowUpRight size={16} /></a>
           </div>
           <div>
             <p className="text-[clamp(1.35rem,2.5vw,2.3rem)] font-light leading-snug text-white/86">{product.description}</p>

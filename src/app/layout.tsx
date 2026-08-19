@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { SoundProvider } from "@/components/audio/SoundSystem";
 
 export const viewport: Viewport = {
   themeColor: "#030506",
@@ -118,7 +117,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body><SoundProvider>{children}</SoundProvider></body>
+      <body>{children}</body>
     </html>
   );
 }

@@ -16,7 +16,5 @@ import { GsmfeedMobileSection } from "@/components/sections/GsmfeedMobileSection
 import { PartnersSection } from "@/components/sections/PartnersSection";
 import { PhilosophySection } from "@/components/sections/PhilosophySection";
 import { ContactSection } from "@/components/sections/ContactSection";
-import { ContextCursor } from "@/components/ui/ContextCursor";
-import { ChapterNavigator } from "@/components/ui/ChapterNavigator";
 
-export default function Home(){return <SmoothScroll><a className="skip-link" href="#main">Skip to content</a><Loader/><ContextCursor/><Header/><ChapterNavigator/><SectionTransitions/><main id="main"><HeroSection/><AboutSection/><GlobalNetworkSection/><ScrollTextSection/><JourneySection/>{/* <VenturesSection/> */}<ProductsSection/><GsmfeedMobileSection/><PartnersSection/><DubaiYachtSection/><PhilosophySection/><ContactSection/></main><Footer/></SmoothScroll>}
+export default function Home(){return <SmoothScroll><a className="skip-link" href="#main">Skip to content</a><Loader/><Header/><SectionTransitions/><main id="main"><HeroSection/><AboutSection/><GlobalNetworkSection/><ScrollTextSection/><JourneySection/>{/* <VenturesSection/> */}<ProductsSection/><GsmfeedMobileSection/><PartnersSection/><DubaiYachtSection/><PhilosophySection/><ContactSection/></main><Footer/></SmoothScroll>}

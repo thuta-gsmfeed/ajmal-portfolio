@@ -16,6 +16,12 @@ BUILD::CONNECT::CREATE::MOVE::LEAD::GROW
 ▓▓▒▒░░▓▓▒▒░░▓▓▒▒░░▓▓▒▒░░▓▓▒▒░░▓▓▒▒░░
 01100111 01101000 01101111 01101100 01111010 01100001 01100100`;
 
+const principles = [
+  { number: "01", title: "Build", text: "Turn an ambitious idea into a product people can trust and use." },
+  { number: "02", title: "Connect", text: "Create the relationships that help ideas travel across markets." },
+  { number: "03", title: "Scale", text: "Use technology and clear systems to make momentum repeatable." },
+];
+
 function PortraitDecode() {
   return (
     <div aria-hidden className="about-ascii absolute inset-0 z-[2] overflow-hidden bg-[#030708] text-cyan-100">
@@ -26,168 +32,110 @@ function PortraitDecode() {
   );
 }
 
+function StatStrip() {
+  return (
+    <div className="grid grid-cols-3 divide-x divide-white/10 border-t border-white/10 bg-black/55 backdrop-blur-xl">
+      <div className="about-stat px-3 py-4 text-center md:py-5">
+        <strong className="block text-lg font-medium text-white md:text-2xl"><AnimatedCounter value={15} suffix="+" /></strong>
+        <span className="mt-1 block font-mono text-[10px] uppercase tracking-[.12em] text-white/42">Years</span>
+      </div>
+      <div className="about-stat px-3 py-4 text-center md:py-5">
+        <strong className="block text-lg font-medium text-cyan-100 md:text-2xl">$<AnimatedCounter value={100} suffix="M+" /></strong>
+        <span className="mt-1 block font-mono text-[10px] uppercase tracking-[.12em] text-white/42">Sales</span>
+      </div>
+      <div className="about-stat px-3 py-4 text-center md:py-5">
+        <strong className="block text-lg font-medium text-white md:text-2xl">Global</strong>
+        <span className="mt-1 block font-mono text-[10px] uppercase tracking-[.12em] text-white/42">Network</span>
+      </div>
+    </div>
+  );
+}
+
 export function AboutSection() {
   const section = useRef<HTMLElement>(null);
 
   useGSAP(() => {
     gsap.registerPlugin(ScrollTrigger);
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (reduceMotion) {
       gsap.set(".about-ascii", { clipPath: "inset(100% 0 0 0)" });
-      gsap.set(".about-stat", { opacity: 1, y: 0 });
+      gsap.set([".about-reveal", ".about-principle", ".about-stat"], { opacity: 1, y: 0 });
       return;
     }
 
     const timeline = gsap.timeline({
       scrollTrigger: {
         trigger: section.current,
-        start: "top 78%",
-        end: "top 24%",
-        scrub: 0.6,
+        start: "top 76%",
+        end: "top 18%",
+        scrub: 0.7,
         invalidateOnRefresh: true,
       },
     });
 
     timeline
-      .fromTo(".about-photo", { scale: 1.075 }, { scale: 1, duration: 1, ease: "none" }, 0)
-      .fromTo(".about-ascii", { clipPath: "inset(0% 0 0 0)" }, { clipPath: "inset(100% 0 0 0)", duration: 0.82, ease: "power2.inOut" }, 0.05)
-      .fromTo(".about-stat", { opacity: 0, y: 18 }, { opacity: 1, y: 0, stagger: 0.08, duration: 0.28, ease: "power2.out" }, 0.58);
+      .fromTo(".about-photo", { scale: 1.08 }, { scale: 1, duration: 1, ease: "none" }, 0)
+      .fromTo(".about-ascii", { clipPath: "inset(0% 0 0 0)" }, { clipPath: "inset(100% 0 0 0)", duration: 0.78, ease: "power2.inOut" }, 0.04)
+      .fromTo(".about-reveal", { opacity: 0, y: 28 }, { opacity: 1, y: 0, stagger: 0.08, duration: 0.36, ease: "power2.out" }, 0.36)
+      .fromTo(".about-principle", { opacity: 0, y: 20 }, { opacity: 1, y: 0, stagger: 0.08, duration: 0.32, ease: "power2.out" }, 0.54)
+      .fromTo(".about-stat", { opacity: 0, y: 14 }, { opacity: 1, y: 0, stagger: 0.06, duration: 0.28, ease: "power2.out" }, 0.62);
   }, { scope: section });
 
   return (
-    <section ref={section} id="about" className="overflow-hidden py-16 md:py-40">
-      <div className="container md:hidden">
-        <p className="eyebrow mb-5">About me</p>
-
-        <div className="relative">
-          <div className="image-wrap relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 shadow-2xl">
-            <Image
-              src={media.portrait.src}
-              alt={media.portrait.alt}
-              fill
-              sizes="calc(100vw - 28px)"
-              className="about-photo object-cover object-top"
-            />
-            <PortraitDecode />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
-            <div aria-hidden className="absolute -right-12 -top-12 size-40 rounded-full bg-cyan-300/10 blur-3xl" />
-
-            <div className="absolute inset-x-3 bottom-3 grid grid-cols-3 divide-x divide-white/10 rounded-xl border border-white/10 bg-black/45 px-2 py-3 backdrop-blur-md">
-              <div className="about-stat text-center">
-                <strong className="block text-base font-medium text-white"><AnimatedCounter value={15} suffix="+" /></strong>
-                <span className="mt-0.5 block font-mono text-sm uppercase tracking-[.04em] text-white/50">Years</span>
-              </div>
-              <div className="about-stat text-center">
-                <strong className="block text-base font-medium text-cyan-100">$<AnimatedCounter value={100} suffix="M+" /></strong>
-                <span className="mt-0.5 block font-mono text-sm uppercase tracking-[.04em] text-white/50">Sales</span>
-              </div>
-              <div className="about-stat text-center">
-                <strong className="block text-base font-medium text-white">Global</strong>
-                <span className="mt-0.5 block font-mono text-sm uppercase tracking-[.04em] text-white/50">Network</span>
-              </div>
-            </div>
-          </div>
+    <section ref={section} id="about" className="overflow-hidden py-20 md:py-40">
+      <div className="container">
+        <div className="mb-9 flex items-center justify-between border-b border-white/10 pb-5 md:mb-16">
+          <p className="eyebrow">About me</p>
+          <p className="font-mono text-[10px] uppercase tracking-[.16em] text-white/36 md:text-xs">Since 2009 · Global</p>
         </div>
 
-        <div className="relative pt-7">
-          <div aria-hidden className="absolute -left-24 top-2 size-48 rounded-full bg-cyan-300/[.06] blur-3xl" />
-          <div className="relative">
-            <h2 className="section-title text-white">
-              Hey! I&apos;m<br />
-              <span className="bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">
-                Ajmal Gholzad.
-              </span>
-            </h2>
+        <div className="grid gap-10 lg:grid-cols-[.82fr_1.18fr] lg:gap-20 xl:gap-28">
+          <div className="lg:sticky lg:top-28 lg:h-fit">
+            <div className="image-wrap relative aspect-[4/5] overflow-hidden rounded-2xl border border-white/10 bg-[#071013] shadow-[0_32px_100px_rgba(0,0,0,.38)]">
+              <Image src={media.portrait.src} alt={media.portrait.alt} fill sizes="(max-width:1023px) calc(100vw - 28px), 38vw" className="about-photo object-cover object-top" />
+              <PortraitDecode />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-transparent to-black/12" />
+              <div className="absolute left-4 top-4 z-10 rounded-full border border-white/15 bg-black/35 px-3 py-2 font-mono text-[9px] uppercase tracking-[.16em] text-white/65 backdrop-blur-md md:left-6 md:top-6 md:text-[10px]">Founder · Operator</div>
+              <div className="absolute inset-x-0 bottom-0 z-10"><StatStrip /></div>
+            </div>
+          </div>
 
-            <p className="mt-5 text-base font-light leading-7 text-white/80">
-              I&apos;ve been an entrepreneur since 2009, successfully building multiple businesses—from a marketing agency and Apple iPhone distribution to e-commerce, affiliate marketing, and now a tech software company. Over the course of my career, my companies have generated over $100 million in sales.
+          <div className="lg:pt-8">
+            <p className="about-reveal font-mono text-[10px] uppercase tracking-[.18em] text-cyan-200 md:text-xs">Entrepreneur · Technologist · Connector</p>
+            <h2 className="about-reveal mt-5 max-w-[11ch] text-[clamp(2.8rem,6.1vw,6.8rem)] font-medium leading-[.92] tracking-[-.055em] text-white">I build ideas that move across markets.</h2>
+
+            <p className="about-reveal mt-7 max-w-3xl text-lg font-light leading-8 text-white/76 md:mt-10 md:text-2xl md:leading-[1.45]">
+              Since 2009, I&apos;ve built businesses across marketing, iPhone distribution, e-commerce, affiliate marketing, and AI software—turning complex opportunities into clear, scalable ventures.
             </p>
 
-            <blockquote className="relative mt-6 border-l border-cyan-300/70 py-1 pl-5 text-base font-light leading-7 text-cyan-50/90">
-              &ldquo;Through strategic thinking and innovative design, I am able to tackle complex challenges and create impactful business solutions.&rdquo;
-            </blockquote>
+            <div className="about-reveal relative mt-8 overflow-hidden rounded-2xl border border-cyan-200/20 bg-cyan-100/[.045] p-6 md:mt-10 md:p-8">
+              <div aria-hidden className="absolute -right-12 -top-16 size-44 rounded-full bg-cyan-300/10 blur-3xl" />
+              <p className="relative font-mono text-[10px] uppercase tracking-[.16em] text-cyan-200/70">Operating principle</p>
+              <blockquote className="relative mt-4 max-w-2xl text-xl font-light leading-snug text-cyan-50 md:text-3xl">“Make the complex clear—then build the system that keeps it moving.”</blockquote>
+            </div>
 
-            <details className="group mt-7 border-y border-white/10">
-              <summary className="flex cursor-pointer list-none items-center justify-between py-4 font-mono text-sm uppercase tracking-[.12em] text-white/65 transition-colors marker:content-none hover:text-cyan-100">
-                Read my full story
-                <span className="grid size-8 place-items-center rounded-full border border-white/15 text-cyan-200 transition-transform duration-300 group-open:rotate-180">
-                  <ChevronDown aria-hidden size={14} />
-                </span>
+            <div className="mt-10 grid border-y border-white/10 sm:grid-cols-3 md:mt-14">
+              {principles.map((principle) => (
+                <article key={principle.number} className="about-principle border-b border-white/10 py-6 last:border-b-0 sm:border-b-0 sm:border-r sm:px-5 sm:first:pl-0 sm:last:border-r-0 sm:last:pr-0">
+                  <span className="font-mono text-[10px] text-cyan-200/65">{principle.number}</span>
+                  <h3 className="mt-4 text-xl font-medium text-white">{principle.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-white/48">{principle.text}</p>
+                </article>
+              ))}
+            </div>
+
+            <details className="group mt-8 border-b border-white/10 md:mt-10">
+              <summary className="flex cursor-pointer list-none items-center justify-between py-5 font-mono text-xs uppercase tracking-[.14em] text-white/58 transition-colors marker:content-none hover:text-cyan-100">
+                The longer story
+                <span className="grid size-9 place-items-center rounded-full border border-white/15 text-cyan-200 transition-transform duration-300 group-open:rotate-180"><ChevronDown aria-hidden size={14} /></span>
               </summary>
-
-              <div className="space-y-4 pb-6 text-base leading-7 text-white/65">
-                <p>
-                  My strength lies in transforming creativity into technology, with a focus on applying AI solutions effectively.
-                </p>
-                <p>
-                  I&apos;ve developed a global network that stretches across the US, Europe, the Middle East, Hong Kong, and China. Through these connections, I&apos;ve built strong relationships and earned trust and recognition in these key markets.
-                </p>
-                <p>
-                  With over 15 years of experience in entrepreneurship and online business opportunities across various markets, I thrive on collaborating with professionals and business owners, finding great satisfaction in working together to achieve success.
-                </p>
-                <p className="pt-1 text-white/80">
-                  Feel free to reach out with any thoughts, questions, or collaboration ideas—I&apos;m always excited to connect and explore new professional opportunities.
-                </p>
+              <div className="max-w-3xl space-y-5 pb-8 text-base leading-8 text-white/58 md:text-lg">
+                <p>My strength lies in transforming creativity into technology, with a focus on applying AI solutions effectively.</p>
+                <p>I&apos;ve developed a network across the US, Europe, the Middle East, Hong Kong, and China—building trusted relationships in each market.</p>
+                <p>After more than 15 years in entrepreneurship and online business, I still find the most energy in collaborating with ambitious professionals and turning shared ideas into measurable progress.</p>
               </div>
             </details>
-          </div>
-        </div>
-      </div>
-
-      <div className="container hidden gap-16 md:grid lg:grid-cols-[.85fr_1.15fr]">
-        {/* Sticky Image Column */}
-        <div className="lg:sticky lg:top-28 lg:h-fit">
-          <p className="eyebrow mb-6">About me</p>
-          <div className="image-wrap relative aspect-[4/5] overflow-hidden rounded-2xl border border-white/10 shadow-2xl">
-            <Image
-              src={media.portrait.src}
-              alt={media.portrait.alt}
-              fill
-              sizes="(max-width:1024px) 100vw, 42vw"
-              className="about-photo object-cover"
-            />
-            <PortraitDecode />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-            <div className="absolute inset-x-3 bottom-3 z-10 grid grid-cols-3 divide-x divide-white/10 rounded-xl border border-white/10 bg-black/50 px-2 py-3 backdrop-blur-md">
-              <div className="about-stat text-center"><strong className="block text-base font-medium text-white"><AnimatedCounter value={15} suffix="+" /></strong><span className="mt-0.5 block font-mono text-sm uppercase text-white/45">Years</span></div>
-              <div className="about-stat text-center"><strong className="block text-base font-medium text-cyan-100">$<AnimatedCounter value={100} suffix="M+" /></strong><span className="mt-0.5 block font-mono text-sm uppercase text-white/45">Sales</span></div>
-              <div className="about-stat text-center"><strong className="block text-base font-medium text-white">Global</strong><span className="mt-0.5 block font-mono text-sm uppercase text-white/45">Network</span></div>
-            </div>
-          </div>
-        </div>
-
-        {/* Content Column */}
-        <div className="lg:pt-16">
-          <h2 className="section-title text-white">
-            Hey! I&apos;m<br />
-            <span className="bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">
-              Ajmal Gholzad.
-            </span>
-          </h2>
-
-          <div className="mt-7 space-y-5 text-[15px] leading-7 text-white/75 md:mt-10 md:space-y-6 md:text-lg md:leading-relaxed">
-            <p className="text-lg font-light text-white/90 md:text-xl md:leading-relaxed">
-              I&apos;ve been an entrepreneur since 2009, successfully building multiple businesses—from a marketing agency and Apple iPhone distribution to e-commerce, affiliate marketing, and now a tech software company. Over the course of my career, my companies have generated over $100 million in sales.
-            </p>
-
-            <blockquote className="my-6 rounded-2xl border-l-2 border-cyan-400 bg-white/[0.03] p-5 text-base italic text-cyan-100/90 backdrop-blur-sm md:my-8 md:p-8 md:text-lg">
-              &ldquo;Through strategic thinking and innovative design, I am able to tackle complex challenges and create impactful business solutions.&rdquo;
-            </blockquote>
-
-            <p>
-              My strength lies in transforming creativity into technology, with a focus on applying AI solutions effectively.
-            </p>
-
-            <p>
-              I&apos;ve developed a global network that stretches across the US, Europe, the Middle East, Hong Kong, and China. Through these connections, I&apos;ve built strong relationships and earned trust and recognition in these key markets.
-            </p>
-
-            <p>
-              With over 15 years of experience in entrepreneurship and online business opportunities across various markets, I thrive on collaborating with professionals and business owners, finding great satisfaction in working together to achieve success.
-            </p>
-
-            <p className="pt-2 text-white/90">
-              Feel free to reach out with any thoughts, questions, or collaboration ideas—I&apos;m always excited to connect and explore new professional opportunities.
-            </p>
           </div>
         </div>
       </div>

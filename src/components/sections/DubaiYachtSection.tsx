@@ -50,6 +50,7 @@ export function DubaiYachtSection() {
 
     let frame = 0;
     let active = false;
+    let displayedTime = 0;
     let lastSeek = 0;
     const frameDuration = 1 / 24;
 
@@ -62,6 +63,7 @@ export function DubaiYachtSection() {
       element.pause();
       syncTarget(scrollYProgress.get());
       const targetFrame = Math.round(targetTime.current / frameDuration) * frameDuration;
+      displayedTime = targetFrame;
       if (Math.abs(element.currentTime - targetFrame) > frameDuration / 2) {
         element.currentTime = targetFrame;
       }
@@ -73,9 +75,12 @@ export function DubaiYachtSection() {
         return;
       }
 
-      if (timestamp - lastSeek >= 1000 / 24 && element.readyState >= 1 && Number.isFinite(element.duration)) {
-        const targetFrame = Math.round(targetTime.current / frameDuration) * frameDuration;
-        if (Math.abs(targetFrame - element.currentTime) > frameDuration / 2) {
+      if (timestamp - lastSeek >= 1000 / 30 && element.readyState >= 2 && Number.isFinite(element.duration)) {
+        const delta = targetTime.current - displayedTime;
+        displayedTime = Math.abs(delta) < frameDuration ? targetTime.current : displayedTime + delta * 0.24;
+        const targetFrame = Math.round(displayedTime / frameDuration) * frameDuration;
+
+        if (!element.seeking && Math.abs(targetFrame - element.currentTime) > frameDuration / 2) {
           element.currentTime = targetFrame;
         }
         lastSeek = timestamp;
@@ -117,8 +122,6 @@ export function DubaiYachtSection() {
     <section
       ref={section}
       id="yachts"
-      data-cursor="SCROLL"
-      data-soundscape="ocean"
       className={`relative bg-[#02070a] ${reducedMotion ? "min-h-[110svh] lg:min-h-screen" : "h-[280svh] lg:h-[330vh]"}`}
       aria-label="Dubai Marina Yachts story"
     >
@@ -127,11 +130,11 @@ export function DubaiYachtSection() {
           ref={video}
           muted
           playsInline
-          preload="metadata"
+          preload="auto"
           aria-label="A silver and black luxury yacht cruising from a side view into an aerial view"
           className="absolute inset-0 size-full object-cover"
         >
-          <source src="/videos/yachts-scroll.optimized.mp4" type="video/mp4" />
+          <source src="/videos/yachts-scroll.scrub.mp4" type="video/mp4" />
         </video>
 
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(2,7,10,.76)_0%,rgba(2,7,10,.22)_46%,transparent_70%),linear-gradient(0deg,rgba(2,7,10,.78)_0%,transparent_36%,rgba(2,7,10,.3)_100%)]" />

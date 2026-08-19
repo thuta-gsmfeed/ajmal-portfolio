@@ -3,15 +3,13 @@
 import Image from "next/image";
 import { type MouseEvent, useEffect, useState } from "react";
 import { AnimatePresence, motion, useScroll } from "framer-motion";
-import { Menu, Volume2, VolumeX, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { nav } from "@/data/content";
-import { useSound } from "@/components/audio/SoundSystem";
 
 export function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { scrollYProgress } = useScroll();
-  const sound = useSound();
 
   const scrollToSection = (event: MouseEvent<HTMLAnchorElement>, id: string) => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -59,17 +57,10 @@ export function Header() {
 
             <nav aria-label="Primary" className="hidden items-center gap-7 lg:flex">
               {nav.slice(0, -1).map(([label, id]) => <a className="nav-link" href={`#${id}`} onClick={(event) => scrollToSection(event, id)} key={id}>{label}</a>)}
-              <button onClick={sound.toggle} aria-label={sound.enabled ? "Turn sound off" : "Turn sound on"} aria-pressed={sound.enabled} className={`sound-toggle ${sound.enabled ? "sound-toggle--active" : ""}`}>
-                {sound.enabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
-                <span>{sound.enabled ? "Sound on" : "Sound off"}</span>
-              </button>
-              <a data-cursor="TALK" className="pill !min-h-10 text-xs" href="#contact" onClick={(event) => scrollToSection(event, "contact")}>Let&apos;s talk</a>
+              <a className="pill !min-h-10 text-xs" href="#contact" onClick={(event) => scrollToSection(event, "contact")}>Let&apos;s talk</a>
             </nav>
 
-            <div className="flex items-center gap-1 lg:hidden">
-              <button onClick={sound.toggle} aria-label={sound.enabled ? "Turn sound off" : "Turn sound on"} aria-pressed={sound.enabled} className={`grid size-10 place-items-center rounded-full border transition-colors ${sound.enabled ? "border-cyan-200/45 bg-cyan-200/10 text-cyan-100" : "border-white/15 text-white/55"}`}>
-                {sound.enabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
-              </button>
+            <div className="flex items-center lg:hidden">
               <button aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} aria-controls="mobile-navigation" className="grid size-11 place-items-center rounded-full border border-white/20 bg-black/20" onClick={() => setOpen(!open)}>
                 {open ? <X /> : <Menu />}
               </button>
