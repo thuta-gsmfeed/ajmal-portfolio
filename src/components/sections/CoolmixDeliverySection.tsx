@@ -89,7 +89,7 @@ export function CoolmixDeliverySection() {
         const vehicleScale = vehicleWidth / van.naturalWidth;
         const travel = Math.sin(currentProgress * Math.PI * 2) * Math.min(14, width * 0.012);
         const vehicleX = width * 0.5 - vehicleWidth * 0.5 + travel;
-        const vehicleY = roadY - vehicleHeight * 0.831;
+        const vehicleY = roadY - vehicleHeight * 0.895;
         const bob = Math.sin(currentProgress * Math.PI * 34) * currentSpeed * 1.6;
 
         context.save();
@@ -114,41 +114,37 @@ export function CoolmixDeliverySection() {
 
         context.drawImage(van, vehicleX, vehicleY + bob, vehicleWidth, vehicleHeight);
 
-        // The wheel-face centres are measured from the source image. Rotate only the
-        // inner alloy area so the tyre, lighting and wheel arch remain visually fixed.
+        // Rotate a softly masked copy of each rim. The tyre and wheel arch stay in the
+        // base image, which prevents square crop edges and keeps the road contact solid.
         const wheelRotation = currentProgress * Math.PI * 28;
         const drawWheelFace = (sourceX: number, sourceY: number, face: HTMLCanvasElement | undefined) => {
           if (!face) return;
           const wheelX = vehicleX + sourceX * vehicleScale;
           const wheelY = vehicleY + bob + sourceY * vehicleScale;
-          const wheelFaceRadius = 76 * vehicleScale;
+          const wheelFaceRadius = (face.width / 2) * vehicleScale;
 
           context.save();
-          context.beginPath();
-          context.arc(wheelX, wheelY, wheelFaceRadius, 0, Math.PI * 2);
-          context.clip();
           context.translate(wheelX, wheelY);
           context.rotate(wheelRotation);
-          context.globalAlpha = 0.94;
           context.drawImage(face, -wheelFaceRadius, -wheelFaceRadius, wheelFaceRadius * 2, wheelFaceRadius * 2);
           context.restore();
         };
 
-        if (currentSpeed > 0.015) {
-          drawWheelFace(401, 679, wheelFaces[0]);
-          drawWheelFace(1484, 679, wheelFaces[1]);
-        }
+        // Keep the rotated faces mounted after scrolling stops. Removing this layer at
+        // zero velocity makes the wheels visibly snap back to the source-image angle.
+        drawWheelFace(356, 746, wheelFaces[0]);
+        drawWheelFace(1310, 746, wheelFaces[1]);
 
-        const decalX = vehicleX + vehicleWidth * 0.36;
-        const decalY = vehicleY + bob + vehicleHeight * 0.35;
-        const symbolSize = vehicleWidth * 0.047;
-        context.save();
-        if (logoLoaded) context.drawImage(logo, decalX, decalY, symbolSize, symbolSize * 1.1);
-        context.fillStyle = "#0071e3";
-        context.font = `600 ${Math.max(13, vehicleWidth * 0.043)}px ${fontSans}`;
-        context.textBaseline = "middle";
-        context.fillText("coolmix", decalX + symbolSize * 1.18, decalY + symbolSize * 0.55);
-        context.restore();
+        if (logoLoaded) {
+          const decalWidth = vehicleWidth * 0.3;
+          const decalHeight = decalWidth * (logo.naturalHeight / logo.naturalWidth);
+          const decalX = vehicleX + vehicleWidth * 0.21;
+          const decalY = vehicleY + bob + vehicleHeight * 0.345;
+          context.save();
+          context.filter = "brightness(0) invert(1)";
+          context.drawImage(logo, decalX, decalY, decalWidth, decalHeight);
+          context.restore();
+        }
 
         if (speedLabel.current) {
           const displayedSpeed = Math.round(currentSpeed * 80);
@@ -186,12 +182,13 @@ export function CoolmixDeliverySection() {
     resizeObserver.observe(canvasElement);
 
     van.onload = () => {
-      const wheelFaceSize = 152;
-      wheelFaces = [[401, 679], [1484, 679]].map(([centerX, centerY]) => {
+      const wheelFaceSize = 176;
+      wheelFaces = [[356, 746], [1310, 746]].map(([centerX, centerY]) => {
         const face = document.createElement("canvas");
         face.width = wheelFaceSize;
         face.height = wheelFaceSize;
-        face.getContext("2d")?.drawImage(
+        const faceContext = face.getContext("2d");
+        faceContext?.drawImage(
           van,
           centerX - wheelFaceSize / 2,
           centerY - wheelFaceSize / 2,
@@ -202,6 +199,18 @@ export function CoolmixDeliverySection() {
           wheelFaceSize,
           wheelFaceSize,
         );
+        if (faceContext) {
+          const radius = wheelFaceSize / 2;
+          const mask = faceContext.createRadialGradient(radius, radius, 0, radius, radius, radius);
+          mask.addColorStop(0, "rgba(0,0,0,1)");
+          mask.addColorStop(0.72, "rgba(0,0,0,1)");
+          mask.addColorStop(0.9, "rgba(0,0,0,.94)");
+          mask.addColorStop(1, "rgba(0,0,0,0)");
+          faceContext.globalCompositeOperation = "destination-in";
+          faceContext.fillStyle = mask;
+          faceContext.fillRect(0, 0, wheelFaceSize, wheelFaceSize);
+          faceContext.globalCompositeOperation = "source-over";
+        }
         return face;
       });
       vanLoaded = true;
@@ -210,8 +219,8 @@ export function CoolmixDeliverySection() {
     };
     van.onerror = () => setCanvasFailed(true);
     logo.onload = () => { logoLoaded = true; draw.current?.(); };
-    van.src = "/images/coolmix-delivery/van-side.png";
-    logo.src = "/images/logo/coolmix-logo.svg";
+    van.src = "/images/coolmix-delivery/step-van-v2.webp";
+    logo.src = "/images/logo/logo-white.svg";
     resize();
 
     return () => {
@@ -278,7 +287,8 @@ export function CoolmixDeliverySection() {
         <canvas ref={canvas} className={`coolmix-delivery__canvas ${canvasReady ? "is-ready" : ""}`} aria-hidden="true" />
         {(!canvasReady || canvasFailed) && (
           <div className="coolmix-delivery__visual-fallback" aria-hidden="true">
-            <Image src="/images/coolmix-delivery/van-side.png" alt="" width={1774} height={887} />
+            <Image src="/images/coolmix-delivery/step-van-v2.webp" alt="" width={1636} height={961} />
+            <Image className="coolmix-delivery__fallback-decal" src="/images/logo/logo-white.svg" alt="" width={411} height={88} />
           </div>
         )}
         <div className="coolmix-delivery__topbar">
@@ -308,7 +318,10 @@ export function CoolmixDeliverySection() {
           <Image src="/images/logo/coolmix-logo.svg" alt="" width={44} height={49} />
           <span>coolmix</span>
         </div>
-        <Image className="coolmix-delivery__reduced-van" src="/images/coolmix-delivery/van-side.png" alt="Coolmix delivery van" width={1774} height={887} />
+        <div className="coolmix-delivery__reduced-van-wrap">
+          <Image className="coolmix-delivery__reduced-van" src="/images/coolmix-delivery/step-van-v2.webp" alt="Coolmix delivery van" width={1636} height={961} />
+          <Image className="coolmix-delivery__reduced-decal" src="/images/logo/logo-white.svg" alt="" width={411} height={88} />
+        </div>
         <div className="coolmix-delivery__reduced-list">
           {chapters.map((chapter) => (
             <article key={`reduced-${chapter.label}`}>

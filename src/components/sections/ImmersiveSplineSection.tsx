@@ -49,6 +49,13 @@ export function ImmersiveSplineSection() {
         viewport={{ once: true, amount: 0.35 }}
         transition={{ duration: reduceMotion ? 0 : 0.8, delay: 0.15, ease: revealEase }}
       >
+        <div className="immersive-brand-lockup" aria-label="gsmfeed">
+          <span className="immersive-brand-mark" aria-hidden="true">
+            <Image src="/images/logo/gsmfeed-full-logo.png" alt="" width={294} height={75} />
+          </span>
+          <span className="immersive-brand-label">AI commerce network</span>
+        </div>
+
         <h2 id="immersive-title" className="immersive-title section-title">
           <span>Innovation</span>
           <span className="immersive-title-accent">In motion.</span>
