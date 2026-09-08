@@ -13,8 +13,6 @@ const chapters = [
   { label: "Reliable delivery", title: "Delivered with confidence", body: "From warehouse to destination, every shipment closes the loop with dependable execution.", word: "DELIVERED" },
   { label: "Device grading", title: "Consistent standards", body: "Clear grading makes every device easier to evaluate, compare, and move with confidence.", word: "GRADED" },
   { label: "Secure packaging", title: "Ready for transit", body: "Protective handling and careful preparation keep every shipment secure from pickup to arrival.", word: "PACKED" },
-  { label: "Inventory scale", title: "Stock when needed", body: "A substantial product range helps partners respond quickly to changing market demand.", word: "READY" },
-  { label: "Partner support", title: "Built for long-term trade", body: "Responsive service and trusted relationships support every order beyond the delivery itself.", word: "CONNECTED" },
 ] as const;
 
 const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
@@ -234,7 +232,7 @@ export function CoolmixDeliverySection() {
       const cards = cardElements.current.filter(Boolean);
       let activeCard = -1;
       const updateCards = (value: number) => {
-        const nextActiveCard = Math.min(chapters.length - 1, Math.floor(value * chapters.length));
+        const nextActiveCard = Math.round(value * (chapters.length - 1));
         if (nextActiveCard === activeCard) return;
         activeCard = nextActiveCard;
         cards.forEach((card, index) => gsap.to(card, { opacity: index === activeCard ? 1 : 0.32, y: index === activeCard ? -10 : 0, duration: 0.35, ease: "power2.out", overwrite: true }));
@@ -268,9 +266,9 @@ export function CoolmixDeliverySection() {
       });
       return () => tween.kill();
     });
-    addTrackMotion("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", -50);
-    addTrackMotion("(min-width: 768px) and (max-width: 1023px) and (prefers-reduced-motion: no-preference)", -75);
-    addTrackMotion("(max-width: 767px) and (prefers-reduced-motion: no-preference)", -87.5);
+    addTrackMotion("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", -33.3333);
+    addTrackMotion("(min-width: 768px) and (max-width: 1023px) and (prefers-reduced-motion: no-preference)", -66.6667);
+    addTrackMotion("(max-width: 767px) and (prefers-reduced-motion: no-preference)", -83.3333);
     return () => media.revert();
   }, { scope: section });
 

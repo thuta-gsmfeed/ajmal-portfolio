@@ -32,7 +32,7 @@ html.lenis,html.lenis body { height:auto; }
 .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior:contain; }
 .lenis.lenis-stopped { overflow:hidden; }
 .lenis.lenis-smooth iframe { pointer-events:none; }
-body { margin:0; background:var(--ink); color:var(--paper); font-family:var(--font-sans); font-size:16px; font-weight:var(--weight-regular); line-height:1.6; letter-spacing:var(--tracking-body); overflow-x:hidden; text-rendering:optimizeLegibility; font-synthesis:none; -webkit-font-smoothing:antialiased; }
+body { margin:0; background:var(--ink); color:var(--paper); font-family:var(--font-sans); font-size:16px; font-weight:var(--weight-regular); line-height:1.6; letter-spacing:var(--tracking-body); overflow-x:clip; text-rendering:optimizeLegibility; font-synthesis:none; -webkit-font-smoothing:antialiased; }
 button,a,input,select,textarea { -webkit-tap-highlight-color:transparent; }
 button,a { touch-action:manipulation; }
 @supports (padding:max(0px)) { body { padding-left:env(safe-area-inset-left); padding-right:env(safe-area-inset-right); } }
@@ -890,7 +890,7 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
 }
 
 /* Coolmix delivery v2: centered side-view vehicle with a horizontal service rail. */
-.coolmix-delivery--rail { height:520svh; background:#101010; }
+.coolmix-delivery--rail { height:440svh; overflow:visible; background:#101010; }
 .coolmix-delivery--rail .coolmix-delivery__stage { min-height:650px; background:#101010; }
 .coolmix-delivery--rail .coolmix-delivery__canvas {
   top:0;
@@ -970,14 +970,14 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
 }
 .coolmix-delivery__service-track {
   display:flex;
-  width:200%;
+  width:150%;
   height:100%;
   padding:clamp(54px,6.5vh,76px) clamp(34px,4vw,66px) clamp(28px,4vh,48px);
   will-change:transform;
 }
 .coolmix-delivery__service-card {
-  flex:0 0 12.5%;
-  width:12.5%;
+  flex:0 0 16.6667%;
+  width:16.6667%;
   min-width:0;
   padding:0 clamp(30px,3.6vw,62px);
   border-left:1px solid rgba(255,255,255,.1);
@@ -1015,34 +1015,34 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
 .coolmix-delivery__reduced-list p { margin:12px 0 0; color:rgba(7,18,28,.55); line-height:1.65; }
 
 @media (max-width:1023px) {
-  .coolmix-delivery--rail { height:500svh; }
-  .coolmix-delivery--rail .coolmix-delivery__stage { min-height:600px; }
+  .coolmix-delivery--rail { height:430svh; }
+  .coolmix-delivery--rail .coolmix-delivery__stage { min-height:0; }
   .coolmix-delivery--rail .coolmix-delivery__canvas { height:62%; }
   .coolmix-delivery__service-panel { height:45%; }
-  .coolmix-delivery__service-track { width:400%; padding:52px 28px 30px; }
-  .coolmix-delivery__service-card { flex-basis:12.5%; width:12.5%; padding-inline:24px; }
+  .coolmix-delivery__service-track { width:300%; padding:52px 28px 30px; }
+  .coolmix-delivery__service-card { flex-basis:16.6667%; width:16.6667%; padding-inline:24px; }
   .coolmix-delivery__service-card h2 { font-size:clamp(1.25rem,2.8vw,1.7rem); }
   .coolmix-delivery__service-card > span { font-size:15px; }
   .coolmix-delivery--rail .coolmix-delivery__visual-fallback { top:auto; bottom:45%; width:min(58vw,600px); }
 }
 
 @media (max-width:767px) {
-  .coolmix-delivery--rail { height:520svh; }
-  .coolmix-delivery--rail .coolmix-delivery__stage { min-height:570px; }
+  .coolmix-delivery--rail { height:430svh; }
+  .coolmix-delivery--rail .coolmix-delivery__stage { height:100svh; min-height:0; }
   .coolmix-delivery--rail .coolmix-delivery__canvas { height:63%; }
-  .coolmix-delivery__topbar { top:24px; right:18px; left:18px; padding-bottom:11px; }
+  .coolmix-delivery__topbar { top:82px; right:18px; left:18px; padding-bottom:11px; }
   .coolmix-delivery__topbar > p { font-size:12px; letter-spacing:.1em; }
-  .coolmix-delivery__speed { top:84px; left:18px; font-size:12px; }
+  .coolmix-delivery__speed { top:138px; left:18px; font-size:12px; }
   .coolmix-delivery__service-panel { height:45%; }
   .coolmix-delivery__service-track {
     display:flex;
-    width:800%;
+    width:600%;
     padding:50px 0 28px;
     will-change:transform;
   }
   .coolmix-delivery__service-card {
-    flex:0 0 12.5%;
-    width:12.5%;
+    flex:0 0 16.6667%;
+    width:16.6667%;
     padding:0 28px;
     border-left:0;
   }
@@ -1056,15 +1056,28 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
   .coolmix-delivery--rail { height:auto; background:#fff; }
 }
 
-.yacht-section { padding-inline:clamp(10px,1.2vw,20px); }
+.yacht-section { padding:0; }
 .yacht-stage {
-  border:1px solid rgba(9,16,18,.12);
-  border-radius:clamp(18px,2vw,30px);
-  box-shadow:0 28px 90px rgba(9,16,18,.16);
+  border:0;
+  border-radius:0;
+  box-shadow:none;
 }
 @media (max-width:1023px) {
-  .yacht-section { padding:12px; }
-  .yacht-stage { border-radius:18px; }
+  .yacht-section { padding:0; }
+  .yacht-stage { border-radius:0; }
+}
+@media (max-width:767px) {
+  .about-card {
+    width:100vw;
+    margin-right:-14px;
+    margin-left:-14px;
+    border-right:0;
+    border-left:0;
+    border-radius:0;
+  }
+  .yacht-stage .section-title { font-size:clamp(2.15rem,10vw,3rem); }
+  .yacht-stage .section-description { max-width:34ch; font-size:.9375rem; line-height:1.6; }
+  .yacht-stage .pill { min-height:44px; margin-top:1.25rem; }
 }
 
 /* Unified typography system: display, heading, body and metadata roles. */
