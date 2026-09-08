@@ -45,7 +45,7 @@ export function AboutSection() {
   }, { scope: section });
 
   return (
-    <section ref={section} id="about" className="section-light overflow-hidden py-20 md:py-40">
+    <section ref={section} id="about" className="about-section section-light overflow-hidden py-20 md:py-40">
       <div className="container">
         <SectionTitle
           kicker="About me"
@@ -53,7 +53,7 @@ export function AboutSection() {
           body="An entrepreneur and technology founder building products, partnerships, and distribution networks across international markets."
         />
 
-        <div className="mt-12 overflow-hidden rounded-2xl border border-white/10 bg-[#080b0c] md:mt-20">
+        <div className="about-card mt-12 overflow-hidden rounded-[1.75rem] border border-black/10 bg-[#080b0c] text-white md:mt-20">
           <div className="grid lg:grid-cols-12">
             <div className="about-frame relative min-h-[430px] overflow-hidden border-b border-white/10 sm:min-h-[560px] lg:col-span-5 lg:min-h-[650px] lg:border-b-0 lg:border-r">
               <Image
@@ -67,33 +67,33 @@ export function AboutSection() {
               <div className="absolute inset-x-5 bottom-5 flex items-end justify-between gap-4 md:inset-x-7 md:bottom-7">
                 <div>
                   <p className="font-mono text-xs uppercase tracking-[.13em] text-cyan-100/75">Ajmal Gholzad</p>
-                  <p className="mt-1 text-sm text-white/58">Founder · Entrepreneur · Technologist</p>
+                  <p className="mt-1 text-sm text-white/[.68]">Founder · Entrepreneur · Technologist</p>
                 </div>
-                <span className="shrink-0 rounded-full border border-white/20 bg-black/25 px-3 py-2 font-mono text-xs uppercase tracking-[.13em] text-white/55 backdrop-blur-md">Since 2009</span>
+                <span className="shrink-0 rounded-full border border-white/20 bg-black/30 px-3 py-2 font-mono text-xs uppercase tracking-[.13em] text-white/[.68] backdrop-blur-md">Since 2009</span>
               </div>
             </div>
 
-            <div className="flex flex-col justify-between p-6 sm:p-9 lg:col-span-7 lg:p-12 xl:p-16">
-              <div>
-                <div className="about-copy flex items-center justify-between gap-5 font-mono text-xs uppercase tracking-[.13em] text-white/35">
+            <div className="about-card__content relative flex flex-col justify-between p-6 sm:p-9 lg:col-span-7 lg:p-12 xl:p-16">
+              <div className="relative z-10">
+                <div className="about-copy flex items-center justify-between gap-5 font-mono text-xs uppercase tracking-[.13em] text-white/[.48]">
                   <span>Profile / 01</span>
                   <span>Build · Connect · Scale</span>
                 </div>
 
-                <p className="about-copy mt-8 max-w-2xl text-[clamp(1.45rem,2.2vw,2.25rem)] font-normal leading-[1.4] tracking-[-.012em] text-white/88 md:mt-12">
+                <p className="about-copy mt-8 max-w-2xl text-[clamp(1.45rem,2.2vw,2.25rem)] font-normal leading-[1.4] tracking-[-.012em] text-white/[.92] md:mt-12">
                   I&apos;ve spent more than 15 years turning opportunities into operating businesses—from marketing and iPhone distribution to e-commerce and AI software.
                 </p>
 
-                <blockquote className="about-copy mt-8 border-l border-cyan-200/55 pl-5 text-base leading-7 text-cyan-50/70 md:mt-10 md:max-w-xl md:text-lg md:leading-8">
+                <blockquote className="about-copy mt-8 border-l border-cyan-200/[.55] pl-5 text-base leading-7 text-cyan-50/[.76] md:mt-10 md:max-w-xl md:text-lg md:leading-8">
                   Clear thinking, trusted relationships, and consistent execution turn complexity into progress.
                 </blockquote>
 
                 <div className="mt-10 md:mt-14">
-                  <div className="about-rule h-px origin-left bg-white/12" />
+                  <div className="about-rule h-px origin-left bg-white/[.14]" />
                   {profile.map(([label, value]) => (
                     <div key={label} className="about-detail grid gap-2 border-b border-white/10 py-4 sm:grid-cols-[120px_1fr] sm:items-center md:py-5">
-                      <span className="font-mono text-xs uppercase tracking-[.13em] text-white/32">{label}</span>
-                      <span className="text-sm leading-6 text-white/68 md:text-base">{value}</span>
+                      <span className="font-mono text-xs uppercase tracking-[.13em] text-white/[.44]">{label}</span>
+                      <span className="text-sm leading-6 text-white/[.72] md:text-base">{value}</span>
                     </div>
                   ))}
                 </div>
@@ -101,18 +101,18 @@ export function AboutSection() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 border-t border-white/10 bg-black/25">
+          <div className="grid grid-cols-3 border-t border-white/10 bg-black/30">
             <div className="about-stat border-r border-white/10 px-3 py-5 text-center md:py-7">
               <strong className="block text-xl font-medium text-white md:text-3xl"><AnimatedCounter value={15} suffix="+" /></strong>
-              <span className="mt-1 block font-mono text-xs uppercase tracking-[.13em] text-white/35">Years</span>
+              <span className="mt-1 block font-mono text-xs uppercase tracking-[.13em] text-white/[.48]">Years</span>
             </div>
             <div className="about-stat border-r border-white/10 px-3 py-5 text-center md:py-7">
               <strong className="block text-xl font-medium text-cyan-100 md:text-3xl">$<AnimatedCounter value={100} suffix="M+" /></strong>
-              <span className="mt-1 block font-mono text-xs uppercase tracking-[.13em] text-white/35">Sales</span>
+              <span className="mt-1 block font-mono text-xs uppercase tracking-[.13em] text-white/[.48]">Sales</span>
             </div>
             <div className="about-stat px-3 py-5 text-center md:py-7">
               <strong className="block text-xl font-medium text-white md:text-3xl">Global</strong>
-              <span className="mt-1 block font-mono text-xs uppercase tracking-[.13em] text-white/35">Network</span>
+              <span className="mt-1 block font-mono text-xs uppercase tracking-[.13em] text-white/[.48]">Network</span>
             </div>
           </div>
         </div>
