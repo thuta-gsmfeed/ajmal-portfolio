@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion, useScroll, useSpring } from "framer-motion";
+import { motion, useReducedMotion,  } from "framer-motion";
+import { useSectionProgress } from "@/components/animation/motion";
 import { ArrowUpRight } from "lucide-react";
 import { timeline } from "@/data/content";
 
@@ -30,21 +31,26 @@ export function JourneySection() {
   const section = useRef<HTMLElement>(null);
   const steps = useRef<Array<HTMLElement | null>>([]);
   const reducedMotion = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: section, offset: ["start 85%", "end 35%"] });
-  const journeyProgress = useSpring(scrollYProgress, { stiffness: 110, damping: 28, mass: 0.35 });
+  const journeyProgress = useSectionProgress(section, "top 85%", "bottom 35%", false);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => entries.forEach((entry) => {
-        if (entry.isIntersecting) setActive(Number((entry.target as HTMLElement).dataset.index));
-      }),
-      { rootMargin: "-36% 0px -42% 0px", threshold: 0 },
-    );
-    steps.current.forEach((step) => step && observer.observe(step));
-    return () => observer.disconnect();
-  }, []);
+    const update = () => {
+      let nearest = 0;
+      let distance = Infinity;
+      steps.current.forEach((step, index) => {
+        if (!step || !step.offsetParent) return;
+        const bounds = step.getBoundingClientRect();
+        const next = Math.abs(bounds.top + bounds.height / 2 - innerHeight / 2);
+        if (next < distance) { distance = next; nearest = index; }
+      });
+      setActive(nearest);
+    };
+    update();
+    return journeyProgress.on("change", update);
+  }, [journeyProgress]);
 
-  const progress = active / (timeline.length - 1);
+
+
 
   return (
     <section ref={section} id="journey" className="relative border-y border-black/10 bg-[#edf0ef] text-[#091012]" aria-label="Entrepreneurial experience: The climb was never linear.">
@@ -100,7 +106,7 @@ export function JourneySection() {
       </div>
 
       <div className="container hidden md:grid lg:grid-cols-[1.2fr_.8fr]">
-        <div className="self-start py-20 lg:sticky lg:top-20 lg:flex lg:min-h-[calc(100svh-5rem)] lg:flex-col lg:py-10">
+        <div className="self-start py-20 motion-safe:lg:sticky lg:top-20 lg:flex lg:min-h-[calc(100svh-5rem)] lg:flex-col lg:py-10">
           <div>
             <p className="eyebrow !text-black/45">Entrepreneurial experience</p>
             <h2 className="section-title mt-7 max-w-3xl">
@@ -116,9 +122,9 @@ export function JourneySection() {
             <svg viewBox="0 0 920 480" className="relative h-full w-full" role="img" aria-label={`Journey progress: ${timeline[active].year}, ${timeline[active].title}`}>
               <path d="M0 465 L110 408 L198 424 L292 354 L372 390 L470 298 L550 330 L650 218 L720 246 L820 98 L920 160 L920 480 L0 480 Z" fill="rgba(0,0,0,.045)" />
               <path d={route} fill="none" stroke="rgba(0,0,0,.16)" strokeWidth="2" strokeDasharray="7 9" />
-              <motion.path d={route} fill="none" stroke="#008fab" strokeWidth="3" strokeLinecap="round" initial={false} animate={{ pathLength: progress }} transition={{ duration: .75, ease: [0.22, 1, 0.36, 1] }} />
+              <motion.path d={route} fill="none" stroke="#008fab" strokeWidth="3" strokeLinecap="round" initial={false} style={{ pathLength: reducedMotion ? 1 : journeyProgress }} transition={{ duration: .75, ease: [0.22, 1, 0.36, 1] }} />
               {points.map(([x, y], index) => (
-                <motion.g key={timeline[index].year} onClick={() => steps.current[index]?.scrollIntoView({ behavior: "smooth", block: "center" })} className="cursor-pointer">
+                <motion.g key={timeline[index].year} onClick={() => steps.current[index]?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "center" })} className="cursor-pointer">
                   <motion.circle cx={x} cy={y} r="15" fill="rgba(0,143,171,.12)" animate={{ scale: index === active ? 1 : 0 }} style={{ transformOrigin: `${x}px ${y}px` }} />
                   <circle cx={x} cy={y} r={index === active ? 7 : 4} fill={index <= active ? "#008fab" : "#aab2b4"} stroke="#edf0ef" strokeWidth="3" />
                 </motion.g>
@@ -147,12 +153,12 @@ export function JourneySection() {
             >
               <motion.div
                 animate={{
-                  opacity: active === index ? 1 : 0.5,
-                  x: active === index ? 0 : 16,
-                  rotate: active === index ? 0 : index % 2 === 0 ? -1.15 : 1.15,
-                  scale: active === index ? 1 : 0.965,
+                  opacity: reducedMotion || active === index ? 1 : 0.78,
+                  x: reducedMotion || active === index ? 0 : 10,
+                  rotate: 0,
+                  scale: 1,
                 }}
-                transition={{ duration: .52, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: reducedMotion ? 0 : .4, ease: [0.22, 1, 0.36, 1] }}
                 className="relative w-full rounded-[1.75rem] border border-black/10 bg-white/55 p-6 shadow-[0_24px_70px_rgba(9,16,18,.08)] backdrop-blur-sm md:p-8"
               >
                 <span aria-hidden className="absolute left-1/2 top-0 h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full border-[7px] border-[#edf0ef] bg-cyan-700 shadow-[0_5px_12px_rgba(0,80,96,.22)]" />
@@ -160,7 +166,7 @@ export function JourneySection() {
                   <p className="font-mono text-sm text-cyan-700 transition-[letter-spacing,color] duration-500 group-hover:tracking-[.08em] group-hover:text-cyan-600">{milestone.year}</p>
                   <span className={`grid size-11 place-items-center rounded-full border transition-colors ${active === index ? "border-[#091012] bg-[#091012] text-white" : "border-black/15 text-black/35"}`}><ArrowUpRight size={16} /></span>
                 </div>
-                <h3 className="mt-5 text-[clamp(2rem,9vw,5.1rem)] leading-[1.12] tracking-[-.025em] transition-[color,transform] duration-500 ease-out group-hover:translate-x-2 group-hover:text-cyan-800 md:mt-8">{milestone.title}</h3>
+                <h3 className="mt-5 text-[clamp(1.75rem,4.2vw,3.5rem)] leading-[1.12] tracking-[-.025em] transition-[color,transform] duration-500 ease-out group-hover:translate-x-2 group-hover:text-cyan-800 md:mt-8">{milestone.title}</h3>
                 <p className="mt-4 line-clamp-2 max-w-xl text-base leading-7 text-black/60 transition-[color,transform] duration-500 ease-out group-hover:translate-x-2 group-hover:text-black/75 sm:line-clamp-none md:mt-7 md:text-lg md:leading-relaxed">{milestone.description}</p>
               </motion.div>
             </article>

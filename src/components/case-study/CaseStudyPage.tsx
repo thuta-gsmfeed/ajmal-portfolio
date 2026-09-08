@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ArrowLeft, ArrowUpRight, Check, Share2 } from "lucide-react";
 import { Product, products } from "@/data/content";
@@ -9,11 +9,24 @@ import { CinematicLink } from "@/components/navigation/CinematicLink";
 
 export function CaseStudyPage({ product }: { product: Product }) {
   const [shared, setShared] = useState(false);
+  const heroVideo = useRef<HTMLVideoElement>(null);
   const reducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
   const mediaScale = useTransform(scrollYProgress, [0, 0.35], [1, reducedMotion ? 1 : 1.08]);
   const mediaY = useTransform(scrollYProgress, [0, 0.35], [0, reducedMotion ? 0 : 90]);
   const next = products[(products.findIndex((item) => item.slug === product.slug) + 1) % products.length];
+
+  useEffect(() => {
+    const element = heroVideo.current;
+    if (!element) return;
+    if (reducedMotion) { element.pause(); return; }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) void element.play().catch(() => undefined);
+      else element.pause();
+    }, { threshold: 0.05 });
+    observer.observe(element);
+    return () => { observer.disconnect(); element.pause(); };
+  }, [reducedMotion]);
 
   const share = async () => {
     const data = { title: `${product.name} Case Study`, text: product.description, url: window.location.href };
@@ -34,7 +47,7 @@ export function CaseStudyPage({ product }: { product: Product }) {
             <span className="hidden font-mono uppercase tracking-[.1em] sm:block">Back to portfolio</span>
           </CinematicLink>
           <Image src={product.logo} alt={`${product.name} logo`} width={120} height={44} className="h-8 w-auto max-w-[108px] object-contain" />
-          <button type="button" onClick={share} aria-label={`Share ${product.name} case study`} className="inline-flex min-h-9 items-center justify-self-end gap-2 rounded-full border border-white/12 px-3 font-mono text-[10px] uppercase tracking-[.1em] text-white/55 transition-colors hover:border-cyan-200/35 hover:text-cyan-100">
+          <button type="button" onClick={share} aria-label={`Share ${product.name} case study`} className="inline-flex min-h-9 items-center justify-self-end gap-2 rounded-full border border-white/12 px-3 font-mono text-xs uppercase tracking-[.13em] text-white/55 transition-colors hover:border-cyan-200/35 hover:text-cyan-100">
             {shared ? <Check size={13} /> : <Share2 size={13} />}<span className="hidden sm:inline">{shared ? "Copied" : "Share"}</span>
           </button>
         </div>
@@ -43,7 +56,7 @@ export function CaseStudyPage({ product }: { product: Product }) {
 
       <section className="relative min-h-[110svh] overflow-hidden">
         <motion.div style={{ scale: mediaScale, y: mediaY }} className="absolute inset-0">
-          <video autoPlay={!reducedMotion} muted loop playsInline preload="metadata" className="size-full object-cover opacity-55">
+          <video ref={heroVideo} muted loop playsInline preload="metadata" className="size-full object-cover opacity-55">
             <source src={product.video.webm} type="video/webm" />
             <source src={product.video.mp4} type="video/mp4" />
           </video>
@@ -55,18 +68,18 @@ export function CaseStudyPage({ product }: { product: Product }) {
         <div className="container relative z-10 flex min-h-[110svh] items-end pb-20 pt-32 md:pb-24">
           <div className="max-w-5xl">
             <motion.p initial={reducedMotion ? false : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="eyebrow">{product.category}</motion.p>
-            <motion.h1 initial={reducedMotion ? false : { opacity: 0, y: 46 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.28, duration: 0.85, ease: [0.22, 1, 0.36, 1] }} className="mt-7 text-[clamp(3.6rem,10vw,9.5rem)] font-medium leading-[.85] tracking-[-.065em]">{product.name}</motion.h1>
+            <motion.h1 initial={reducedMotion ? false : { opacity: 0, y: 46 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.28, duration: 0.85, ease: [0.22, 1, 0.36, 1] }} className="mt-7 text-[clamp(3.6rem,10vw,9.5rem)] font-medium leading-[.88] tracking-[-.055em]">{product.name}</motion.h1>
             <motion.p initial={reducedMotion ? false : { opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.42, duration: 0.75 }} className="mt-8 max-w-3xl text-[clamp(1.35rem,2.4vw,2.4rem)] leading-tight text-white/80">{product.tagline}</motion.p>
           </div>
         </div>
       </section>
 
-      <section className="border-y border-white/10 bg-[#070a0b] py-16 md:py-24">
+      <section className="section-light border-y border-black/10 py-16 md:py-24">
         <div className="container grid gap-8 md:grid-cols-3">
           {product.metrics.map((metric, index) => (
-            <motion.div key={metric.label} initial={reducedMotion ? false : { opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.45 }} transition={{ delay: index * 0.08, duration: 0.65 }} className="border-l border-cyan-200/35 pl-5">
-              <strong className="block text-[clamp(2.5rem,5vw,5.5rem)] font-medium leading-none tracking-[-.05em] text-cyan-100">{metric.value}</strong>
-              <span className="mt-3 block font-mono text-sm uppercase tracking-[.12em] text-white/40">{metric.label}</span>
+            <motion.div key={metric.label} initial={reducedMotion ? false : { opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.45 }} transition={{ delay: index * 0.08, duration: 0.65 }} className="border-l border-cyan-700/35 pl-5">
+              <strong className="block text-[clamp(2.5rem,5vw,5.5rem)] font-medium leading-none tracking-[-.05em] text-cyan-800">{metric.value}</strong>
+              <span className="mt-3 block font-mono text-sm uppercase tracking-[.12em] text-black/45">{metric.label}</span>
             </motion.div>
           ))}
         </div>
@@ -80,7 +93,7 @@ export function CaseStudyPage({ product }: { product: Product }) {
             <a href={product.url} target="_blank" rel="noreferrer" className="pill mt-9">Visit {product.name}<ArrowUpRight size={16} /></a>
           </div>
           <div>
-            <p className="text-[clamp(1.35rem,2.5vw,2.3rem)] font-light leading-snug text-white/86">{product.description}</p>
+            <p className="text-[clamp(1.35rem,2.5vw,2.3rem)] font-normal leading-[1.4] tracking-[-.012em] text-white/86">{product.description}</p>
             <div className="mt-10 space-y-7 border-t border-white/10 pt-9 text-base leading-8 text-white/58 md:text-lg">
               {product.details.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
             </div>

@@ -79,7 +79,7 @@ export function ParticleJourneySection() {
             />
           </div>
 
-          <div className="pointer-events-none absolute bottom-2 left-1/2 hidden -translate-x-1/2 items-center gap-2 rounded-full border border-white/10 bg-black/25 px-4 py-2 font-mono text-[9px] uppercase tracking-[.14em] text-white/35 backdrop-blur-md lg:flex">
+          <div className="pointer-events-none absolute bottom-2 left-1/2 hidden -translate-x-1/2 items-center gap-2 rounded-full border border-white/10 bg-black/25 px-4 py-2 font-mono text-xs uppercase tracking-[.13em] text-white/35 backdrop-blur-md lg:flex">
             Scroll to morph
             <ArrowDown aria-hidden="true" size={12} strokeWidth={1.5} />
           </div>

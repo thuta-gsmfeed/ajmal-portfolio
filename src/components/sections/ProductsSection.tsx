@@ -3,10 +3,8 @@
 import Image from "next/image";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform, type MotionValue } from "framer-motion";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
+import { AnimatePresence, motion, useReducedMotion, useTransform, type MotionValue } from "framer-motion";
+import { useMotionSettings, useSectionProgress } from "@/components/animation/motion";
 import { ArrowUpRight, X } from "lucide-react";
 import { Product, products } from "@/data/content";
 import { CinematicLink } from "@/components/navigation/CinematicLink";
@@ -38,21 +36,21 @@ function ProductPreview({ product, compact = false }: { product: Product; compac
     const element = videoRef.current;
     if (!element) return;
     if (reducedMotion) {
+      element.preload = "metadata";
+      element.load();
       element.pause();
       return;
     }
 
-    if (!window.matchMedia("(max-width: 767px)").matches) {
-      void element.play().catch(() => undefined);
-      return () => element.pause();
-    }
-
     const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) void element.play().catch(() => undefined);
+      if (entry.isIntersecting) {
+        if (element.preload === "none") { element.preload = "metadata"; element.load(); }
+        void element.play().catch(() => undefined);
+      }
       else element.pause();
-    }, { threshold: 0.45 });
+    }, { threshold: 0.2, rootMargin: "180px 0px" });
     observer.observe(element);
-    return () => observer.disconnect();
+    return () => { observer.disconnect(); element.pause(); };
   }, [reducedMotion]);
 
   return (
@@ -62,7 +60,7 @@ function ProductPreview({ product, compact = false }: { product: Product; compac
         muted
         loop
         playsInline
-        preload="metadata"
+        preload="none"
         aria-label={`${product.name} product preview`}
         className={`w-full object-cover ${compact ? "aspect-[16/10]" : "aspect-video"}`}
       >
@@ -78,59 +76,45 @@ function ProductPreview({ product, compact = false }: { product: Product; compac
   );
 }
 
-function DepthProductSlide({ progress, index, total, children }: { progress: MotionValue<number>; index: number; total: number; children: ReactNode }) {
+function DepthProductSlide({ progress, index, total, active, children }: { active: boolean; progress: MotionValue<number>; index: number; total: number; children: ReactNode }) {
   const center = total <= 1 ? 0 : index / (total - 1);
-  const range = 0.42;
-  const input = index === 0 ? [0, range] : index === total - 1 ? [1 - range, 1] : [center - range, center, center + range];
-  const scale = useTransform(progress, input, index === 0 ? [1, 0.9] : index === total - 1 ? [0.9, 1] : [0.9, 1, 0.9]);
-  const rotateY = useTransform(progress, input, index === 0 ? [0, -8] : index === total - 1 ? [8, 0] : [8, 0, -8]);
-  const opacity = useTransform(progress, input, index === 0 ? [1, 0.56] : index === total - 1 ? [0.56, 1] : [0.56, 1, 0.56]);
-
-  return (
-    <motion.article
-      style={{ scale, rotateY, opacity, transformPerspective: 1200 }}
-      className="flex h-full w-screen shrink-0 items-center px-[max(24px,calc((100vw-1380px)/2))] pb-28 will-change-transform"
-    >
-      {children}
-    </motion.article>
-  );
+  const range = 1 / Math.max(1, total - 1);
+  const scale = useTransform(progress, [center - range, center - range * 0.18, center + range * 0.18, center + range], [0.93, 1, 1, 0.93]);
+  const rotateY = useTransform(progress, [center - range, center, center + range], [5, 0, -5]);
+  return <motion.article inert={!active} aria-hidden={!active} style={{ scale, rotateY, transformPerspective: 1400 }} className="product-slide flex h-full w-screen shrink-0 items-center px-[max(24px,calc((100vw-1280px)/2))] pb-24">{children}</motion.article>;
 }
 
 export function ProductsSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const mobileStageRef = useRef<HTMLDivElement>(null);
+  const currentRef = useRef(0);
+  const { desktop } = useMotionSettings();
+  const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<Product | null>(null);
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end end"] });
-  const trackX = useTransform(scrollYProgress, [0, 1], ["0vw", `-${(products.length - 1) * 100}vw`]);
-  const headlineOpacity = useTransform(scrollYProgress, [0, 0.1, 0.16], [1, 1, 0.22]);
-
-  useGSAP(
-    () => {
-      if (!window.matchMedia("(max-width: 767px)").matches) return;
-
-      gsap.registerPlugin(ScrollTrigger);
-      ScrollTrigger.create({
-        trigger: sectionRef.current,
-        start: "top top",
-        end: "bottom bottom",
-        pin: mobileStageRef.current,
-        pinSpacing: false,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-      });
-    },
-    { scope: sectionRef },
-  );
+  const scrollYProgress = useSectionProgress(sectionRef);
+  // Each viewport of travel contains a readable hold, followed by the transition.
+  const slideProgress = useTransform(scrollYProgress, (value) => {
+    if (products.length <= 1) return 0;
+    const chapter = value * products.length;
+    const index = Math.min(products.length - 1, Math.floor(chapter));
+    const transition = Math.max(0, Math.min(1, (chapter - index - 0.45) / 0.55));
+    return Math.min(1, (index + transition) / (products.length - 1));
+  });
+  useEffect(() => slideProgress.on("change", (value) => {
+    const next = Math.round(value * (products.length - 1));
+    if (next === currentRef.current) return;
+    currentRef.current = next;
+    setCurrent(next);
+  }), [slideProgress]);
+  const trackX = useTransform(slideProgress, [0, 1], ["0vw", `-${(products.length - 1) * 100}vw`]);
 
   return (
-    <section ref={sectionRef} id="products" className="relative h-[270svh] bg-[#030506] md:h-auto lg:h-[260vh]">
-      <div className="hidden h-screen overflow-hidden lg:sticky lg:top-0 lg:block">
+    <section ref={sectionRef} id="products" className="relative bg-[#030506]" style={{ height: desktop ? `${(products.length + 1) * 100}svh` : "auto" }}>
+      {desktop && <div className="product-stage sticky top-0 h-svh overflow-hidden">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_68%_55%,rgba(55,207,232,.075),transparent_34%)]" />
         <div className="hero-grid pointer-events-none absolute inset-0 opacity-15" />
         <div className="grain" />
 
         <motion.header
-          style={{ opacity: headlineOpacity }}
           className="container absolute inset-x-0 top-[92px] z-20 flex items-end justify-between gap-8 border-b border-white/10 pb-4"
         >
           <div>
@@ -146,7 +130,7 @@ export function ProductsSection() {
           className="flex h-full pt-[220px]"
         >
           {products.map((product, index) => (
-            <DepthProductSlide key={product.name} progress={scrollYProgress} index={index} total={products.length}>
+            <DepthProductSlide key={product.name} progress={slideProgress} index={index} total={products.length} active={current === index}>
               <div className="grid w-full grid-cols-[.82fr_1.18fr] items-center gap-10 xl:gap-16">
                 <div className="max-w-xl">
                   <div className="flex items-center gap-4 font-mono text-sm uppercase tracking-[.14em] text-cyan-200">
@@ -154,7 +138,7 @@ export function ProductsSection() {
                     <span className="h-px w-10 bg-cyan-200/45" />
                     <span>{product.category}</span>
                   </div>
-                  <ProductTitle product={product} className="mt-5 text-[clamp(2.5rem,3.25vw,3.125rem)] font-medium leading-[1.08] tracking-[.01em]" />
+                  <ProductTitle product={product} className="mt-5 text-[clamp(2.5rem,3.25vw,3.125rem)] font-medium leading-[1.08] tracking-[-.025em]" />
                   <p className="mt-4 max-w-lg text-[clamp(1.15rem,1.45vw,1.5rem)] leading-snug tracking-[.005em] text-white/78">
                     {product.tagline}
                   </p>
@@ -185,52 +169,15 @@ export function ProductsSection() {
 
         <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-[#030506] via-[#030506]/95 to-transparent pb-5 pt-12">
           <div className="container">
+            <div className="mb-4 flex items-center justify-between font-mono text-sm uppercase tracking-[.12em] text-white/55"><span>{products[current].name}</span><span>0{current + 1} / 0{products.length}</span></div>
             <div className="h-px bg-white/10">
               <motion.div style={{ scaleX: scrollYProgress }} className="h-full origin-left bg-cyan-200" />
             </div>
           </div>
         </div>
-      </div>
+      </div>}
 
-      <div ref={mobileStageRef} className="h-svh overflow-hidden md:hidden">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_62%_55%,rgba(55,207,232,.08),transparent_42%)]" />
-        <div className="hero-grid pointer-events-none absolute inset-0 opacity-15" />
-        <div className="grain" />
-
-        <header className="container absolute inset-x-0 top-20 z-20 border-b border-white/10 pb-4">
-          <p className="eyebrow">Featured products</p>
-          <h2 className="section-title mt-3">
-            <span className="block">Explore Our</span>
-            <span className="block text-cyan-200">Vision in Action.</span>
-          </h2>
-        </header>
-
-        <motion.div
-          style={{ x: trackX, width: `${products.length * 100}vw` }}
-          className="flex h-full pt-[190px]"
-        >
-          {products.map((product) => (
-            <article key={`mobile-horizontal-${product.name}`} className="flex h-full w-screen shrink-0 items-center px-3.5 pb-16">
-              <div className="w-full">
-                <ProductTitle product={product} className="text-[2.15rem] font-medium leading-[1.06] tracking-[.01em]" />
-                <button
-                  onClick={() => setSelected(product)}
-                  data-cursor="VIEW"
-                  className="relative mt-5 block w-full text-left"
-                  aria-label={`Read more about ${product.name}`}
-                >
-                  <ProductPreview product={product} />
-                </button>
-                <button onClick={() => setSelected(product)} className="pill mt-5">
-                  Read more <ArrowUpRight size={15} />
-                </button>
-              </div>
-            </article>
-          ))}
-        </motion.div>
-      </div>
-
-      <div className="container hidden py-20 md:block lg:hidden">
+      {!desktop && <div className="container py-20">
         <p className="eyebrow">Featured products</p>
         <h2 className="section-title mt-5">
           Explore Our<br /><span className="text-cyan-200">Vision in Action.</span>
@@ -241,7 +188,7 @@ export function ProductsSection() {
               <p className="font-mono text-sm uppercase tracking-[.14em] text-cyan-200">
                 0{index + 1} / {product.category}
               </p>
-              <ProductTitle product={product} className="mt-4 text-[clamp(2.15rem,9vw,3.125rem)] font-medium leading-[1.08] tracking-[.01em] sm:text-[clamp(2.5rem,12vw,3.125rem)]" />
+              <ProductTitle product={product} className="mt-4 text-[clamp(2.15rem,9vw,3.125rem)] font-medium leading-[1.08] tracking-[-.025em] sm:text-[clamp(2.5rem,12vw,3.125rem)]" />
               <p className="mt-4 text-base leading-relaxed text-white/75 md:text-xl md:leading-snug">{product.tagline}</p>
               <button
                 onClick={() => setSelected(product)}
@@ -258,7 +205,7 @@ export function ProductsSection() {
             </article>
           ))}
         </div>
-      </div>
+      </div>}
 
       <AnimatePresence>
         {selected && <ProductModal product={selected} onClose={() => setSelected(null)} />}
@@ -268,12 +215,24 @@ export function ProductsSection() {
 }
 
 function ProductModal({ product, onClose }: { product: Product; onClose: () => void }) {
+  const dialog = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const closeOnEscape = (event: KeyboardEvent) => event.key === "Escape" && onClose();
+    const opener = document.activeElement as HTMLElement | null;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+      if (event.key !== "Tab") return;
+      const nodes = Array.from(dialog.current?.querySelectorAll<HTMLElement>('button, a[href], input, select, textarea, iframe, [tabindex="0"]') ?? []).filter((node) => node.getClientRects().length);
+      const first = nodes[0], last = nodes[nodes.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    };
+    const frame = requestAnimationFrame(() => dialog.current?.querySelector<HTMLButtonElement>("button")?.focus());
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", closeOnEscape);
     return () => {
+      cancelAnimationFrame(frame);
+      opener?.focus({ preventScroll: true });
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", closeOnEscape);
     };
@@ -288,6 +247,7 @@ function ProductModal({ product, onClose }: { product: Product; onClose: () => v
       className="fixed inset-0 z-[350] grid place-items-center bg-black/90 p-3 md:p-7"
     >
       <motion.div
+        ref={dialog}
         role="dialog"
         aria-modal="true"
         aria-label={`${product.name} overview`}
@@ -308,7 +268,7 @@ function ProductModal({ product, onClose }: { product: Product; onClose: () => v
 
         <div className="px-6 pb-10 md:px-10 md:pb-12 lg:px-14">
           <div className="font-mono text-sm uppercase tracking-[.14em] text-cyan-200">{product.category}</div>
-          <ProductTitle product={product} className="mt-4 text-[clamp(2.5rem,5vw,3.125rem)] font-medium leading-[1.08] tracking-[.01em]" />
+          <ProductTitle product={product} className="mt-4 text-[clamp(2.5rem,5vw,3.125rem)] font-medium leading-[1.08] tracking-[-.025em]" />
           <p className="mt-4 max-w-3xl text-base leading-relaxed text-white/78 md:text-2xl md:leading-snug">{product.tagline}</p>
 
           <div className="mt-9 grid gap-10 lg:grid-cols-[.9fr_1.1fr]">
@@ -320,7 +280,7 @@ function ProductModal({ product, onClose }: { product: Product; onClose: () => v
 
               {product.features && (
                 <div className="mt-8 border-t border-white/10 pt-6">
-                  <h4 className="text-sm font-medium text-white/85">Our platform offers powerful tools like:</h4>
+                  <h4 className="text-base font-medium tracking-[-.015em] text-white/85">Our platform offers powerful tools like:</h4>
                   <dl className="mt-5 grid gap-4 sm:grid-cols-2">
                     {product.features.map((feature) => (
                       <div key={feature.title} className="border-l border-cyan-200/35 pl-4">
@@ -386,7 +346,7 @@ function ProductModal({ product, onClose }: { product: Product; onClose: () => v
                           <Image src={`${GSMFEED_APP_ASSET_ROOT}/${screen.image}`} alt={`gsmfeed ${screen.name} mobile screen`} fill sizes="190px" className="object-cover" />
                           <span className="pointer-events-none absolute inset-0 rounded-[1.65rem] ring-1 ring-inset ring-white/15" />
                         </div>
-                        <figcaption className="mt-3 text-center font-mono text-[11px] uppercase tracking-[.12em] text-white/45">{screen.name}</figcaption>
+                        <figcaption className="mt-3 text-center font-mono text-xs uppercase tracking-[.13em] text-white/45">{screen.name}</figcaption>
                       </figure>
                     ))}
                   </div>

@@ -1,62 +1,29 @@
 "use client";
 
-import { useLayoutEffect } from "react";
+import { useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+/** Refresh measurements after media settles. Section roots stay untransformed. */
 export function SectionTransitions() {
-  useLayoutEffect(() => {
-    if (matchMedia("(prefers-reduced-motion: reduce), (max-width: 767px)").matches) return;
-
+  useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
-    const context = gsap.context(() => {
-      const sections = gsap.utils
-        .toArray<HTMLElement>("main > section")
-        .filter((section) => !section.hasAttribute("data-no-section-transition"));
-
-      sections.slice(1).forEach((section) => {
-        gsap.fromTo(
-          section,
-          {
-            opacity: 0.7,
-            y: 34,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            ease: "none",
-            scrollTrigger: {
-              trigger: section,
-              start: "top 96%",
-              end: "top 72%",
-              scrub: 0.65,
-              invalidateOnRefresh: true,
-            },
-          },
-        );
-
-        gsap.fromTo(
-          section,
-          { "--section-edge-opacity": 0 } as gsap.TweenVars,
-          {
-            "--section-edge-opacity": 1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: section,
-              start: "top 92%",
-              end: "top 72%",
-              scrub: 0.5,
-              invalidateOnRefresh: true,
-            },
-          } as gsap.TweenVars,
-        );
-      });
-
-      requestAnimationFrame(() => ScrollTrigger.refresh());
-    });
-
-    return () => context.revert();
+    let frame = 0;
+    let refreshTimer = 0;
+    let disposed = false;
+    const refresh = () => {
+      if (disposed) return;
+      window.clearTimeout(refreshTimer);
+      refreshTimer = window.setTimeout(() => {
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(() => ScrollTrigger.refresh());
+      }, 120);
+    };
+    const onLoad = (event: Event) => { if (event.target instanceof HTMLImageElement && event.target.closest("main")) refresh(); };
+    document.fonts.ready.then(refresh);
+    document.addEventListener("load", onLoad, true);
+    window.addEventListener("pageshow", refresh);
+    return () => { disposed = true; window.clearTimeout(refreshTimer); cancelAnimationFrame(frame); document.removeEventListener("load", onLoad, true); window.removeEventListener("pageshow", refresh); };
   }, []);
-
   return null;
 }

@@ -50,7 +50,7 @@ const magnifierStyles = String.raw`
     height: 750svh;
     background: oklch(0.08 0 0);
     color: white;
-    font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+    font-family: var(--font-sans);
   }
   .magnifier-reveal::after { display: none; }
   .magnifier-stage {
@@ -113,10 +113,10 @@ const magnifierStyles = String.raw`
     gap: 10px;
     translate: -50% 0;
     color: rgba(255,255,255,.44);
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 600;
-    letter-spacing: .17em;
-    line-height: 1;
+    letter-spacing: var(--tracking-label);
+    line-height: 1.45;
     text-transform: uppercase;
     white-space: nowrap;
   }
@@ -148,16 +148,16 @@ const magnifierStyles = String.raw`
     background: rgba(255,255,255,.018);
     box-shadow: inset 0 0 28px rgba(255,255,255,.012);
     color: rgba(255,255,255,.23);
-    font-size: clamp(11px, 1.2vmin, 15px);
-    font-weight: 450;
-    letter-spacing: -.015em;
+    font-size: clamp(12px, 1.2vmin, 15px);
+    font-weight: 400;
+    letter-spacing: .005em;
     white-space: nowrap;
     will-change: transform, color, border-color, background-color, box-shadow;
   }
   .magnifier-bubble[data-kind="target"] {
     color: rgba(255,255,255,.3);
     font-size: clamp(13px, 1.5vmin, 18px);
-    font-weight: 540;
+    font-weight: 500;
   }
   .magnifier-halo {
     position: absolute;
@@ -219,9 +219,10 @@ const magnifierStyles = String.raw`
     gap: 10px;
     translate: -50% 0;
     color: rgba(255,255,255,.36);
-    font-family: "SFMono-Regular", Consolas, monospace;
-    font-size: 9px;
-    letter-spacing: .16em;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     pointer-events: none;
     will-change: opacity, transform;
@@ -269,9 +270,9 @@ const magnifierStyles = String.raw`
       font-size: clamp(1.65rem, 7vw, 2.35rem);
       line-height: 1.08;
     }
-    .magnifier-kicker { top: 48px; font-size: 8px; letter-spacing: .14em; }
+    .magnifier-kicker { top: 48px; font-size: 12px; letter-spacing: var(--tracking-label); }
     .magnifier-lens { width: 270px; height: 270px; }
-    .magnifier-bubble { font-size: 11px; }
+    .magnifier-bubble { font-size: 12px; }
     .magnifier-bubble[data-kind="target"] { font-size: 13px; }
     .magnifier-progress { right: 16px; bottom: 28px; width: 58px; }
     .magnifier-scroll-hint { bottom: 27px; }

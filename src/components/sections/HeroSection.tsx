@@ -1,7 +1,8 @@
 "use client";
 
+import { useMotionSettings, useSectionProgress } from "@/components/animation/motion";
 import Image from "next/image";
-import { motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { currentVentures, media } from "@/data/content";
@@ -23,13 +24,15 @@ export function HeroSection() {
   const imageY = useSpring(pointerY, { stiffness: 45, damping: 20 });
   const glowX = useSpring(useMotionValue(50), { stiffness: 55, damping: 24 });
   const glowY = useSpring(useMotionValue(40), { stiffness: 55, damping: 24 });
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const { desktop, reduced } = useMotionSettings();
+  const scrollYProgress = useSectionProgress(ref, "top top", "bottom top");
+  const imageScale = useTransform(scrollYProgress, [0, 1], [1.08, 1]);
   const scrollY = useTransform(scrollYProgress, [0, 1], [0, 190]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, 80]);
   const opacity = useTransform(scrollYProgress, [0, 0.78], [1, 0]);
 
   const move = (event: React.PointerEvent<HTMLElement>) => {
-    if (event.pointerType !== "mouse") return;
+    if (!desktop || event.pointerType !== "mouse") return;
     const bounds = event.currentTarget.getBoundingClientRect();
     const x = (event.clientX - bounds.left) / bounds.width;
     const y = (event.clientY - bounds.top) / bounds.height;
@@ -41,8 +44,8 @@ export function HeroSection() {
 
   return (
     <section ref={ref} id="home" onPointerMove={move} className="relative min-h-[108svh] overflow-hidden bg-[#030506]">
-      <motion.div className="absolute -inset-8" style={{ y: scrollY }}>
-        <motion.div className="absolute inset-0" style={{ x: imageX, y: imageY }} initial={{ scale: 1.12, filter: "blur(6px)" }} animate={{ scale: 1, filter: "blur(0px)" }} transition={{ duration: 2.2, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}>
+      <motion.div className="absolute -inset-8" style={{ y: desktop ? scrollY : 0, scale: desktop ? imageScale : 1 }}>
+        <motion.div className="absolute inset-0" style={{ x: imageX, y: imageY }} initial={reduced ? false : { scale: 1.04 }} animate={{ scale: 1 }} transition={{ duration: 2.2, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}>
           <Image src={media.hero.src} alt={media.hero.alt} fill priority sizes="100vw" className="object-cover opacity-65" />
         </motion.div>
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(3,5,6,.88)_0%,rgba(3,5,6,.44)_48%,rgba(3,5,6,.22)_100%),linear-gradient(0deg,#050607_0%,transparent_48%,rgba(2,3,4,.35)_100%)]" />
@@ -56,15 +59,15 @@ export function HeroSection() {
       <div className="hero-grid pointer-events-none absolute inset-0 opacity-25" />
       <div className="grain" />
 
-      <motion.div style={{ opacity, y: contentY }} className="container relative z-10 flex min-h-[100svh] flex-col justify-end pb-10 pt-32 md:pb-12">
+      <motion.div style={{ opacity: desktop ? opacity : 1, y: desktop ? contentY : 0 }} className="container relative z-10 flex min-h-[100svh] flex-col justify-end pb-10 pt-32 md:pb-12">
         <div className="mb-8 flex items-end justify-between">
           <div className="overflow-hidden">
             <motion.p
               variants={reveal}
-              initial="hidden"
+              initial={reduced ? false : "hidden"}
               animate="visible"
               custom={1.02}
-              className="eyebrow whitespace-nowrap !gap-2 !text-sm !tracking-[-.02em] sm:!gap-[.6rem] sm:!tracking-[.08em] md:!gap-3 md:!tracking-[.16em]"
+              className="eyebrow whitespace-nowrap"
             >
               Entrepreneur · Business Builder · Founder
             </motion.p>
@@ -84,14 +87,14 @@ export function HeroSection() {
 
         <h1 className="section-title max-w-[1320px]">
           <span className="block overflow-hidden md:hidden">
-            <motion.span className="block text-white/95" variants={reveal} initial="hidden" animate="visible" custom={1.08}>
+            <motion.span className="block text-white/95" variants={reveal} initial={reduced ? false : "hidden"} animate="visible" custom={1.08}>
               An innovative <span className="bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">entrepreneur.</span>
             </motion.span>
           </span>
           <span className="hidden md:block">
-            <span className="block"><motion.span className="block text-white/95" variants={reveal} initial="hidden" animate="visible" custom={1.08}>An innovative entrepreneur,</motion.span></span>
-            <span className="block"><motion.span className="block bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent" variants={reveal} initial="hidden" animate="visible" custom={1.2}>turning challenges into</motion.span></span>
-            <span className="block"><motion.span className="block text-white/95" variants={reveal} initial="hidden" animate="visible" custom={1.32}>impactful solutions.</motion.span></span>
+            <span className="block"><motion.span className="block text-white/95" variants={reveal} initial={reduced ? false : "hidden"} animate="visible" custom={1.08}>An innovative entrepreneur,</motion.span></span>
+            <span className="block"><motion.span className="block bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent" variants={reveal} initial={reduced ? false : "hidden"} animate="visible" custom={1.2}>turning challenges into</motion.span></span>
+            <span className="block"><motion.span className="block text-white/95" variants={reveal} initial={reduced ? false : "hidden"} animate="visible" custom={1.32}>impactful solutions.</motion.span></span>
           </span>
         </h1>
 

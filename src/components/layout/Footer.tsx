@@ -24,8 +24,8 @@ function BrandFinale() {
           <motion.path d={logoPath} transform="translate(-38.112 0)" fill="#f3f6f7" variants={{ hidden: { opacity: 0 }, visible: { opacity: 0.94 } }} transition={{ delay: reducedMotion ? 0 : 1.45, duration: 0.85 }} />
         </motion.svg>
         <motion.div initial={reducedMotion ? false : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.7 }} transition={{ delay: reducedMotion ? 0 : 1.1, duration: 0.9, ease: [0.22, 1, 0.36, 1] }} className="mt-10">
-          <p className="font-mono text-[10px] uppercase tracking-[.35em] text-cyan-100/65 md:text-xs">Vision · Trust · Consistency · Execution</p>
-          <h2 className="mt-5 text-[clamp(2.8rem,7vw,7.5rem)] font-medium leading-[.92] tracking-[-.055em]">Building what<br /><span className="text-cyan-100">comes next.</span></h2>
+          <p className="font-mono text-xs uppercase tracking-[.13em] text-cyan-100/65">Vision · Trust · Consistency · Execution</p>
+          <h2 className="mt-5 text-[clamp(2.8rem,7vw,7.5rem)] font-medium leading-[.94] tracking-[-.05em]">Building what<br /><span className="text-cyan-100">comes next.</span></h2>
         </motion.div>
         <motion.div aria-hidden initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }} transition={{ delay: reducedMotion ? 0 : 1.55, duration: 1.2 }} className="mt-12 h-px w-[min(560px,76vw)] origin-center bg-gradient-to-r from-transparent via-cyan-200/75 to-transparent" />
       </div>

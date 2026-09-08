@@ -1,10 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
+import { motion, useTransform } from "framer-motion";
+import { useMotionSettings, useSectionProgress } from "@/components/animation/motion";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { useEffect, useRef } from "react";
 
@@ -13,8 +11,9 @@ export function DubaiYachtSection() {
   const stage = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
   const targetTime = useRef(0);
-  const reducedMotion = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: section, offset: ["start start", "end end"] });
+  const { desktop } = useMotionSettings();
+  const reducedMotion = !desktop;
+  const scrollYProgress = useSectionProgress(section);
 
   const introOpacity = useTransform(scrollYProgress, [0, 0.055, 0.23, 0.31], [0, 1, 1, 0]);
   const introY = useTransform(scrollYProgress, [0, 0.22], [32, 0]);
@@ -23,143 +22,135 @@ export function DubaiYachtSection() {
   const seaOpacity = useTransform(scrollYProgress, [0.6, 0.7, 0.94, 1], [0, 1, 1, 0.7]);
   const seaY = useTransform(scrollYProgress, [0.6, 0.86], [38, 0]);
 
-  useGSAP(
-    () => {
-      if (reducedMotion || !window.matchMedia("(max-width: 1023px)").matches) return;
-
-      gsap.registerPlugin(ScrollTrigger);
-      ScrollTrigger.create({
-        trigger: section.current,
-        start: "top top",
-        end: "bottom bottom",
-        pin: stage.current,
-        pinSpacing: false,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-      });
-    },
-    { scope: section, dependencies: [reducedMotion] },
-  );
-
   useEffect(() => {
     const element = video.current;
     const container = section.current;
     if (!element || !container || reducedMotion) return;
-    element.preload = "auto";
-    element.load();
+
 
     let frame = 0;
     let active = false;
-    let displayedTime = 0;
     let lastSeek = 0;
     const frameDuration = 1 / 24;
+
+    const requestRender = () => {
+      if (active && !frame) frame = requestAnimationFrame(renderFrame);
+    };
 
     const syncTarget = (progress: number) => {
       if (!Number.isFinite(element.duration)) return;
       targetTime.current = progress * Math.max(0, element.duration - 0.08);
+      requestRender();
     };
 
     const onMetadata = () => {
       element.pause();
       syncTarget(scrollYProgress.get());
       const targetFrame = Math.round(targetTime.current / frameDuration) * frameDuration;
-      displayedTime = targetFrame;
       if (Math.abs(element.currentTime - targetFrame) > frameDuration / 2) {
         element.currentTime = targetFrame;
       }
     };
 
+    const onSeeked = () => {
+      if (Math.abs(targetTime.current - element.currentTime) > frameDuration / 2) requestRender();
+    };
+
     const renderFrame = (timestamp: number) => {
-      if (!active) {
-        frame = 0;
+      frame = 0;
+      if (!active) return;
+
+      if (timestamp - lastSeek < 1000 / 24) {
+        requestRender();
         return;
       }
 
-      if (timestamp - lastSeek >= 1000 / 30 && element.readyState >= 2 && Number.isFinite(element.duration)) {
-        const delta = targetTime.current - displayedTime;
-        displayedTime = Math.abs(delta) < frameDuration ? targetTime.current : displayedTime + delta * 0.24;
-        const targetFrame = Math.round(displayedTime / frameDuration) * frameDuration;
-
+      if (element.readyState >= 2 && Number.isFinite(element.duration)) {
+        const targetFrame = Math.round(targetTime.current / frameDuration) * frameDuration;
         if (!element.seeking && Math.abs(targetFrame - element.currentTime) > frameDuration / 2) {
           element.currentTime = targetFrame;
         }
         lastSeek = timestamp;
       }
-
-      frame = requestAnimationFrame(renderFrame);
     };
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         active = entry.isIntersecting;
-        if (active && !frame) frame = requestAnimationFrame(renderFrame);
+        if (active && element.preload !== "auto") { element.preload = "auto"; element.load(); }
+        if (active) requestRender();
         if (!active && frame) {
           cancelAnimationFrame(frame);
           frame = 0;
         }
       },
-      { rootMargin: "30% 0px" },
+      { rootMargin: "0px" },
     );
 
     const unsubscribe = scrollYProgress.on("change", syncTarget);
     element.addEventListener("loadedmetadata", onMetadata);
     element.addEventListener("durationchange", onMetadata);
-    element.addEventListener("canplay", onMetadata);
+    element.addEventListener("seeked", onSeeked);
     observer.observe(container);
     if (element.readyState >= 1) onMetadata();
 
-    return () => {
+  return () => {
       unsubscribe();
       observer.disconnect();
       element.removeEventListener("loadedmetadata", onMetadata);
       element.removeEventListener("durationchange", onMetadata);
-      element.removeEventListener("canplay", onMetadata);
+      element.removeEventListener("seeked", onSeeked);
       if (frame) cancelAnimationFrame(frame);
     };
   }, [reducedMotion, scrollYProgress]);
+
+  useEffect(() => {
+    const element = video.current;
+    if (!element || desktop) return;
+    const observer = new IntersectionObserver(([entry]) => { if (!entry.isIntersecting) element.pause(); });
+    observer.observe(element);
+    return () => { observer.disconnect(); element.pause(); };
+  }, [desktop]);
 
   return (
     <section
       ref={section}
       id="yachts"
-      className={`relative bg-[#02070a] ${reducedMotion ? "min-h-[110svh] lg:min-h-screen" : "h-[220svh] lg:h-[250vh]"}`}
+      className={`yacht-section relative bg-[#edf0ef] ${reducedMotion ? "" : "h-[250svh]"}`}
       aria-label="Dubai Marina Yachts story"
     >
-      <div ref={stage} className={`${reducedMotion ? "relative min-h-[110svh] lg:min-h-screen" : "h-svh lg:sticky lg:top-0 lg:h-screen"} overflow-hidden`}>
+      <div ref={stage} className={`yacht-stage ${reducedMotion ? "relative" : "sticky top-4 h-[calc(100svh-2rem)]"} overflow-hidden bg-[#02070a] text-white`}>
         <video
           ref={video}
           muted
           playsInline
-          preload="auto"
+          preload="none"
+          poster="/images/yacht-poster.jpg"
+          controls={!desktop}
           aria-label="A silver and black luxury yacht cruising from a side view into an aerial view"
-          className="absolute inset-0 size-full object-cover"
+          className={desktop ? "absolute inset-0 size-full object-cover" : "relative aspect-video w-full object-cover"}
         >
           <source src="/videos/yachts-scroll.scrub.mp4" type="video/mp4" />
         </video>
 
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(2,7,10,.76)_0%,rgba(2,7,10,.22)_46%,transparent_70%),linear-gradient(0deg,rgba(2,7,10,.78)_0%,transparent_36%,rgba(2,7,10,.3)_100%)]" />
+        <div hidden={!desktop} className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(2,7,10,.76)_0%,rgba(2,7,10,.22)_46%,transparent_70%),linear-gradient(0deg,rgba(2,7,10,.82)_0%,rgba(2,7,10,.4)_48%,transparent_78%,rgba(2,7,10,.3)_100%)]" />
         <div className="grain" />
 
-        <div className="container pointer-events-none absolute inset-x-0 top-24 z-10 flex items-center justify-between border-b border-white/15 pb-4">
+        <div className={`container pointer-events-none ${desktop ? "absolute inset-x-0 top-24" : "relative pt-8"} z-10 flex items-center justify-between border-b border-white/15 pb-4`}>
           <Image src="/images/logo/dubai-marina-yachts-logo.svg" alt="Dubai Marina Yachts" width={246} height={36} className="h-auto w-[180px] sm:w-[220px]" />
           <span className="hidden font-mono text-sm uppercase tracking-[.14em] text-white/55 sm:block">Dubai · Arabian Sea</span>
         </div>
 
-        <div className="container relative z-10 flex min-h-svh items-end pb-20 pt-36 lg:hidden">
-          <div>
-            <p className="font-mono text-sm uppercase tracking-[.14em] text-cyan-200">Dubai Marina Yachts</p>
-            <h2 className="section-title mt-4 max-w-4xl uppercase">No. 1 yacht rental<br />in Dubai.</h2>
-            <p className="section-description mt-5">Exclusive yacht experiences with dedicated crew, tailored packages, privacy, and premium service on Dubai&apos;s waters.</p>
-            <a href="https://dubaimarinayachts.ae/" target="_blank" rel="noreferrer" className="pill mt-7 bg-black/35 backdrop-blur-sm">Explore the fleet <ArrowUpRight size={15} /></a>
-          </div>
-        </div>
-
         {reducedMotion ? (
-          <div className="container relative z-10 hidden min-h-screen items-end pb-24 pt-40 lg:flex">
+          <div className="container relative z-10 pb-16 pt-8">
             <div>
               <p className="font-mono text-sm uppercase tracking-[.14em] text-cyan-200">Dubai Marina Yachts</p>
               <h2 className="section-title mt-5 max-w-4xl uppercase">No. 1 yacht rental<br />in Dubai.</h2>
               <p className="section-description mt-6">Exclusive yacht rental in Dubai with dedicated crew, tailored packages and the best service.</p>
+              <h3 className="mt-8 text-2xl">Your moment. Your horizon.</h3>
+              <p className="section-description mt-4">Weddings, engagements, celebrations, parties, sea adventures, and fishing—made unforgettable on the water.</p>
+              <h3 className="mt-8 text-2xl">The Arabian Sea, entirely yours.</h3>
+              <p className="section-description mt-4">Exclusive yacht rental services created for freedom, privacy, and unparalleled luxury on Dubai&apos;s pristine waters.</p>
               <a href="https://dubaimarinayachts.ae/" target="_blank" rel="noreferrer" className="pill mt-8 bg-black/25">Explore the fleet <ArrowUpRight size={15} /></a>
             </div>
           </div>

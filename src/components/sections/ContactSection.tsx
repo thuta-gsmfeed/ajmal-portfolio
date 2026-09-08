@@ -2,12 +2,13 @@
 
 import { FormEvent, useRef, useState } from "react";
 import { ArrowUpRight, CheckCircle2 } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { site } from "@/data/content";
 
 type State = { status: "idle" | "sending" | "success" | "error"; message?: string };
 
 export function ContactSection() {
+  const reduced = useReducedMotion();
   const [state, setState] = useState<State>({ status: "idle" });
   const startedAt = useRef(Date.now());
   const whatsappUrl = `https://wa.me/${site.whatsapp.phone}?text=${encodeURIComponent(site.whatsapp.message)}`;
@@ -34,7 +35,7 @@ export function ContactSection() {
       <div className="absolute -right-32 top-16 size-[560px] rounded-full bg-cyan-400/20 blur-[100px]" />
       <div className="container relative">
         <p className="eyebrow !text-black/50">Start a conversation</p>
-        <h2 className="section-title mt-6 max-w-6xl md:mt-8">Let&apos;s build the future together.</h2>
+        <motion.h2 initial={reduced ? false : { y: 16 }} whileInView={{ y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }} className="section-title mt-6 max-w-6xl md:mt-8">Let&apos;s build the future together.</motion.h2>
         <div className="mt-12 grid gap-12 md:mt-20 md:gap-20 lg:grid-cols-[.7fr_1.3fr]">
           <div>
             <p className="section-description section-description--dark max-w-md">Whether you&apos;re building a business, launching a product, entering a new market, or exploring a technology partnership, let&apos;s create something meaningful.</p>

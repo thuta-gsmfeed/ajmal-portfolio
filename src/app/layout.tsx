@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { SectionTransitions } from "@/components/animation/SectionTransitions";
+import { SmoothScroll } from "@/components/animation/SmoothScroll";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -117,7 +119,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body>{children}</body>
+      <body><SmoothScroll><SectionTransitions />{children}</SmoothScroll></body>
     </html>
   );
 }

@@ -2,14 +2,13 @@
 
 import Image from "next/image";
 import { type MouseEvent, useEffect, useState } from "react";
-import { AnimatePresence, motion, useScroll } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { nav } from "@/data/content";
 
 export function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { scrollYProgress } = useScroll();
 
   const scrollToSection = (event: MouseEvent<HTMLAnchorElement>, id: string) => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -26,10 +25,22 @@ export function Header() {
   };
 
   useEffect(() => {
-    const update = () => setScrolled(scrollY > 36);
+    let frame = 0;
+    let last = scrollY > 36;
+    const update = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        const next = scrollY > 36;
+        if (next === last) return;
+        last = next;
+        setScrolled(next);
+      });
+    };
+    setScrolled(last);
     update();
     addEventListener("scroll", update, { passive: true });
-    return () => removeEventListener("scroll", update);
+    return () => { cancelAnimationFrame(frame); removeEventListener("scroll", update); };
   }, []);
 
   useEffect(() => {
@@ -66,7 +77,6 @@ export function Header() {
             </div>
           </div>
 
-          <div className="absolute inset-x-0 bottom-0 h-px bg-white/10"><motion.div aria-hidden className="h-full origin-left bg-cyan-300" style={{ scaleX: scrollYProgress }} /></div>
         </motion.div>
       </header>
 

@@ -4,9 +4,11 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Html, Line, OrbitControls, Sparkles } from "@react-three/drei";
 import { feature } from "topojson-client";
 import countries from "world-atlas/countries-110m.json";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import * as THREE from "three";
 import { globalLocations, GlobalLocation, GlobalRoute, routes } from "@/data/content";
+
+type GlobeInteractionState = { interactive: RefObject<boolean> };
 
 const GLOBE_RADIUS = 2.15;
 
@@ -64,7 +66,7 @@ function CountryOutlines() {
 const samePoint = (first: [number, number], second: [number, number]) => first[0] === second[0] && first[1] === second[1];
 
 function AnimatedRoute({ route, index, selected }: { route: GlobalRoute; index: number; selected: GlobalLocation | null }) {
-  const particle = useRef<THREE.Mesh>(null);
+  const particle = useRef<THREE.Group>(null);
   const active = !selected || samePoint(route.from, selected.coordinates) || samePoint(route.to, selected.coordinates);
   const curve = useMemo(() => {
     const start = globePoint(...route.from, GLOBE_RADIUS + 0.035);
@@ -73,7 +75,7 @@ function AnimatedRoute({ route, index, selected }: { route: GlobalRoute; index: 
     const middle = start.clone().add(end).multiplyScalar(0.5).normalize().multiplyScalar(GLOBE_RADIUS + 0.3 + distance * 0.14);
     return new THREE.QuadraticBezierCurve3(start, middle, end);
   }, [route]);
-  const points = useMemo(() => curve.getPoints(72), [curve]);
+  const points = useMemo(() => curve.getPoints(48), [curve]);
 
   useFrame(({ clock }) => {
     if (!particle.current) return;
@@ -85,16 +87,23 @@ function AnimatedRoute({ route, index, selected }: { route: GlobalRoute; index: 
 
   return (
     <>
-      <Line points={points} color={active ? "#9aeeff" : "#31515a"} lineWidth={active && selected ? 1.6 : 0.72} transparent opacity={active ? (selected ? 0.88 : 0.42) : 0.1} />
-      <mesh ref={particle}>
-        <sphereGeometry args={[0.027, 12, 12]} />
-        <meshBasicMaterial color={active ? "#e5fcff" : "#31515a"} transparent opacity={active ? 1 : 0.16} toneMapped={false} />
-      </mesh>
+      <Line points={points} color={active ? "#ff7a2f" : "#5a3022"} lineWidth={active && selected ? 4.8 : 2.8} transparent opacity={active ? (selected ? 0.18 : 0.1) : 0.035} depthWrite={false} />
+      <Line points={points} color={active ? (selected ? "#ffb05c" : "#ff8738") : "#633423"} lineWidth={active && selected ? 1.85 : 1.05} transparent opacity={active ? (selected ? 0.95 : 0.64) : 0.1} depthWrite={false} />
+      <group ref={particle}>
+        <mesh>
+          <sphereGeometry args={[0.064, 10, 10]} />
+          <meshBasicMaterial color="#ff6b22" transparent opacity={active ? 0.16 : 0.03} depthWrite={false} toneMapped={false} />
+        </mesh>
+        <mesh>
+          <sphereGeometry args={[0.025, 8, 8]} />
+          <meshBasicMaterial color={active ? "#ffd2a1" : "#633423"} transparent opacity={active ? 1 : 0.14} toneMapped={false} />
+        </mesh>
+      </group>
     </>
   );
 }
 
-function LocationMarker({ location, index, mobile, selected, onSelect }: { location: GlobalLocation; index: number; mobile: boolean; selected: boolean; onSelect: (name: string) => void }) {
+function LocationMarker({ location, index, mobile, enabled, onSelect }: { location: GlobalLocation; index: number; mobile: boolean; enabled: boolean; onSelect: (name: string) => void }) {
   const group = useRef<THREE.Group>(null);
   const pulse = useRef<THREE.Mesh>(null);
   const label = useRef<HTMLDivElement>(null);
@@ -115,25 +124,25 @@ function LocationMarker({ location, index, mobile, selected, onSelect }: { locat
     if (label.current) label.current.style.opacity = visible ? "1" : "0";
     if (pulse.current) {
       const scale = 1.15 + Math.sin(clock.elapsedTime * 2.2 + index * 0.7) * 0.28;
-      pulse.current.scale.setScalar(scale * (selected ? 1.55 : 1));
+      pulse.current.scale.setScalar(scale);
     }
-    group.current.scale.setScalar(THREE.MathUtils.lerp(group.current.scale.x, selected ? 1.34 : 1, 0.08));
+    group.current.scale.setScalar(THREE.MathUtils.lerp(group.current.scale.x, 1, 0.08));
   });
 
   return (
     <group
       ref={group}
       position={position}
-      onClick={(event) => { event.stopPropagation(); onSelect(location.name); }}
-      onPointerOver={(event) => { event.stopPropagation(); document.body.style.cursor = "pointer"; }}
-      onPointerOut={() => { document.body.style.cursor = ""; }}
+      onClick={enabled ? (event) => { event.stopPropagation(); onSelect(location.name); } : undefined}
+      onPointerOver={enabled ? (event) => { event.stopPropagation(); document.body.style.cursor = "pointer"; } : undefined}
+      onPointerOut={enabled ? () => { document.body.style.cursor = ""; } : undefined}
     >
       <mesh>
-        <sphereGeometry args={[selected ? 0.047 : 0.034, 16, 16]} />
-        <meshBasicMaterial color={selected ? "#e5fcff" : "#d4c997"} toneMapped={false} />
+        <sphereGeometry args={[0.034, 12, 12]} />
+        <meshBasicMaterial color="#d4c997" toneMapped={false} />
       </mesh>
       <mesh ref={pulse}>
-        <sphereGeometry args={[0.061, 16, 16]} />
+        <sphereGeometry args={[0.061, 12, 12]} />
         <meshBasicMaterial color="#68e7ff" transparent opacity={0.16} depthWrite={false} />
       </mesh>
       {location.showLabel !== false && (
@@ -141,7 +150,7 @@ function LocationMarker({ location, index, mobile, selected, onSelect }: { locat
           <div
             ref={label}
             style={{ transform: `translate(${labelX}px, ${labelY}px)` }}
-            className="pointer-events-none whitespace-nowrap rounded-sm border border-white/15 bg-[#061014]/88 px-1.5 py-1 font-mono text-sm uppercase tracking-[.08em] text-white/75 shadow-[0_6px_24px_rgba(0,0,0,.4)] backdrop-blur-sm transition-opacity duration-300 md:text-[6px] md:tracking-[.15em]"
+            className="pointer-events-none whitespace-nowrap rounded-sm border border-white/15 bg-[#061014]/88 px-2 py-1.5 font-mono text-xs uppercase tracking-[.13em] text-white/75 shadow-[0_6px_24px_rgba(0,0,0,.4)] backdrop-blur-sm transition-opacity duration-300"
           >
             {location.name}
           </div>
@@ -151,20 +160,13 @@ function LocationMarker({ location, index, mobile, selected, onSelect }: { locat
   );
 }
 
-function NetworkGlobe({ mobile, selected, onSelect }: { mobile: boolean; selected: GlobalLocation | null; onSelect: (name: string) => void }) {
+function NetworkGlobe({ mobile, interactive }: { mobile: boolean } & GlobeInteractionState) {
   const group = useRef<THREE.Group>(null);
-  const targetQuaternion = useMemo(() => {
-    if (!selected) return null;
-    const locationDirection = globePoint(...selected.coordinates).normalize();
-    return new THREE.Quaternion().setFromUnitVectors(locationDirection, new THREE.Vector3(0, 0, 1));
-  }, [selected]);
 
-  useFrame((state, delta) => {
+  useFrame((state) => {
     if (!group.current) return;
-    if (targetQuaternion) {
-      group.current.quaternion.slerp(targetQuaternion, 0.045);
-    } else {
-      group.current.rotation.y += delta * 0.035;
+    if (!interactive.current && !mobile) {
+      group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, -1.38, 0.065);
       group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, state.pointer.y * 0.09 - 0.08, 0.025);
       group.current.rotation.z = THREE.MathUtils.lerp(group.current.rotation.z, state.pointer.x * -0.035, 0.02);
     }
@@ -173,7 +175,7 @@ function NetworkGlobe({ mobile, selected, onSelect }: { mobile: boolean; selecte
   return (
     <group ref={group} rotation={[-0.08, -1.38, 0]}>
       <mesh receiveShadow>
-        <sphereGeometry args={[GLOBE_RADIUS, mobile ? 56 : 72, mobile ? 56 : 72]} />
+        <sphereGeometry args={[GLOBE_RADIUS, mobile ? 48 : 64, mobile ? 48 : 64]} />
         <meshPhysicalMaterial color="#041116" roughness={0.72} metalness={0.5} clearcoat={0.2} />
       </mesh>
       <CountryOutlines />
@@ -181,27 +183,48 @@ function NetworkGlobe({ mobile, selected, onSelect }: { mobile: boolean; selecte
         <sphereGeometry args={[GLOBE_RADIUS + 0.095, 48, 48]} />
         <meshBasicMaterial color="#68e7ff" transparent opacity={0.045} side={THREE.BackSide} />
       </mesh>
-      {routes.map((route, index) => <AnimatedRoute key={route.label} route={route} index={index} selected={selected} />)}
-      {globalLocations.map((location, index) => <LocationMarker key={location.name} location={location} index={index} mobile={mobile} selected={selected?.name === location.name} onSelect={onSelect} />)}
+      {routes.map((route, index) => <AnimatedRoute key={route.label} route={route} index={index} selected={null} />)}
+      {globalLocations.map((location, index) => (
+        <LocationMarker
+          key={location.name}
+          location={location}
+          index={index}
+          mobile={mobile}
+          enabled={false}
+          onSelect={() => undefined}
+        />
+      ))}
     </group>
   );
 }
 
-export default function GlobeScene({ selectedName, onSelect }: { selectedName: string | null; onSelect: (name: string) => void }) {
+export default function GlobeScene({ active }: { active: boolean }) {
+  const interactive = useRef(false);
+  const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    if (!canvas) return;
+    const lost = () => setFailed(true);
+    canvas.addEventListener("webglcontextlost", lost);
+    return () => canvas.removeEventListener("webglcontextlost", lost);
+  }, [canvas]);
   const [mobile, setMobile] = useState(false);
-  const selected = globalLocations.find((location) => location.name === selectedName) ?? null;
 
   useEffect(() => {
-    const query = window.matchMedia("(max-width: 767px)");
+    const query = window.matchMedia("(max-width: 1023px)");
     const update = () => setMobile(query.matches);
     update();
     query.addEventListener("change", update);
     return () => query.removeEventListener("change", update);
   }, []);
 
+  if (failed) throw new Error("Globe graphics context unavailable");
+
   return (
     <Canvas
-      dpr={mobile ? 1 : [1, 1.5]}
+      onCreated={({ gl }) => setCanvas(gl.domElement)}
+      frameloop={active ? "always" : "demand"}
+      dpr={mobile ? 1 : [1, 1.35]}
       camera={{ position: [0, 0.15, 7.55], fov: 38 }}
       gl={{ antialias: !mobile, alpha: true, powerPreference: "high-performance" }}
       performance={{ min: 0.55 }}
@@ -209,10 +232,11 @@ export default function GlobeScene({ selectedName, onSelect }: { selectedName: s
       <ambientLight intensity={0.55} color="#bdeaf0" />
       <directionalLight position={[4, 4, 5]} intensity={3.2} color="#c9f6ff" />
       <directionalLight position={[-4, -1, 2]} intensity={1.2} color="#d4c997" />
-      <NetworkGlobe mobile={mobile} selected={selected} onSelect={onSelect} />
-      <Sparkles count={mobile ? 36 : 55} scale={[8, 7, 5]} size={0.75} speed={0.08} opacity={0.18} />
+      <NetworkGlobe mobile={mobile} interactive={interactive} />
+      <Sparkles count={mobile ? 28 : 42} scale={[8, 7, 5]} size={0.75} speed={0.08} opacity={0.18} />
       <OrbitControls
-        enabled={!selected}
+        onStart={() => { interactive.current = true; }}
+        enabled={!mobile}
         enablePan={false}
         enableZoom={false}
         enableDamping
