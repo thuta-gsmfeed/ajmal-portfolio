@@ -293,8 +293,7 @@ export function CoolmixDeliverySection() {
         )}
         <div className="coolmix-delivery__topbar">
           <div className="coolmix-delivery__brand" aria-label="Coolmix">
-            <Image src="/images/logo/coolmix-logo.svg" alt="" width={40} height={44} />
-            <span>coolmix</span>
+            <Image src="/images/logo/logo-white.svg" alt="" width={411} height={88} />
           </div>
           <p>Devices in motion</p>
         </div>

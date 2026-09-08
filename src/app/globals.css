@@ -757,13 +757,8 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
 .coolmix-delivery__brand {
   display:flex;
   align-items:center;
-  gap:11px;
-  color:#0071e3;
-  font-size:clamp(21px,1.8vw,28px);
-  font-weight:var(--weight-semibold);
-  letter-spacing:-.035em;
 }
-.coolmix-delivery__brand img { display:block; width:25px; height:auto; }
+.coolmix-delivery__brand img { display:block; width:clamp(118px,10vw,146px); height:auto; }
 .coolmix-delivery__chapters {
   position:absolute;
   z-index:3;
@@ -874,8 +869,7 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
     padding-bottom:13px;
   }
   .coolmix-delivery__intro > p { font-size:12px; letter-spacing:var(--tracking-label); }
-  .coolmix-delivery__brand { gap:8px; font-size:20px; }
-  .coolmix-delivery__brand img { width:20px; }
+  .coolmix-delivery__brand img { width:112px; }
   .coolmix-delivery__chapters { top:145px; right:18px; left:18px; }
   .coolmix-delivery__chapter { width:calc(100vw - 36px); }
   .coolmix-delivery__chapter-meta { margin-bottom:16px; font-size:12px; }
