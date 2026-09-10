@@ -136,9 +136,8 @@ export function DubaiYachtSection() {
         <div hidden={reducedMotion} className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(2,7,10,.76)_0%,rgba(2,7,10,.22)_46%,transparent_70%),linear-gradient(0deg,rgba(2,7,10,.82)_0%,rgba(2,7,10,.4)_48%,transparent_78%,rgba(2,7,10,.3)_100%)]" />
         <div className="grain" />
 
-        <div className={`container pointer-events-none ${reducedMotion ? "relative pt-8" : "absolute inset-x-0 top-24"} z-10 flex items-center justify-between border-b border-white/15 pb-4`}>
+        <div className={`container pointer-events-none ${reducedMotion ? "relative pt-8" : "absolute inset-x-0 top-[82px] md:top-[clamp(28px,4.5vh,52px)]"} z-10 flex items-center justify-center border-b border-white/15 pb-4`}>
           <Image src="/images/logo/dubai-marina-yachts-logo.svg" alt="Dubai Marina Yachts" width={246} height={36} className="h-auto w-[180px] sm:w-[220px]" />
-          <span className="hidden font-mono text-sm uppercase tracking-[.14em] text-white/55 sm:block">Dubai · Arabian Sea</span>
         </div>
 
         {reducedMotion ? (

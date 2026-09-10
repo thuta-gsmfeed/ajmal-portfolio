@@ -31,7 +31,7 @@ export function ContactSection() {
   }
 
   return (
-    <section id="contact" className="relative overflow-hidden bg-[#dfe9eb] py-20 text-[#071013] md:py-40">
+    <section id="contact" data-header-theme="light" className="relative overflow-hidden bg-[#dfe9eb] py-20 text-[#071013] md:py-40">
       <div className="absolute -right-32 top-16 size-[560px] rounded-full bg-cyan-400/20 blur-[100px]" />
       <div className="container relative">
         <p className="eyebrow !text-black/50">Start a conversation</p>

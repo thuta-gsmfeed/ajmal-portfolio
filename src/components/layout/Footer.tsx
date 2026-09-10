@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { ArrowUp, ArrowUpRight, Mail, MapPin, MessageCircle } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef } from "react";
 import { nav, site } from "@/data/content";
 
 const contactLinks = [
@@ -34,22 +35,48 @@ function BrandFinale() {
 }
 
 export function Footer() {
+  const shell = useRef<HTMLDivElement>(null);
+  const footer = useRef<HTMLElement>(null);
   const whatsappUrl = `https://wa.me/${site.whatsapp.phone}?text=${encodeURIComponent(site.whatsapp.message)}`;
   // Temporarily hidden; switch to true to restore the Gholzad Management Group finale.
   const showBrandFinale = false;
 
+  useEffect(() => {
+    const shellElement = shell.current;
+    const footerElement = footer.current;
+    if (!shellElement || !footerElement) return;
+
+    const syncHeight = () => {
+      const footerHeight = Math.ceil(footerElement.scrollHeight);
+      shellElement.style.setProperty("--sticky-footer-height", `${footerHeight}px`);
+      shellElement.classList.toggle(
+        "sticky-footer-shell--enabled",
+        window.matchMedia("(min-width: 1024px)").matches && footerHeight <= window.innerHeight,
+      );
+    };
+    const observer = new ResizeObserver(syncHeight);
+    observer.observe(footerElement);
+    window.addEventListener("resize", syncHeight);
+    syncHeight();
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", syncHeight);
+    };
+  }, []);
+
   return (
-    <footer className="relative overflow-hidden border-t border-white/10 bg-[#030506]">
+    <div ref={shell} className="sticky-footer-shell">
+      <footer ref={footer} className="sticky-footer-inner overflow-hidden border-t border-white/10 bg-[#030506]">
       <div aria-hidden className="absolute -right-40 top-0 size-[520px] rounded-full bg-cyan-300/[.045] blur-[110px]" />
       <div aria-hidden className="hero-grid pointer-events-none absolute inset-0 opacity-10" />
 
       {showBrandFinale && <BrandFinale />}
 
       <div className="container relative z-10">
-        <div className="grid gap-8 border-b border-white/10 py-12 md:grid-cols-[1fr_auto] md:items-end md:py-16 lg:py-20">
+        <div className="grid gap-8 border-b border-white/10 py-10 md:grid-cols-[1fr_auto] md:items-end md:py-12">
           <div>
             <p className="eyebrow">Start a conversation</p>
-            <h2 className="section-title mt-5 max-w-4xl md:mt-7">
+            <h2 className="section-title mt-5 max-w-4xl">
               Let&apos;s build what&apos;s
               <span className="block bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">
                 coming next.
@@ -63,7 +90,7 @@ export function Footer() {
           </a>
         </div>
 
-        <div className="grid gap-10 py-10 sm:grid-cols-2 md:gap-x-12 md:py-14 lg:grid-cols-12 lg:gap-8 lg:py-16">
+        <div className="grid gap-10 py-10 sm:grid-cols-2 md:gap-x-12 md:py-10 lg:grid-cols-12 lg:gap-8">
           <div className="sm:col-span-2 lg:col-span-5">
             <a
               href="#home"
@@ -145,7 +172,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-5 border-t border-white/10 py-6 text-sm text-white/30 sm:flex-row sm:items-center sm:justify-between md:py-7">
+        <div className="flex flex-col gap-5 border-t border-white/10 py-6 text-sm text-white/30 sm:flex-row sm:items-center sm:justify-between md:py-5">
           <p>© {new Date().getFullYear()} Ajmal Gholzad. All rights reserved.</p>
           <div className="flex items-center justify-between gap-6 sm:justify-end">
             <p className="font-mono uppercase tracking-[.08em]">Entrepreneur · Technology Founder</p>
@@ -159,6 +186,7 @@ export function Footer() {
           </div>
         </div>
       </div>
-    </footer>
+      </footer>
+    </div>
   );
 }

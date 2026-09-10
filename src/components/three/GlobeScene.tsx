@@ -146,11 +146,11 @@ function LocationMarker({ location, index, mobile, enabled, onSelect }: { locati
         <meshBasicMaterial color="#68e7ff" transparent opacity={0.16} depthWrite={false} />
       </mesh>
       {location.showLabel !== false && (
-        <Html center position={[0, 0, 0]} distanceFactor={mobile ? 4 : 6.2} zIndexRange={[30, 0]}>
+        <Html center position={[0, 0, 0]} distanceFactor={mobile ? 3.2 : 4.2} zIndexRange={[30, 0]}>
           <div
             ref={label}
             style={{ transform: `translate(${labelX}px, ${labelY}px)` }}
-            className="pointer-events-none whitespace-nowrap rounded-sm border border-white/15 bg-[#061014]/88 px-2 py-1.5 font-mono text-xs uppercase tracking-[.13em] text-white/75 shadow-[0_6px_24px_rgba(0,0,0,.4)] backdrop-blur-sm transition-opacity duration-300"
+            className="pointer-events-none whitespace-nowrap rounded-sm border border-white/15 bg-[#061014]/88 px-1.5 py-1 font-mono text-[10px] uppercase tracking-[.11em] text-white/75 shadow-[0_6px_24px_rgba(0,0,0,.4)] backdrop-blur-sm transition-opacity duration-300"
           >
             {location.name}
           </div>

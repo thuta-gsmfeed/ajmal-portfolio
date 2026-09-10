@@ -45,7 +45,7 @@ export function AboutSection() {
   }, { scope: section });
 
   return (
-    <section ref={section} id="about" className="about-section section-light overflow-hidden py-20 md:py-40">
+    <section ref={section} id="about" data-header-theme="light" className="about-section section-light overflow-hidden py-20 md:py-40">
       <div className="container">
         <SectionTitle
           kicker="About me"

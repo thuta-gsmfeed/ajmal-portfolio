@@ -53,7 +53,7 @@ export function JourneySection() {
 
 
   return (
-    <section ref={section} id="journey" className="relative border-y border-black/10 bg-[#edf0ef] text-[#091012]" aria-label="Entrepreneurial experience: The climb was never linear.">
+    <section ref={section} id="journey" data-header-theme="light" className="relative border-y border-black/10 bg-[#edf0ef] text-[#091012]" aria-label="Entrepreneurial experience: The climb was never linear.">
       <div className="container py-16 md:hidden">
         <div className="border-b border-black/15 pb-7">
           <p className="eyebrow !text-black/45">Entrepreneurial experience</p>

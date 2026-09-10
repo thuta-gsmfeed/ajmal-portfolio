@@ -19,6 +19,8 @@ const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, v
 
 export function CoolmixDeliverySection() {
   const section = useRef<HTMLElement>(null);
+  const stage = useRef<HTMLDivElement>(null);
+  const transitionWipe = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const speedLabel = useRef<HTMLSpanElement>(null);
   const cardTrack = useRef<HTMLDivElement>(null);
@@ -238,6 +240,20 @@ export function CoolmixDeliverySection() {
     gsap.registerPlugin(ScrollTrigger);
     const media = gsap.matchMedia();
     media.add("(prefers-reduced-motion: no-preference)", () => {
+      const reveal = gsap.fromTo(
+        transitionWipe.current,
+        { clipPath: "inset(0% 0% 0% 0%)" },
+        {
+          clipPath: "inset(0% 0% 0% 100%)",
+          ease: "none",
+          scrollTrigger: {
+            trigger: section.current,
+            start: "top 92%",
+            end: "top 18%",
+            scrub: 0.5,
+          },
+        },
+      );
       const cards = cardElements.current.filter(Boolean);
       let activeCard = -1;
       const updateCards = (value: number) => {
@@ -263,7 +279,7 @@ export function CoolmixDeliverySection() {
         onRefresh: (self) => { progress.current = self.progress; updateCards(self.progress); draw.current?.(); },
       });
       updateCards(0);
-      return () => { trigger.kill(); progress.current = 0; lastProgress.current = 0; velocity.current = 0; };
+      return () => { reveal.kill(); trigger.kill(); progress.current = 0; lastProgress.current = 0; velocity.current = 0; };
     });
 
     const addTrackMotion = (query: string, xPercent: number) => media.add(query, () => {
@@ -282,8 +298,9 @@ export function CoolmixDeliverySection() {
   }, { scope: section });
 
   return (
-    <section ref={section} id="coolmix-delivery" className="coolmix-delivery coolmix-delivery--rail" aria-label="Coolmix delivery journey" data-no-section-transition>
-      <div className="coolmix-delivery__stage">
+    <section ref={section} id="coolmix-delivery" data-header-theme="light" className="coolmix-delivery coolmix-delivery--rail" aria-label="Coolmix delivery journey" data-no-section-transition>
+      <div ref={stage} className="coolmix-delivery__stage">
+        <div ref={transitionWipe} data-header-theme="dark" className="coolmix-delivery__transition-wipe" aria-hidden="true" />
         <canvas ref={canvas} className={`coolmix-delivery__canvas ${canvasReady ? "is-ready" : ""}`} aria-hidden="true" />
         {(!canvasReady || canvasFailed) && (
           <div className="coolmix-delivery__visual-fallback" aria-hidden="true">
@@ -295,10 +312,9 @@ export function CoolmixDeliverySection() {
           <div className="coolmix-delivery__brand" aria-label="Coolmix">
             <Image src="/images/logo/logo-white.svg" alt="" width={411} height={88} />
           </div>
-          <p>Devices in motion</p>
         </div>
         <span ref={speedLabel} className="coolmix-delivery__speed" aria-hidden="true">00 KM/H</span>
-        <div className="coolmix-delivery__service-panel">
+        <div data-header-theme="dark" className="coolmix-delivery__service-panel">
           <div ref={cardTrack} className="coolmix-delivery__service-track">
             {chapters.map((chapter, index) => (
               <article key={chapter.label} ref={(node) => { cardElements.current[index] = node; }} className="coolmix-delivery__service-card">
