@@ -9,7 +9,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://ajmalgholzad.com"),
+  metadataBase: new URL("https://www.gholzad.com"),
   title: {
     default: "Ajmal Gholzad — Innovative Entrepreneur & Technology Founder",
     template: "%s | Ajmal Gholzad",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     "Dubai Entrepreneur",
     "Venture Capital",
   ],
-  authors: [{ name: "Ajmal Gholzad", url: "https://ajmalgholzad.com" }],
+  authors: [{ name: "Ajmal Gholzad", url: "https://www.gholzad.com" }],
   creator: "Ajmal Gholzad",
   publisher: "Gholzad Management Group",
   formatDetection: {
@@ -38,16 +38,18 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/images/logo/gholzad-logo.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon-96x96.png", type: "image/png", sizes: "96x96" },
     ],
-    shortcut: "/images/logo/gholzad-logo.svg",
-    apple: "/images/logo/gholzad-logo.svg",
+    shortcut: "/favicon.ico",
+    apple: [{ url: "/apple-icon.png", type: "image/png", sizes: "180x180" }],
   },
   openGraph: {
     title: "Ajmal Gholzad — Innovative Entrepreneur & Technology Founder",
     description:
       "An innovative entrepreneur, turning challenges into impactful solutions across global markets.",
-    url: "https://ajmalgholzad.com",
+    url: "https://www.gholzad.com",
     siteName: "Ajmal Gholzad Official Portfolio",
     images: [
       {
@@ -79,7 +81,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://ajmalgholzad.com",
+    canonical: "https://www.gholzad.com",
   },
 };
 
@@ -92,8 +94,8 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "Person",
     name: "Ajmal Gholzad",
-    url: "https://ajmalgholzad.com",
-    image: "https://ajmalgholzad.com/images/about/about.JPG",
+    url: "https://www.gholzad.com",
+    image: "https://www.gholzad.com/images/about/about.JPG",
     jobTitle: "Entrepreneur & Technology Founder",
     worksFor: {
       "@type": "Organization",
@@ -113,7 +115,6 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
-        <link rel="icon" href="/images/logo/gholzad-logo.svg" type="image/svg+xml" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { products } from "@/data/content";
 
-const baseUrl = "https://ajmalgholzad.com";
+const baseUrl = "https://www.gholzad.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
