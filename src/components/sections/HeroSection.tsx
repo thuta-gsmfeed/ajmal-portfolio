@@ -93,7 +93,7 @@ export function HeroSection() {
           </span>
           <span className="hidden md:block">
             <span className="block"><motion.span className="block text-white/95" variants={reveal} initial={reduced ? false : "hidden"} animate="visible" custom={1.08}>An innovative entrepreneur,</motion.span></span>
-            <span className="block"><motion.span className="block bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent" variants={reveal} initial={reduced ? false : "hidden"} animate="visible" custom={1.2}>turning challenges into</motion.span></span>
+            <span className="block"><motion.span className="block pb-[.12em] -mb-[.12em] bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent" variants={reveal} initial={reduced ? false : "hidden"} animate="visible" custom={1.2}>turning challenges into</motion.span></span>
             <span className="block"><motion.span className="block text-white/95" variants={reveal} initial={reduced ? false : "hidden"} animate="visible" custom={1.32}>impactful solutions.</motion.span></span>
           </span>
         </h1>
