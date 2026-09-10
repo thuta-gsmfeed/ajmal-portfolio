@@ -1,23 +1,15 @@
 "use client";
 
-import { useMotionSettings, useSceneVisibility } from "@/components/animation/motion";
+import { useSceneVisibility } from "@/components/animation/motion";
 import { SceneBoundary } from "@/components/three/SceneBoundary";
-import dynamic from "next/dynamic";
+import Globe from "@/components/three/GlobeScene";
 import { useRef } from "react";
 import { globalLocations } from "@/data/content";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 
-const Globe = dynamic(() => import("@/components/three/GlobeScene"), {
-  ssr: false,
-  loading: () => (
-    <div className="size-full rounded-full border border-cyan-300/15 bg-[radial-gradient(circle,rgba(104,231,255,.12),rgba(4,17,22,.7)_50%,transparent_72%)]" />
-  ),
-});
-
 export function GlobalNetworkSection() {
   const chapter = useRef<HTMLDivElement>(null);
-  const { reduced } = useMotionSettings();
-  const { near, active } = useSceneVisibility(chapter);
+  const { active } = useSceneVisibility(chapter);
   const fallback = <div className="scene-fallback"><p className="text-4xl text-cyan-100">Connected across markets.</p><p>A connected view of the global network.</p></div>;
 
   return (
@@ -36,7 +28,7 @@ export function GlobalNetworkSection() {
 
             <div className="network-scene relative mt-8 grid min-h-[480px] place-items-center py-4 md:mt-10 md:min-h-[780px] md:py-12">
               <div data-cursor="DRAG" className="network-globe absolute left-1/2 top-1/2 h-[min(92vw,470px)] w-[min(96vw,470px)] -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none active:cursor-grabbing md:h-[min(80vw,680px)] md:w-[min(88vw,680px)]">
-                {near && !reduced ? <SceneBoundary fallback={fallback}><Globe active={active} /></SceneBoundary> : fallback}
+                <SceneBoundary fallback={fallback}><Globe active={active} /></SceneBoundary>
               </div>
 
               <div className="network-controls absolute inset-x-0 bottom-4 z-20 flex max-w-full gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:left-auto md:right-0 md:max-w-lg md:flex-wrap md:justify-end md:overflow-visible">
