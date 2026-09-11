@@ -1,10 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { AnimatePresence, motion, useReducedMotion, useTransform, type MotionValue } from "framer-motion";
-import { useMotionSettings, useSectionProgress } from "@/components/animation/motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowUpRight, X } from "lucide-react";
 import { Product, products } from "@/data/content";
 import { CinematicLink } from "@/components/navigation/CinematicLink";
@@ -17,7 +19,57 @@ const gsmfeedAppScreens = [
   { name: "Trade Alerts", image: "Alert.png" },
 ] as const;
 
+const productHeadingLines = [
+  { words: ["Building", "the", "systems"], outline: false },
+  { words: ["that", "move", "markets."], outline: true },
+] as const;
+
+function AnimatedProductsHeading() {
+  return (
+    <h2 aria-label="Building the systems that move markets.">
+      {productHeadingLines.map((line) => (
+        <span key={line.words.join("-")} className={`featured-products__heading-line ${line.outline ? "featured-products__heading-line--outline" : ""}`} aria-hidden="true">
+          {line.words.map((word) => (
+            <span key={word} className="featured-products__heading-clip">
+              <span className="featured-products__heading-word">{word}</span>
+            </span>
+          ))}
+        </span>
+      ))}
+    </h2>
+  );
+}
+
 function ProductTitle({ product, className }: { product: Product; className: string }) {
+  if (product.slug === "gsmfeed") {
+    return (
+      <h3 className={`${className} featured-product__gsmfeed-lockup`}>
+        <Image className="featured-product__gsmfeed-symbol" src="/images/logo/gsmfeed-logo.svg" alt="" width={40} height={19} />
+        <Image className="featured-product__gsmfeed-wordmark" src="/images/logo/gsmfeed-full-logo.png" alt="gsmfeed logo" width={294} height={75} />
+      </h3>
+    );
+  }
+
+  const fullLogo = product.slug === "coolmix"
+    ? { src: "/images/logo/logo-white.svg", width: 411, height: 88 }
+    : product.slug === "projectmix"
+      ? { src: "/images/logo/projectfulllogo.svg", width: 523, height: 106 }
+      : null;
+
+  if (fullLogo) {
+    return (
+      <h3 className={className}>
+        <Image
+          src={fullLogo.src}
+          alt={`${product.name} logo`}
+          width={fullLogo.width}
+          height={fullLogo.height}
+          className={`featured-product__full-logo featured-product__full-logo--${product.slug}`}
+        />
+      </h3>
+    );
+  }
+
   return (
     <h3 className={`flex items-center gap-4 ${className}`}>
       <span className="grid h-11 min-w-10 shrink-0 place-items-center md:h-12 md:min-w-11">
@@ -76,136 +128,87 @@ function ProductPreview({ product, compact = false }: { product: Product; compac
   );
 }
 
-function DepthProductSlide({ progress, index, total, active, children }: { active: boolean; progress: MotionValue<number>; index: number; total: number; children: ReactNode }) {
-  const center = total <= 1 ? 0 : index / (total - 1);
-  const range = 1 / Math.max(1, total - 1);
-  const scale = useTransform(progress, [center - range, center - range * 0.18, center + range * 0.18, center + range], [0.93, 1, 1, 0.93]);
-  const rotateY = useTransform(progress, [center - range, center, center + range], [5, 0, -5]);
-  return <motion.article inert={!active} aria-hidden={!active} style={{ scale, rotateY, transformPerspective: 1400 }} className="product-slide flex h-full w-screen shrink-0 items-center px-[max(24px,calc((100vw-1280px)/2))] pb-24">{children}</motion.article>;
-}
-
 export function ProductsSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const currentRef = useRef(0);
-  const { desktop } = useMotionSettings();
-  const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<Product | null>(null);
-  const scrollYProgress = useSectionProgress(sectionRef);
-  // Each viewport of travel contains a readable hold, followed by the transition.
-  const slideProgress = useTransform(scrollYProgress, (value) => {
-    if (products.length <= 1) return 0;
-    const chapter = value * products.length;
-    const index = Math.min(products.length - 1, Math.floor(chapter));
-    const transition = Math.max(0, Math.min(1, (chapter - index - 0.45) / 0.55));
-    return Math.min(1, (index + transition) / (products.length - 1));
-  });
-  useEffect(() => slideProgress.on("change", (value) => {
-    const next = Math.round(value * (products.length - 1));
-    if (next === currentRef.current) return;
-    currentRef.current = next;
-    setCurrent(next);
-  }), [slideProgress]);
-  const trackX = useTransform(slideProgress, [0, 1], ["0vw", `-${(products.length - 1) * 100}vw`]);
+
+  useGSAP(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    const media = gsap.matchMedia();
+
+    media.add("(prefers-reduced-motion: no-preference)", () => {
+      gsap.fromTo(".featured-products__heading-word", {
+        yPercent: 115,
+        opacity: 0,
+        rotate: 3,
+      }, {
+        yPercent: 0,
+        opacity: 1,
+        rotate: 0,
+        duration: 0.9,
+        stagger: 0.085,
+        ease: "power4.out",
+        scrollTrigger: {
+          trigger: ".featured-products__intro",
+          start: "top 82%",
+          toggleActions: "play none none reverse",
+        },
+      });
+    });
+
+    return () => media.revert();
+  }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} id="products" className="relative bg-[#030506]" style={{ height: desktop ? `${(products.length + 1) * 100}svh` : "auto" }}>
-      {desktop && <div className="product-stage sticky top-0 h-svh overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_68%_55%,rgba(55,207,232,.075),transparent_34%)]" />
-        <div className="hero-grid pointer-events-none absolute inset-0 opacity-15" />
-        <div className="grain" />
+    <section ref={sectionRef} id="products" data-header-theme="dark" className="featured-products">
+      <div className="featured-products__glow" aria-hidden="true" />
+      <header className="featured-products__intro">
+        <p className="eyebrow">Featured products <span className="featured-products__count">/ 03</span></p>
+        <AnimatedProductsHeading />
+      </header>
 
-        <motion.header
-          className="container absolute inset-x-0 top-[92px] z-20 flex items-end justify-between gap-8 border-b border-white/10 pb-4"
-        >
-          <div>
-            <p className="eyebrow">Featured products</p>
-            <h2 className="section-title mt-3">
-              Explore Our <span className="text-cyan-200">Vision in Action.</span>
-            </h2>
-          </div>
-        </motion.header>
-
-        <motion.div
-          style={{ x: trackX, width: `${products.length * 100}vw` }}
-          className="flex h-full pt-[220px]"
-        >
-          {products.map((product, index) => (
-            <DepthProductSlide key={product.name} progress={slideProgress} index={index} total={products.length} active={current === index}>
-              <div className="grid w-full grid-cols-[.82fr_1.18fr] items-center gap-10 xl:gap-16">
-                <div className="max-w-xl">
-                  <div className="flex items-center gap-4 font-mono text-sm uppercase tracking-[.14em] text-cyan-200">
-                    <span>0{index + 1}</span>
-                    <span className="h-px w-10 bg-cyan-200/45" />
-                    <span>{product.category}</span>
-                  </div>
-                  <ProductTitle product={product} className="mt-5 text-[clamp(2.5rem,3.25vw,3.125rem)] font-medium leading-[1.08] tracking-[-.025em]" />
-                  <p className="mt-4 max-w-lg text-[clamp(1.15rem,1.45vw,1.5rem)] leading-snug tracking-[.005em] text-white/78">
-                    {product.tagline}
-                  </p>
-                  <p className="mt-5 max-w-lg text-sm leading-relaxed text-white/48 xl:text-base">
-                    {product.description}
-                  </p>
-                  <button onClick={() => setSelected(product)} className="pill mt-7">
-                    Read more <ArrowUpRight size={15} />
-                  </button>
-                </div>
-
-                <motion.button
-                  type="button"
-                  data-cursor="VIEW"
-                  onClick={() => setSelected(product)}
-                  whileHover={{ scale: 1.012 }}
-                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                  className="group relative w-full max-w-[620px] justify-self-end text-left xl:max-w-[700px]"
-                  aria-label={`Read more about ${product.name}`}
-                >
-                  <div className="absolute -inset-10 rounded-full bg-cyan-300/[.06] blur-[90px]" />
-                  <ProductPreview product={product} />
-                </motion.button>
-              </div>
-            </DepthProductSlide>
-          ))}
-        </motion.div>
-
-        <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-[#030506] via-[#030506]/95 to-transparent pb-5 pt-12">
-          <div className="container">
-            <div className="mb-4 flex items-center justify-between font-mono text-sm uppercase tracking-[.12em] text-white/55"><span>{products[current].name}</span><span>0{current + 1} / 0{products.length}</span></div>
-            <div className="h-px bg-white/10">
-              <motion.div style={{ scaleX: scrollYProgress }} className="h-full origin-left bg-cyan-200" />
+      <div className="featured-products__stack">
+        {products.map((product, index) => (
+          <motion.article
+            key={product.name}
+            className={`featured-product featured-product--${product.slug}`}
+            style={{ top: `calc(72px + ${index * 14}px)` }}
+            initial={{ opacity: 0.5, y: 70 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.15 }}
+            transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <span className="featured-product__number" aria-hidden="true">0{index + 1}</span>
+            <div className="featured-product__copy">
+              <p className="featured-product__meta"><span>0{index + 1}</span><span>{product.category}</span></p>
+              <ProductTitle product={product} className="featured-product__title" />
+              <p className="featured-product__tagline">{product.tagline}</p>
+              <p className="featured-product__description">{product.description}</p>
+              <button onClick={() => setSelected(product)} className="featured-product__cta">
+                <span>Explore venture</span><ArrowUpRight size={17} />
+              </button>
             </div>
-          </div>
-        </div>
-      </div>}
 
-      {!desktop && <div className="container py-20">
-        <p className="eyebrow">Featured products</p>
-        <h2 className="section-title mt-5">
-          Explore Our<br /><span className="text-cyan-200">Vision in Action.</span>
-        </h2>
-        <div className="mt-12 space-y-16 sm:space-y-20">
-          {products.map((product, index) => (
-            <article key={product.name}>
-              <p className="font-mono text-sm uppercase tracking-[.14em] text-cyan-200">
-                0{index + 1} / {product.category}
-              </p>
-              <ProductTitle product={product} className="mt-4 text-[clamp(2.15rem,9vw,3.125rem)] font-medium leading-[1.08] tracking-[-.025em] sm:text-[clamp(2.5rem,12vw,3.125rem)]" />
-              <p className="mt-4 text-base leading-relaxed text-white/75 md:text-xl md:leading-snug">{product.tagline}</p>
-              <button
-                onClick={() => setSelected(product)}
-                data-cursor="VIEW"
-                className="relative mt-6 block w-full text-left sm:mt-7"
-                aria-label={`Read more about ${product.name}`}
-              >
-                <ProductPreview product={product} compact />
-              </button>
-              <p className="mt-5 text-sm leading-7 text-white/55 sm:leading-relaxed sm:text-white/48 md:text-base">{product.description}</p>
-              <button onClick={() => setSelected(product)} className="pill mt-7">
-                Read more <ArrowUpRight size={15} />
-              </button>
-            </article>
-          ))}
-        </div>
-      </div>}
+            <motion.button
+              type="button"
+              data-cursor="VIEW"
+              onClick={() => setSelected(product)}
+              whileHover={{ rotate: -1.2, scale: 1.018 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="featured-product__media"
+              aria-label={`Explore ${product.name}`}
+            >
+              <ProductPreview product={product} compact />
+              <span className="featured-product__view">View project</span>
+            </motion.button>
+
+            <div className="featured-product__footer" aria-hidden="true">
+              <span>Ajmal Gholzad / Ventures</span>
+              <span>0{index + 1} — 0{products.length}</span>
+            </div>
+          </motion.article>
+        ))}
+      </div>
 
       <AnimatePresence>
         {selected && <ProductModal product={selected} onClose={() => setSelected(null)} />}

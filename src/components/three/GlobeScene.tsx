@@ -163,12 +163,16 @@ function LocationMarker({ location, index, mobile, enabled, onSelect }: { locati
 function NetworkGlobe({ mobile, interactive }: { mobile: boolean } & GlobeInteractionState) {
   const group = useRef<THREE.Group>(null);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     if (!group.current) return;
-    if (!interactive.current && !mobile) {
-      group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, -1.38, 0.065);
-      group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, state.pointer.y * 0.09 - 0.08, 0.025);
-      group.current.rotation.z = THREE.MathUtils.lerp(group.current.rotation.z, state.pointer.x * -0.035, 0.02);
+    if (!interactive.current) {
+      if (mobile) {
+        group.current.rotation.y += delta * 0.07;
+      } else {
+        group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, -1.38, 0.065);
+        group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, state.pointer.y * 0.09 - 0.08, 0.025);
+        group.current.rotation.z = THREE.MathUtils.lerp(group.current.rotation.z, state.pointer.x * -0.035, 0.02);
+      }
     }
   });
 
@@ -236,12 +240,13 @@ export default function GlobeScene({ active }: { active: boolean }) {
       <Sparkles count={mobile ? 28 : 42} scale={[8, 7, 5]} size={0.75} speed={0.08} opacity={0.18} />
       <OrbitControls
         onStart={() => { interactive.current = true; }}
-        enabled={!mobile}
+        enabled={active}
         enablePan={false}
         enableZoom={false}
         enableDamping
         dampingFactor={0.065}
-        rotateSpeed={0.48}
+        rotateSpeed={mobile ? 0.68 : 0.48}
+        touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.ROTATE }}
         minPolarAngle={Math.PI * 0.22}
         maxPolarAngle={Math.PI * 0.78}
       />

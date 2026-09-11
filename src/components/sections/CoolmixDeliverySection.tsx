@@ -324,6 +324,15 @@ export function CoolmixDeliverySection() {
               </article>
             ))}
           </div>
+          <a
+            className="coolmix-delivery__website-link"
+            href="https://coolmix.eu/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Visit Coolmix website (opens in a new tab)"
+          >
+            <span>Visit Coolmix</span>
+          </a>
         </div>
         <p className="sr-only">A Coolmix delivery journey from trusted sourcing and quality control through international logistics to reliable delivery.</p>
       </div>
@@ -346,6 +355,14 @@ export function CoolmixDeliverySection() {
             </article>
           ))}
         </div>
+        <a
+          className="coolmix-delivery__website-link coolmix-delivery__website-link--reduced"
+          href="https://coolmix.eu/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span>Visit Coolmix</span>
+        </a>
       </div>
     </section>
   );

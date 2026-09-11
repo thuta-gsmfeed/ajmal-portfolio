@@ -1,20 +1,13 @@
 "use client";
 
-import { DESKTOP_MOTION } from "@/components/animation/motion";
 import Image from "next/image";
-import { useRef } from "react";
+import { Fragment, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { media } from "@/data/content";
-import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
-import { SectionTitle } from "@/components/ui/SectionTitle";
 
-const profile = [
-  ["Based in", "Dubai · Europe"],
-  ["Markets", "US · Europe · Middle East · Asia"],
-  ["Focus", "Technology · Commerce · Distribution"],
-];
+const biography = "I've spent more than 15 years turning opportunities into operating businesses—from marketing and iPhone distribution to e-commerce and AI software.";
 
 export function AboutSection() {
   const section = useRef<HTMLElement>(null);
@@ -22,100 +15,85 @@ export function AboutSection() {
   useGSAP(() => {
     gsap.registerPlugin(ScrollTrigger);
     const match = gsap.matchMedia();
-    match.add(DESKTOP_MOTION, () => {
+    match.add("(prefers-reduced-motion: no-preference)", () => {
       const timeline = gsap.timeline({
         defaults: { ease: "power3.out" },
         scrollTrigger: {
           trigger: section.current,
-          start: "top 85%",
-          end: "top 12%",
-          scrub: 0.45,
+          start: "top 78%",
+          toggleActions: "play none none reverse",
         },
       });
 
       timeline
-        .fromTo(".about-frame", { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.05, ease: "power3.inOut" }, 0)
-        .fromTo(".about-photo", { scale: 1.08 }, { scale: 1, duration: 1.35, ease: "power2.out" }, 0.08)
-        .fromTo(".about-copy", { opacity: 0, y: 28 }, { opacity: 1, y: 0, stagger: 0.09, duration: 0.62 }, 0.28)
-        .fromTo(".about-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.75, ease: "power2.inOut" }, 0.4)
-        .fromTo(".about-detail", { opacity: 0, x: 18 }, { opacity: 1, x: 0, stagger: 0.08, duration: 0.48 }, 0.55)
-        .fromTo(".about-stat", { opacity: 0, y: 14 }, { opacity: 1, y: 0, stagger: 0.07, duration: 0.45 }, 0.72);
+        .fromTo(".about-kicker", { opacity: 0, x: -22 }, { opacity: 1, x: 0, duration: 0.55 }, 0)
+        .fromTo(".about-frame", { clipPath: "inset(0% 0% 0% 100%)", xPercent: 7 }, { clipPath: "inset(0% 0% 0% 0%)", xPercent: 0, duration: 1.05, ease: "power3.inOut" }, 0.04)
+        .fromTo(".about-quote-mark", { opacity: 0, scale: 0.55, rotate: -12 }, { opacity: 1, scale: 1, rotate: 0, duration: 0.55, ease: "back.out(1.8)" })
+        .fromTo(".about-caption", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.55 }, 0.72);
+
+      gsap.fromTo(".about-word", {
+        opacity: 0.08,
+        y: "0.7em",
+        filter: "blur(8px)",
+      }, {
+        opacity: 1,
+        y: 0,
+        filter: "blur(0px)",
+        stagger: 0.06,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: ".about-dossier__story",
+          start: "top 92%",
+          end: "center 38%",
+          scrub: 0.65,
+        },
+      });
+
+      gsap.fromTo(".about-photo", { scale: 1.1, yPercent: -2 }, {
+        scale: 1.02,
+        yPercent: 3,
+        ease: "none",
+        scrollTrigger: { trigger: section.current, start: "top bottom", end: "bottom top", scrub: 0.6 },
+      });
     });
     return () => match.revert();
   }, { scope: section });
 
   return (
-    <section ref={section} id="about" data-header-theme="light" className="about-section section-light overflow-hidden py-20 md:py-40">
-      <div className="container">
-        <SectionTitle
-          kicker="About me"
-          title="Ideas into enduring businesses."
-          body="An entrepreneur and technology founder building products, partnerships, and distribution networks across international markets."
-        />
-
-        <div className="about-card mt-12 overflow-hidden rounded-[1.75rem] border border-black/10 bg-[#080b0c] text-white md:mt-20">
-          <div className="grid lg:grid-cols-12">
-            <div className="about-frame relative min-h-[430px] overflow-hidden border-b border-white/10 sm:min-h-[560px] lg:col-span-5 lg:min-h-[650px] lg:border-b-0 lg:border-r">
-              <Image
-                src={media.portrait.src}
-                alt={media.portrait.alt}
-                fill
-                sizes="(max-width:1023px) calc(100vw - 28px), 42vw"
-                className="about-photo object-cover object-top"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/10" />
-              <div className="absolute inset-x-5 bottom-5 flex items-end justify-between gap-4 md:inset-x-7 md:bottom-7">
-                <div>
-                  <p className="font-mono text-xs uppercase tracking-[.13em] text-cyan-100/75">Ajmal Gholzad</p>
-                  <p className="mt-1 text-sm text-white/[.68]">Founder · Entrepreneur · Technologist</p>
-                </div>
-                <span className="shrink-0 rounded-full border border-white/20 bg-black/30 px-3 py-2 font-mono text-xs uppercase tracking-[.13em] text-white/[.68] backdrop-blur-md">Since 2009</span>
-              </div>
-            </div>
-
-            <div className="about-card__content relative flex flex-col justify-between p-6 sm:p-9 lg:col-span-7 lg:p-12 xl:p-16">
-              <div className="relative z-10">
-                <div className="about-copy flex items-center justify-between gap-5 font-mono text-xs uppercase tracking-[.13em] text-white/[.48]">
-                  <span>Profile / 01</span>
-                  <span>Build · Connect · Scale</span>
-                </div>
-
-                <p className="about-copy mt-8 max-w-2xl text-[clamp(1.45rem,2.2vw,2.25rem)] font-normal leading-[1.4] tracking-[-.012em] text-white/[.92] md:mt-12">
-                  I&apos;ve spent more than 15 years turning opportunities into operating businesses—from marketing and iPhone distribution to e-commerce and AI software.
-                </p>
-
-                <blockquote className="about-copy mt-8 border-l border-cyan-200/[.55] pl-5 text-base leading-7 text-cyan-50/[.76] md:mt-10 md:max-w-xl md:text-lg md:leading-8">
-                  Clear thinking, trusted relationships, and consistent execution turn complexity into progress.
-                </blockquote>
-
-                <div className="mt-10 md:mt-14">
-                  <div className="about-rule h-px origin-left bg-white/[.14]" />
-                  {profile.map(([label, value]) => (
-                    <div key={label} className="about-detail grid gap-2 border-b border-white/10 py-4 sm:grid-cols-[120px_1fr] sm:items-center md:py-5">
-                      <span className="font-mono text-xs uppercase tracking-[.13em] text-white/[.44]">{label}</span>
-                      <span className="text-sm leading-6 text-white/[.72] md:text-base">{value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 border-t border-white/10 bg-black/30">
-            <div className="about-stat border-r border-white/10 px-3 py-5 text-center md:py-7">
-              <strong className="block text-xl font-medium text-white md:text-3xl"><AnimatedCounter value={15} suffix="+" /></strong>
-              <span className="mt-1 block font-mono text-xs uppercase tracking-[.13em] text-white/[.48]">Years</span>
-            </div>
-            <div className="about-stat border-r border-white/10 px-3 py-5 text-center md:py-7">
-              <strong className="block text-xl font-medium text-cyan-100 md:text-3xl">$<AnimatedCounter value={100} suffix="M+" /></strong>
-              <span className="mt-1 block font-mono text-xs uppercase tracking-[.13em] text-white/[.48]">Sales</span>
-            </div>
-            <div className="about-stat px-3 py-5 text-center md:py-7">
-              <strong className="block text-xl font-medium text-white md:text-3xl">Global</strong>
-              <span className="mt-1 block font-mono text-xs uppercase tracking-[.13em] text-white/[.48]">Network</span>
-            </div>
-          </div>
+    <section ref={section} id="about" data-header-theme="light" className="about-section section-light overflow-hidden">
+      <div className="about-split">
+        <div className="about-dossier__story">
+          <p className="about-kicker eyebrow">About me</p>
+          <blockquote className="about-dossier__lead" aria-label={biography}>
+            <span className="about-quote-mark about-quote-mark--open" aria-hidden="true">“</span>
+            <span className="about-quote-copy" aria-hidden="true">
+              {biography.split(" ").map((word, index, words) => (
+                <Fragment key={`${word}-${index}`}>
+                  <span className="about-word">{word}</span>{index < words.length - 1 ? " " : ""}
+                </Fragment>
+              ))}
+              <span className="about-quote-mark about-quote-mark--close">”</span>
+            </span>
+          </blockquote>
         </div>
+
+        <figure className="about-frame about-dossier__portrait">
+          <Image
+            src={media.portrait.src}
+            alt={media.portrait.alt}
+            fill
+            sizes="(max-width:767px) calc(100vw - 48px), 40vw"
+            className="about-photo object-cover object-top"
+          />
+          <div className="about-dossier__portrait-shade" />
+          <figcaption className="about-caption about-dossier__caption">
+            <div>
+              <p>Ajmal Gholzad</p>
+              <span>Founder · Entrepreneur · Technologist</span>
+            </div>
+            <span className="about-dossier__since">Since 2009</span>
+          </figcaption>
+        </figure>
       </div>
     </section>
   );

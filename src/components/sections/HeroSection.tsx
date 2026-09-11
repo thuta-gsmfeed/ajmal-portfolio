@@ -67,7 +67,7 @@ export function HeroSection() {
               initial={reduced ? false : "hidden"}
               animate="visible"
               custom={1.02}
-              className="eyebrow whitespace-nowrap"
+              className="hero-roleline eyebrow"
             >
               Entrepreneur · Business Builder · Founder
             </motion.p>

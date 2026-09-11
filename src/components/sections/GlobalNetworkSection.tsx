@@ -27,7 +27,7 @@ export function GlobalNetworkSection() {
             </div>
 
             <div className="network-scene relative mt-8 grid min-h-[480px] place-items-center py-4 md:mt-10 md:min-h-[780px] md:py-12">
-              <div data-cursor="DRAG" className="network-globe absolute left-1/2 top-1/2 h-[min(92vw,470px)] w-[min(96vw,470px)] -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none active:cursor-grabbing md:h-[min(80vw,680px)] md:w-[min(88vw,680px)]">
+              <div data-cursor="DRAG" className="network-globe absolute left-1/2 top-1/2 h-[min(92vw,470px)] w-[min(96vw,470px)] -translate-x-1/2 -translate-y-1/2 cursor-grab touch-pan-y active:cursor-grabbing md:h-[min(80vw,680px)] md:w-[min(88vw,680px)]">
                 <SceneBoundary fallback={fallback}><Globe active={active} /></SceneBoundary>
               </div>
 
