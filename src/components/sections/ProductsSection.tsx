@@ -116,8 +116,8 @@ function ProductPreview({ product, compact = false }: { product: Product; compac
         aria-label={`${product.name} product preview`}
         className={`w-full object-cover ${compact ? "aspect-[16/10]" : "aspect-video"}`}
       >
-        <source src={product.video.webm} type="video/webm" />
         <source src={product.video.mp4} type="video/mp4" />
+        <source src={product.video.webm} type="video/webm" />
       </video>
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-cyan-200/[.08]" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/80 to-transparent px-4 pb-3 pt-10 font-mono text-sm uppercase tracking-[.12em] text-white/55">

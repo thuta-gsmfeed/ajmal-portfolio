@@ -19,13 +19,13 @@ export function ImmersiveSplineSection() {
   const [failed, setFailed] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
   const section = useRef<HTMLElement>(null);
-  const { reduced: reduceMotion, desktop } = useMotionSettings();
+  const { reduced: reduceMotion, desktop, lightweight } = useMotionSettings();
   const { near, active } = useSceneVisibility(section);
   useEffect(() => {
-    if (!near || sceneReady || reduceMotion) return;
+    if (!near || sceneReady || reduceMotion || lightweight) return;
     const timer = window.setTimeout(() => setFailed(true), 15000);
     return () => clearTimeout(timer);
-  }, [near, sceneReady, reduceMotion]);
+  }, [near, sceneReady, reduceMotion, lightweight]);
   const progress = useSectionProgress(section, "top bottom", "bottom top");
   const scale = useTransform(progress, [0, 0.55, 1], [0.86, 1, 1.025]);
   const copyY = useTransform(progress, [0, 1], [55, -45]);
@@ -84,10 +84,10 @@ export function ImmersiveSplineSection() {
         transition={{ duration: reduceMotion ? 0 : 1, delay: 0.15, ease: revealEase }}
       >
         <div className="immersive-spline-layer" aria-hidden="true">
-          {near && !reduceMotion && !failed ? <SceneBoundary fallback={fallback} onError={() => setFailed(true)}><ImmersiveSplineCanvas active={active} onLoad={() => setSceneReady(true)} /></SceneBoundary> : fallback}
+          {near && !reduceMotion && !lightweight && !failed ? <SceneBoundary fallback={fallback} onError={() => setFailed(true)}><ImmersiveSplineCanvas active={active} onLoad={() => setSceneReady(true)} /></SceneBoundary> : fallback}
         </div>
 
-        {near && !reduceMotion && !sceneReady && !failed && (
+        {near && !reduceMotion && !lightweight && !sceneReady && !failed && (
           <div className="immersive-loader pointer-events-none" role="status" aria-live="polite">
             <span aria-hidden="true" className="immersive-loader-spinner" />
             <span>Loading 3D scene</span>

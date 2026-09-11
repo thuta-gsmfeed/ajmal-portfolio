@@ -46,6 +46,7 @@ export function CoolmixDeliverySection() {
     const logo = new window.Image();
     let vanLoaded = false;
     let logoLoaded = false;
+    let whiteLogo: HTMLCanvasElement | null = null;
     let active = false;
     let disposed = false;
     let width = 1;
@@ -142,10 +143,7 @@ export function CoolmixDeliverySection() {
           const decalHeight = decalWidth * (logo.naturalHeight / logo.naturalWidth);
           const decalX = vehicleX + vehicleWidth * 0.255;
           const decalY = vehicleY + bob + vehicleHeight * 0.265;
-          context.save();
-          context.filter = "brightness(0) invert(1)";
-          context.drawImage(logo, decalX, decalY, decalWidth, decalHeight);
-          context.restore();
+          context.drawImage(whiteLogo ?? logo, decalX, decalY, decalWidth, decalHeight);
         }
 
         if (speedLabel.current) {
@@ -220,7 +218,24 @@ export function CoolmixDeliverySection() {
       draw.current?.();
     };
     van.onerror = () => setCanvasFailed(true);
-    logo.onload = () => { logoLoaded = true; draw.current?.(); };
+    logo.onload = () => {
+      const tintWidth = 512;
+      const tintHeight = Math.max(1, Math.round(tintWidth * (logo.naturalHeight / logo.naturalWidth)));
+      const tintCanvas = document.createElement("canvas");
+      const tintContext = tintCanvas.getContext("2d");
+      tintCanvas.width = tintWidth;
+      tintCanvas.height = tintHeight;
+      if (tintContext) {
+        tintContext.drawImage(logo, 0, 0, tintWidth, tintHeight);
+        tintContext.globalCompositeOperation = "source-in";
+        tintContext.fillStyle = "#fff";
+        tintContext.fillRect(0, 0, tintWidth, tintHeight);
+        tintContext.globalCompositeOperation = "source-over";
+        whiteLogo = tintCanvas;
+      }
+      logoLoaded = true;
+      draw.current?.();
+    };
     van.src = "/images/coolmix-delivery/step-van-v2.webp";
     logo.src = "/images/logo/coolmix-logo-for-car.png";
     resize();

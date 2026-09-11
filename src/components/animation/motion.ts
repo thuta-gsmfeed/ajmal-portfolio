@@ -9,16 +9,40 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 export const DESKTOP_MOTION = "(min-width: 1024px) and (prefers-reduced-motion: no-preference)";
 export const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 
+type NetworkInformationLike = EventTarget & {
+  downlink?: number;
+  effectiveType?: string;
+  saveData?: boolean;
+};
+
 export function useMotionSettings() {
-  const [settings, setSettings] = useState({ desktop: false, reduced: true });
+  const [settings, setSettings] = useState({ desktop: false, reduced: true, lightweight: false });
   useEffect(() => {
     const desktop = matchMedia(DESKTOP_MOTION);
     const reduced = matchMedia(REDUCED_MOTION);
-    const update = () => setSettings({ desktop: desktop.matches, reduced: reduced.matches });
+    const mobile = matchMedia("(max-width: 767px)");
+    const connection = (navigator as Navigator & { connection?: NetworkInformationLike }).connection;
+    const update = () => {
+      const slowType = ["slow-2g", "2g", "3g"].includes(connection?.effectiveType ?? "");
+      const slowLink = typeof connection?.downlink === "number" && connection.downlink < 1.5;
+      const lightweight = mobile.matches && (!navigator.onLine || Boolean(connection?.saveData) || slowType || slowLink);
+      setSettings({ desktop: desktop.matches, reduced: reduced.matches, lightweight });
+    };
     update();
     desktop.addEventListener("change", update);
     reduced.addEventListener("change", update);
-    return () => { desktop.removeEventListener("change", update); reduced.removeEventListener("change", update); };
+    mobile.addEventListener("change", update);
+    connection?.addEventListener("change", update);
+    window.addEventListener("online", update);
+    window.addEventListener("offline", update);
+    return () => {
+      desktop.removeEventListener("change", update);
+      reduced.removeEventListener("change", update);
+      mobile.removeEventListener("change", update);
+      connection?.removeEventListener("change", update);
+      window.removeEventListener("online", update);
+      window.removeEventListener("offline", update);
+    };
   }, []);
   return settings;
 }

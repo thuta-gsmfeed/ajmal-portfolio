@@ -98,8 +98,6 @@ export function HeroSection() {
           </span>
         </h1>
 
-        <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ delay: 1.55, duration: 1.2, ease: [0.22, 1, 0.36, 1] }} className="mt-7 h-px origin-left bg-gradient-to-r from-cyan-200/80 via-white/20 to-transparent" />
-
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}

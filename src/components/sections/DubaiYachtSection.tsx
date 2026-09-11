@@ -11,7 +11,7 @@ export function DubaiYachtSection() {
   const stage = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
   const targetTime = useRef(0);
-  const { desktop, reduced } = useMotionSettings();
+  const { desktop, reduced, lightweight } = useMotionSettings();
   const reducedMotion = reduced;
   const scrollYProgress = useSectionProgress(section, "top top", "bottom bottom", false);
 
@@ -102,7 +102,7 @@ export function DubaiYachtSection() {
       element.removeEventListener("seeked", onSeeked);
       if (frame) cancelAnimationFrame(frame);
     };
-  }, [reducedMotion, scrollYProgress]);
+  }, [reducedMotion, lightweight, scrollYProgress]);
 
   useEffect(() => {
     const element = video.current;
@@ -110,7 +110,7 @@ export function DubaiYachtSection() {
     const observer = new IntersectionObserver(([entry]) => { if (!entry.isIntersecting) element.pause(); });
     observer.observe(element);
     return () => { observer.disconnect(); element.pause(); };
-  }, [desktop]);
+  }, [desktop, lightweight]);
 
   return (
     <section
@@ -120,18 +120,28 @@ export function DubaiYachtSection() {
       aria-label="Dubai Marina Yachts story"
     >
       <div ref={stage} className={`yacht-stage ${reducedMotion ? "relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden bg-[#02070a] text-white`}>
-        <video
-          ref={video}
-          muted
-          playsInline
-          preload="none"
-          poster="/images/yacht-poster.jpg"
-          controls={reducedMotion}
-          aria-label="A silver and black luxury yacht cruising from a side view into an aerial view"
-          className={reducedMotion ? "relative aspect-video w-full object-cover" : "absolute inset-0 size-full object-cover"}
-        >
-          <source src="/videos/yachts-scroll.scrub.mp4" type="video/mp4" />
-        </video>
+        {lightweight ? (
+          <Image
+            src="/images/yacht-poster.jpg"
+            alt="A silver and black luxury yacht cruising on the water"
+            fill
+            sizes="100vw"
+            className="object-cover"
+          />
+        ) : (
+          <video
+            ref={video}
+            muted
+            playsInline
+            preload="none"
+            poster="/images/yacht-poster.jpg"
+            controls={reducedMotion}
+            aria-label="A silver and black luxury yacht cruising from a side view into an aerial view"
+            className={reducedMotion ? "relative aspect-video w-full object-cover" : "absolute inset-0 size-full object-cover"}
+          >
+            <source src="/videos/yachts-scroll.scrub.mp4" type="video/mp4" />
+          </video>
+        )}
 
         <div hidden={reducedMotion} className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(2,7,10,.76)_0%,rgba(2,7,10,.22)_46%,transparent_70%),linear-gradient(0deg,rgba(2,7,10,.82)_0%,rgba(2,7,10,.4)_48%,transparent_78%,rgba(2,7,10,.3)_100%)]" />
         <div className="grain" />

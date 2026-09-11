@@ -1260,6 +1260,40 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
   .yacht-stage { border-radius:0; }
 }
 @media (max-width:767px) {
+  .network-partners-chapter { margin-top:0; }
+  .network-stage .network-scene { min-height:560px; }
+  .network-stage .network-controls {
+    bottom:0;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:0;
+    max-width:none;
+    overflow:visible;
+    padding:0;
+    border-top:1px solid rgba(255,255,255,.1);
+    border-bottom:1px solid rgba(255,255,255,.1);
+    background:rgba(3,5,6,.82);
+    backdrop-filter:blur(18px);
+  }
+  .network-stage .network-controls .network-location {
+    min-width:0;
+    min-height:48px;
+    gap:9px;
+    padding:0 12px;
+    transform:none;
+    border:0;
+    border-bottom:1px solid rgba(255,255,255,.07);
+    border-radius:0;
+    background:transparent;
+    color:rgba(255,255,255,.62);
+    box-shadow:none;
+    font-size:10px;
+    letter-spacing:.1em;
+  }
+  .network-stage .network-controls .network-location:nth-child(odd) { border-right:1px solid rgba(255,255,255,.07); }
+  .network-stage .network-controls .network-location:nth-last-child(-n+2) { border-bottom:0; }
+  .network-location__index { flex:0 0 18px; color:rgba(104,231,255,.46); font-size:8px; letter-spacing:.04em; }
+  .network-location__label { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .yacht-stage .section-title { font-size:clamp(2.15rem,10vw,3rem); }
   .yacht-stage .section-description { max-width:34ch; font-size:.9375rem; line-height:1.6; }
   .yacht-stage .pill { min-height:44px; margin-top:1.25rem; }
