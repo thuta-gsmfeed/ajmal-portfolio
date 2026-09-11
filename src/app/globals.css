@@ -552,7 +552,7 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
 .featured-products__heading-clip { display:inline-block; overflow:hidden; margin:-.08em -.025em -.1em 0; padding:.08em .025em .1em; vertical-align:top; }
 .featured-products__heading-clip:not(:last-child) { margin-right:.2em; }
 .featured-products__heading-word { display:inline-block; transform-origin:left bottom; will-change:transform,opacity; }
-.featured-products__stack { position:relative; width:min(1440px,calc(100% - 48px)); margin:0 auto; padding-bottom:38svh; }
+.featured-products__stack { position:relative; width:min(1440px,calc(100% - 48px)); margin:0 auto; padding-bottom:0; }
 .featured-product { position:sticky; display:grid; min-height:calc(100svh - 108px); grid-template-columns:minmax(290px,.72fr) minmax(480px,1.28fr); align-items:center; gap:clamp(38px,5vw,84px); margin-bottom:18svh; padding:clamp(54px,6vw,92px); overflow:hidden; border:1px solid rgba(255,255,255,.14); border-radius:clamp(24px,2.4vw,38px); box-shadow:0 -16px 65px rgba(0,0,0,.38),0 45px 100px rgba(0,0,0,.58); isolation:isolate; }
 .featured-product:last-child { margin-bottom:0; }
 .featured-product--gsmfeed { background:radial-gradient(circle at 78% 28%,rgba(54,209,235,.19),transparent 35%),linear-gradient(145deg,#081b20,#05090b 72%); }
@@ -585,6 +585,7 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
   .featured-products__intro h2 { font-size:clamp(3.2rem,10.5vw,6.8rem); }
   .featured-products__stack { width:calc(100% - 28px); padding-bottom:0; }
   .featured-product { position:relative; top:auto!important; min-height:0; grid-template-columns:1fr; gap:38px; margin-bottom:28px; padding:72px 34px 70px; }
+  .featured-product:last-child { margin-bottom:0; }
   .featured-product__copy { max-width:680px; }
   .featured-product__media { width:min(760px,100%); justify-self:end; }
   .featured-product__footer { right:34px; left:34px; }
@@ -622,6 +623,19 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
 }
 
 /* Cinematic chapters: stable section roots, motion on their visual layers only. */
+.network-section { background:#030506; }
+.network-stage { background:#030506; }
+.network-stage::after {
+  content:"";
+  position:absolute;
+  z-index:15;
+  right:0;
+  bottom:0;
+  left:0;
+  height:clamp(120px,16svh,220px);
+  pointer-events:none;
+  background:linear-gradient(180deg,rgba(3,5,6,0),#030506 88%);
+}
 .scene-fallback { display:flex; height:100%; min-height:260px; flex-direction:column; align-items:center; justify-content:center; gap:24px; padding:32px; text-align:center; background:radial-gradient(ellipse at center,rgba(104,231,255,.09),transparent 65%); color:rgba(255,255,255,.65); }
 .scene-fallback img { width:min(65%,294px); height:auto; }
 .immersive-scene-shell { overflow:hidden; border:1px solid rgba(255,255,255,.08); border-radius:24px; }
@@ -840,9 +854,9 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
 .coolmix-delivery__visual-fallback img { display:block; width:100%; height:auto; }
 .coolmix-delivery__visual-fallback .coolmix-delivery__fallback-decal {
   position:absolute;
-  top:34.5%;
-  left:21%;
-  width:30%;
+  top:26.5%;
+  left:25.5%;
+  width:21.5%;
   filter:brightness(0) invert(1);
 }
 .coolmix-delivery__chrome {
@@ -1027,7 +1041,7 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
   .coolmix-delivery__reduced-brand img { width:26px; height:auto; }
   .coolmix-delivery__reduced-van-wrap { position:relative; width:min(840px,100%); margin:50px auto 32px; }
   .coolmix-delivery__reduced-van { display:block; width:100%; height:auto; }
-  .coolmix-delivery__reduced-decal { position:absolute; top:34.5%; left:21%; width:30%; height:auto; filter:brightness(0) invert(1); }
+  .coolmix-delivery__reduced-decal { position:absolute; top:26.5%; left:25.5%; width:21.5%; height:auto; filter:brightness(0) invert(1); }
   .coolmix-delivery__reduced-list { border-top:1px solid rgba(7,18,28,.12); }
   .coolmix-delivery__reduced-list article {
     display:grid;
@@ -1235,14 +1249,14 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
   .coolmix-delivery--rail { height:auto; background:#fff; }
 }
 
-.yacht-section { padding:0; }
+.yacht-section { margin-top:0; padding:clamp(168px,15vw,220px) 0 0; background:#030506; }
 .yacht-stage {
   border:0;
   border-radius:0;
   box-shadow:none;
 }
 @media (max-width:1023px) {
-  .yacht-section { padding:0; }
+  .yacht-section { margin-top:0; padding:112px 0 0; }
   .yacht-stage { border-radius:0; }
 }
 @media (max-width:767px) {

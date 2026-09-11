@@ -138,10 +138,10 @@ export function CoolmixDeliverySection() {
         drawWheelFace(1310, 746, wheelFaces[1]);
 
         if (logoLoaded) {
-          const decalWidth = vehicleWidth * 0.3;
+          const decalWidth = vehicleWidth * 0.215;
           const decalHeight = decalWidth * (logo.naturalHeight / logo.naturalWidth);
-          const decalX = vehicleX + vehicleWidth * 0.21;
-          const decalY = vehicleY + bob + vehicleHeight * 0.345;
+          const decalX = vehicleX + vehicleWidth * 0.255;
+          const decalY = vehicleY + bob + vehicleHeight * 0.265;
           context.save();
           context.filter = "brightness(0) invert(1)";
           context.drawImage(logo, decalX, decalY, decalWidth, decalHeight);
@@ -222,7 +222,7 @@ export function CoolmixDeliverySection() {
     van.onerror = () => setCanvasFailed(true);
     logo.onload = () => { logoLoaded = true; draw.current?.(); };
     van.src = "/images/coolmix-delivery/step-van-v2.webp";
-    logo.src = "/images/logo/logo-white.svg";
+    logo.src = "/images/logo/coolmix-logo-for-car.png";
     resize();
 
     return () => {
@@ -305,7 +305,7 @@ export function CoolmixDeliverySection() {
         {(!canvasReady || canvasFailed) && (
           <div className="coolmix-delivery__visual-fallback" aria-hidden="true">
             <Image src="/images/coolmix-delivery/step-van-v2.webp" alt="" width={1636} height={961} />
-            <Image className="coolmix-delivery__fallback-decal" src="/images/logo/logo-white.svg" alt="" width={411} height={88} />
+            <Image className="coolmix-delivery__fallback-decal" src="/images/logo/coolmix-logo-for-car.png" alt="" width={3839} height={2154} />
           </div>
         )}
         <div className="coolmix-delivery__topbar">
@@ -344,7 +344,7 @@ export function CoolmixDeliverySection() {
         </div>
         <div className="coolmix-delivery__reduced-van-wrap">
           <Image className="coolmix-delivery__reduced-van" src="/images/coolmix-delivery/step-van-v2.webp" alt="Coolmix delivery van" width={1636} height={961} />
-          <Image className="coolmix-delivery__reduced-decal" src="/images/logo/logo-white.svg" alt="" width={411} height={88} />
+          <Image className="coolmix-delivery__reduced-decal" src="/images/logo/coolmix-logo-for-car.png" alt="" width={3839} height={2154} />
         </div>
         <div className="coolmix-delivery__reduced-list">
           {chapters.map((chapter) => (
