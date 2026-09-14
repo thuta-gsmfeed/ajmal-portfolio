@@ -549,7 +549,7 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
 .featured-products__intro h2 { max-width:12ch; margin:clamp(28px,5vh,54px) 0 0; font-size:clamp(3.6rem,8.2vw,8.75rem); font-weight:var(--weight-medium); line-height:.86; letter-spacing:-.065em; }
 .featured-products__heading-line { display:block; }
 .featured-products__heading-line--outline { color:transparent; -webkit-text-stroke:1px rgba(255,255,255,.43); }
-.featured-products__heading-clip { display:inline-block; overflow:hidden; margin:-.08em -.025em -.1em 0; padding:.08em .025em .1em; vertical-align:top; }
+.featured-products__heading-clip { display:inline-block; overflow:hidden; margin:-.08em -.12em -.2em -.04em; padding:.08em .12em .2em .04em; vertical-align:top; }
 .featured-products__heading-clip:not(:last-child) { margin-right:.2em; }
 .featured-products__heading-word { display:inline-block; transform-origin:left bottom; will-change:transform,opacity; }
 .featured-products__stack { position:relative; width:min(1440px,calc(100% - 48px)); margin:0 auto; padding-bottom:0; }
@@ -1292,7 +1292,6 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
   }
   .network-stage .network-controls .network-location:nth-child(odd) { border-right:1px solid rgba(255,255,255,.07); }
   .network-stage .network-controls .network-location:nth-last-child(-n+2) { border-bottom:0; }
-  .network-location__index { flex:0 0 18px; color:rgba(104,231,255,.46); font-size:8px; letter-spacing:.04em; }
   .network-location__label { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .yacht-stage .section-title { font-size:clamp(2.15rem,10vw,3rem); }
   .yacht-stage .section-description { max-width:34ch; font-size:.9375rem; line-height:1.6; }

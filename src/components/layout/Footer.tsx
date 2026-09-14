@@ -73,7 +73,7 @@ export function Footer() {
       {showBrandFinale && <BrandFinale />}
 
       <div className="container relative z-10">
-        <div className="grid gap-8 border-b border-white/10 py-10 md:grid-cols-[1fr_auto] md:items-end md:py-12">
+        <div className="hidden gap-8 border-b border-white/10 py-10 md:grid md:grid-cols-[1fr_auto] md:items-end md:py-12">
           <div>
             <p className="eyebrow">Start a conversation</p>
             <h2 className="section-title mt-5 max-w-4xl">
@@ -90,15 +90,15 @@ export function Footer() {
           </a>
         </div>
 
-        <div className="grid gap-10 py-10 sm:grid-cols-2 md:gap-x-12 md:py-10 lg:grid-cols-12 lg:gap-8">
+        <div className="grid gap-6 py-7 sm:grid-cols-2 md:gap-x-12 md:gap-y-10 md:py-10 lg:grid-cols-12 lg:gap-8">
           <div className="sm:col-span-2 lg:col-span-5">
             <a
               href="#home"
               aria-label="Gholzad Management Group — back to home"
-              className="inline-flex items-center gap-4 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
+              className="inline-flex items-center gap-3 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 md:gap-4"
             >
-              <span className="grid size-14 place-items-center rounded-2xl border border-white/10 bg-white/[.035] md:size-16">
-                <Image src="/images/logo/gholzad-logo.svg" alt="" width={40} height={40} className="size-9 md:size-10" />
+              <span className="grid size-11 place-items-center rounded-xl border border-white/10 bg-white/[.035] md:size-16 md:rounded-2xl">
+                <Image src="/images/logo/gholzad-logo.svg" alt="" width={40} height={40} className="size-7 md:size-10" />
               </span>
               <span>
                 <strong className="block text-lg font-medium tracking-[.08em] text-white md:text-xl">GHOLZAD</strong>
@@ -106,24 +106,24 @@ export function Footer() {
               </span>
             </a>
 
-            <p className="mt-6 max-w-md text-base leading-7 text-white/55">
+            <p className="mt-6 hidden max-w-md text-base leading-7 text-white/55 md:block">
               Building trusted businesses, technology platforms, and global partnerships across markets.
             </p>
 
-            <div className="mt-6 flex items-center gap-2 text-sm text-white/40">
+            <div className="mt-4 flex items-center gap-2 text-xs text-white/40 md:mt-6 md:text-sm">
               <MapPin aria-hidden size={15} className="text-cyan-200/70" />
               {site.location}
             </div>
           </div>
 
-          <nav aria-label="Footer navigation" className="lg:col-span-3">
+          <nav aria-label="Footer navigation" className="hidden md:block lg:col-span-3">
             <p className="font-mono text-sm uppercase tracking-[.14em] text-white/35">Explore</p>
-            <div className="mt-4 grid grid-cols-2 gap-x-5 sm:grid-cols-1">
+            <div className="mt-2 grid grid-cols-2 gap-x-5 md:mt-4 sm:grid-cols-1">
               {nav.map(([label, id]) => (
                 <a
                   key={id}
                   href={`#${id}`}
-                  className="group flex min-h-11 items-center border-b border-white/[.07] text-base text-white/60 transition-colors duration-300 hover:text-white lg:max-w-[210px]"
+                  className="group flex min-h-10 items-center border-b border-white/[.07] text-sm text-white/60 transition-colors duration-300 hover:text-white md:min-h-11 md:text-base lg:max-w-[210px]"
                 >
                   {label}
                 </a>
@@ -133,21 +133,21 @@ export function Footer() {
 
           <div className="lg:col-span-4 lg:pl-5">
             <p className="font-mono text-sm uppercase tracking-[.14em] text-white/35">Connect</p>
-            <div className="mt-4">
+            <div className="mt-2 md:mt-4">
               {contactLinks.map(({ label, value, href, icon: Icon, ...link }) => (
                 <a
                   key={label}
                   href={href}
                   target={link.external ? "_blank" : undefined}
                   rel={link.external ? "noreferrer" : undefined}
-                  className="group grid min-h-[68px] grid-cols-[36px_1fr_auto] items-center gap-3 border-b border-white/[.07] text-white/60 transition-colors duration-300 hover:text-white"
+                  className="group grid min-h-14 grid-cols-[32px_minmax(0,1fr)_auto] items-center gap-3 border-b border-white/[.07] text-white/60 transition-colors duration-300 hover:text-white md:min-h-[68px] md:grid-cols-[36px_1fr_auto]"
                 >
                   <span className="grid size-9 place-items-center rounded-full border border-white/10 text-cyan-200/70 transition-colors group-hover:border-cyan-200/35 group-hover:text-cyan-100">
                     <Icon aria-hidden size={15} />
                   </span>
                   <span>
                     <span className="block font-mono text-sm uppercase tracking-[.08em] text-white/30">{label}</span>
-                    <span className="mt-0.5 block text-base">{value}</span>
+                    <span className="mt-0.5 block break-all text-sm md:text-base">{value}</span>
                   </span>
                   <ArrowUpRight aria-hidden size={15} className="text-white/25 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-cyan-200" />
                 </a>
@@ -157,14 +157,14 @@ export function Footer() {
                 href={whatsappUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="group grid min-h-[68px] grid-cols-[36px_1fr_auto] items-center gap-3 border-b border-white/[.07] text-white/60 transition-colors duration-300 hover:text-white"
+                className="group grid min-h-14 grid-cols-[32px_minmax(0,1fr)_auto] items-center gap-3 border-b border-white/[.07] text-white/60 transition-colors duration-300 hover:text-white md:min-h-[68px] md:grid-cols-[36px_1fr_auto]"
               >
                 <span className="grid size-9 place-items-center rounded-full border border-white/10 text-cyan-200/70 transition-colors group-hover:border-cyan-200/35 group-hover:text-cyan-100">
                   <MessageCircle aria-hidden size={15} />
                 </span>
                 <span>
                   <span className="block font-mono text-sm uppercase tracking-[.08em] text-white/30">WhatsApp</span>
-                  <span className="mt-0.5 block text-base">Start a conversation</span>
+                  <span className="mt-0.5 block text-sm md:text-base">Start a conversation</span>
                 </span>
                 <ArrowUpRight aria-hidden size={15} className="text-white/25 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-cyan-200" />
               </a>
@@ -172,10 +172,10 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-5 border-t border-white/10 py-6 text-sm text-white/30 sm:flex-row sm:items-center sm:justify-between md:py-5">
+        <div className="flex items-center justify-between gap-4 border-t border-white/10 py-5 text-xs text-white/30 sm:text-sm md:py-5">
           <p>© {new Date().getFullYear()} Ajmal Gholzad. All rights reserved.</p>
           <div className="flex items-center justify-between gap-6 sm:justify-end">
-            <p className="font-mono uppercase tracking-[.08em]">Entrepreneur · Technology Founder</p>
+            <p className="hidden font-mono uppercase tracking-[.08em] md:block">Entrepreneur · Technology Founder</p>
             <a
               href="#home"
               aria-label="Back to top"

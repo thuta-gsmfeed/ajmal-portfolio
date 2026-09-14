@@ -31,28 +31,28 @@ export function ContactSection() {
   }
 
   return (
-    <section id="contact" data-header-theme="light" className="relative overflow-hidden bg-[#dfe9eb] py-20 text-[#071013] md:py-40">
-      <div className="absolute -right-32 top-16 size-[560px] rounded-full bg-cyan-400/20 blur-[100px]" />
+    <section id="contact" data-header-theme="light" className="relative overflow-hidden bg-[#dfe9eb] py-12 text-[#071013] md:py-40">
+      <div className="absolute -right-32 top-16 size-[360px] rounded-full bg-cyan-400/20 blur-[100px] md:size-[560px]" />
       <div className="container relative">
         <p className="eyebrow !text-black/50">Start a conversation</p>
-        <motion.h2 initial={reduced ? false : { y: 16 }} whileInView={{ y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }} className="section-title mt-6 max-w-6xl md:mt-8">Let&apos;s build the future together.</motion.h2>
-        <div className="mt-12 grid gap-12 md:mt-20 md:gap-20 lg:grid-cols-[.7fr_1.3fr]">
+        <motion.h2 initial={reduced ? false : { y: 16 }} whileInView={{ y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }} className="section-title mt-4 max-w-6xl text-[clamp(2.15rem,10vw,3rem)] md:mt-8 md:text-[clamp(2.4rem,4.4vw,5rem)]">Let&apos;s build the future together.</motion.h2>
+        <div className="mt-8 grid gap-8 md:mt-20 md:gap-20 lg:grid-cols-[.7fr_1.3fr]">
           <div>
-            <p className="section-description section-description--dark max-w-md">Whether you&apos;re building a business, launching a product, entering a new market, or exploring a technology partnership, let&apos;s create something meaningful.</p>
-            <dl className="mt-8 space-y-1 border-t border-black/20 pt-4 text-sm md:mt-12 md:space-y-5 md:pt-7">
-              <div><dt className="text-black/40">Email</dt><dd className="md:mt-1"><a data-cursor="EMAIL" className="inline-flex min-h-11 items-center md:min-h-0" href={`mailto:${site.email}`}>{site.email}</a></dd></div>
-              <div><dt className="text-black/40">WhatsApp</dt><dd className="md:mt-1"><a data-cursor="CHAT" className="inline-flex min-h-11 items-center md:min-h-0" href={whatsappUrl} target="_blank" rel="noreferrer">Start a conversation <ArrowUpRight className="ml-1" size={13} /></a></dd></div>
-              <div><dt className="text-black/40">Base</dt><dd className="flex min-h-11 items-center md:mt-1 md:min-h-0">{site.location}</dd></div>
-              <div><dt className="text-black/40">Availability</dt><dd className="flex min-h-11 items-center gap-2 md:mt-1 md:min-h-0"><i className="size-2 rounded-full bg-emerald-500" />{site.availability}</dd></div>
+            <p className="section-description section-description--dark max-w-md !text-[.9375rem] !leading-6 md:!text-base md:!leading-7">Whether you&apos;re building a business, launching a product, entering a new market, or exploring a technology partnership, let&apos;s create something meaningful.</p>
+            <dl className="mt-6 grid grid-cols-2 gap-x-4 gap-y-4 border-t border-black/20 pt-4 text-xs md:mt-12 md:block md:space-y-5 md:pt-7 md:text-sm">
+              <div className="min-w-0"><dt className="text-black/40">Email</dt><dd className="min-w-0 md:mt-1"><a data-cursor="EMAIL" className="inline-flex min-h-10 max-w-full items-center break-all md:min-h-0" href={`mailto:${site.email}`}>{site.email}</a></dd></div>
+              <div><dt className="text-black/40">WhatsApp</dt><dd className="md:mt-1"><a data-cursor="CHAT" className="inline-flex min-h-10 items-center md:min-h-0" href={whatsappUrl} target="_blank" rel="noreferrer">Start a chat <ArrowUpRight className="ml-1 shrink-0" size={13} /></a></dd></div>
+              <div><dt className="text-black/40">Base</dt><dd className="flex min-h-8 items-center md:mt-1 md:min-h-0">{site.location}</dd></div>
+              <div><dt className="text-black/40">Availability</dt><dd className="flex min-h-8 items-center gap-2 md:mt-1 md:min-h-0"><i className="size-2 shrink-0 rounded-full bg-emerald-500" />{site.availability}</dd></div>
             </dl>
           </div>
-          <form onSubmit={submit} className="grid gap-x-5 gap-y-6 md:grid-cols-2 md:gap-y-7">
+          <form onSubmit={submit} className="grid gap-x-5 gap-y-4 md:grid-cols-2 md:gap-y-7">
             <label className="absolute -left-[9999px]" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
             {[["name", "Name", "text"], ["email", "Email", "email"], ["company", "Company", "text"]].map(([name, label, type]) => (
-              <label key={name} className="contact-field relative border-b border-black/25 pb-2 md:pb-3"><span className="contact-field-label block text-xs uppercase tracking-widest text-black/45">{label}</span><input name={name} type={type} required={name !== "company"} className="mt-1 min-h-12 w-full bg-transparent text-base outline-none md:mt-3 md:min-h-0 md:text-lg" /><i aria-hidden className="contact-field-line absolute inset-x-0 bottom-[-1px] h-px origin-left bg-cyan-700" /></label>
+              <label key={name} className="contact-field relative border-b border-black/25 pb-1 md:pb-3"><span className="contact-field-label block text-xs uppercase tracking-widest text-black/45">{label}</span><input name={name} type={type} required={name !== "company"} className="min-h-11 w-full bg-transparent text-base outline-none md:mt-3 md:min-h-0 md:text-lg" /><i aria-hidden className="contact-field-line absolute inset-x-0 bottom-[-1px] h-px origin-left bg-cyan-700" /></label>
             ))}
-            <label className="contact-field relative border-b border-black/25 pb-2 md:pb-3"><span className="contact-field-label block text-xs uppercase tracking-widest text-black/45">Project type</span><select name="projectType" className="mt-1 min-h-12 w-full bg-transparent text-base outline-none md:mt-3 md:min-h-0 md:text-lg"><option>Business collaboration</option><option>Technology partnership</option><option>Investment opportunity</option><option>Other</option></select><i aria-hidden className="contact-field-line absolute inset-x-0 bottom-[-1px] h-px origin-left bg-cyan-700" /></label>
-            <label className="contact-field relative border-b border-black/25 pb-2 md:col-span-2 md:pb-3"><span className="contact-field-label block text-xs uppercase tracking-widest text-black/45">Message</span><textarea name="message" required minLength={20} maxLength={2000} rows={4} className="mt-2 w-full resize-none bg-transparent text-base outline-none md:mt-3 md:text-lg" /><i aria-hidden className="contact-field-line absolute inset-x-0 bottom-[-1px] h-px origin-left bg-cyan-700" /></label>
+            <label className="contact-field relative border-b border-black/25 pb-1 md:pb-3"><span className="contact-field-label block text-xs uppercase tracking-widest text-black/45">Project type</span><select name="projectType" className="min-h-11 w-full bg-transparent text-base outline-none md:mt-3 md:min-h-0 md:text-lg"><option>Business collaboration</option><option>Technology partnership</option><option>Investment opportunity</option><option>Other</option></select><i aria-hidden className="contact-field-line absolute inset-x-0 bottom-[-1px] h-px origin-left bg-cyan-700" /></label>
+            <label className="contact-field relative border-b border-black/25 pb-1 md:col-span-2 md:pb-3"><span className="contact-field-label block text-xs uppercase tracking-widest text-black/45">Message</span><textarea name="message" required minLength={20} maxLength={2000} rows={3} className="mt-1 w-full resize-none bg-transparent text-base outline-none md:mt-3 md:text-lg" /><i aria-hidden className="contact-field-line absolute inset-x-0 bottom-[-1px] h-px origin-left bg-cyan-700" /></label>
             <div className="flex flex-wrap items-center gap-4 md:col-span-2 md:gap-5">
               <motion.button data-cursor="SEND" disabled={state.status === "sending"} className={`send-button pill !border-black/30 !text-white disabled:opacity-50 ${state.status === "success" ? "send-button--success" : "bg-black"}`} type="submit" whileTap={{ scale: 0.96 }}>
                 <AnimatePresence mode="wait" initial={false}>
