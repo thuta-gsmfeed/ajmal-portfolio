@@ -145,6 +145,32 @@ img { user-select:none; }
 .contact-field-line { transform:scaleX(0); transition:transform .55s var(--ease); }
 .contact-field:focus-within .contact-field-label { transform:translateY(-3px); color:#087c93; letter-spacing:var(--tracking-label); }
 .contact-field:focus-within .contact-field-line { transform:scaleX(1); }
+.contact-mobile-cta {
+  display:flex;
+  min-height:54px;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:0 18px;
+  border:1px solid rgba(7,16,19,.18);
+  border-radius:16px;
+  font-size:.875rem;
+  font-weight:var(--weight-semibold);
+  letter-spacing:.015em;
+  transition:transform .35s var(--ease),background-color .35s var(--ease),border-color .35s var(--ease);
+}
+.contact-mobile-cta > span { display:flex; align-items:center; gap:10px; }
+.contact-mobile-cta:active { transform:scale(.985); }
+.contact-mobile-cta--primary { border-color:#071013; background:#071013; color:white; box-shadow:0 14px 34px rgba(7,16,19,.13); }
+.contact-mobile-cta--secondary { background:rgba(255,255,255,.28); color:#071013; backdrop-filter:blur(10px); }
+.contact-form-toggle > span { display:flex; flex-direction:column; gap:1px; font-size:1rem; font-weight:var(--weight-semibold); }
+.contact-form-toggle small { color:rgba(7,16,19,.46); font-size:.6875rem; font-weight:var(--weight-medium); letter-spacing:.05em; }
+.contact-form-toggle svg { transition:transform .4s var(--ease); }
+.contact-form-panel { display:grid; grid-template-rows:0fr; opacity:0; transition:grid-template-rows .55s var(--ease),opacity .35s ease; }
+.contact-form-panel--open { grid-template-rows:1fr; opacity:1; }
+@media (min-width:768px) {
+  .contact-form-panel { display:block; opacity:1; }
+}
 .send-button { position:relative; overflow:hidden; isolation:isolate; transition:background-color .45s var(--ease),border-radius .45s var(--ease),box-shadow .45s var(--ease); }
 .send-button::before { content:""; position:absolute; z-index:0; inset:0; transform:translateX(-105%); background:linear-gradient(110deg,#087c93,#0aa8c5); transition:transform .55s var(--ease); }
 .send-button:hover::before,.send-button:focus-visible::before,.send-button--success::before { transform:translateX(0); }
