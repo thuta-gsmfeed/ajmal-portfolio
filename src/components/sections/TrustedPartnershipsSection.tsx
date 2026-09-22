@@ -7,7 +7,6 @@ export function TrustedPartnershipsSection() {
       <div className="container">
         <div className="network-partners">
           <div className="network-partners__intro">
-            <p className="eyebrow">Trusted partnerships</p>
             <h3>Built through relationships.</h3>
             <p>Selected partnerships supporting international trade, payments, logistics, and operations.</p>
           </div>
