@@ -54,7 +54,7 @@ export function CoolmixDeliverySection() {
     let dpr = 1;
     let wheelFaces: HTMLCanvasElement[] = [];
     let speedResetTimer = 0;
-    const fontSans = window.getComputedStyle(document.body).fontFamily || 'Inter, "Helvetica Neue", Arial, sans-serif';
+    const fontSans = window.getComputedStyle(document.body).fontFamily || 'Poppins, Arial, sans-serif';
 
     const resize = () => {
       const bounds = canvasElement.getBoundingClientRect();

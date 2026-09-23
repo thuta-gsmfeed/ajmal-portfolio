@@ -51,7 +51,7 @@ export function HeroSection() {
 
       <motion.div
         style={{ y: desktop && !reduced ? contentY : 0 }}
-        className="hero-portrait__inner container relative z-10 flex min-h-[100svh] items-end pb-[clamp(48px,8vh,96px)] pt-32"
+        className="hero-portrait__inner container relative z-10 flex min-h-[100svh] items-end pt-32"
       >
         <div className="hero-portrait__copy">
           <h1 id="hero-title" className="hero-portrait__title" aria-label="Ajmal Gholzad">

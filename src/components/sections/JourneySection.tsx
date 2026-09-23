@@ -1,13 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValueEvent, useReducedMotion } from "framer-motion";
+import { type KeyboardEvent, useEffect, useRef, useState } from "react";
+import { motion, type PanInfo, useMotionValueEvent, useReducedMotion } from "framer-motion";
 import { useSectionProgress } from "@/components/animation/motion";
 import { timeline } from "@/data/content";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const stepHeight = 98;
 const pathHeight = 900;
+const pathTrim = 90;
+const journeyPath = `M146 ${pathTrim} V326 C146 365 127 385 127 450 C127 515 146 535 146 574 V${pathHeight - pathTrim}`;
+const mobileJourneyPath = "M0 119 H150 C184 119 195 92 240 92 C285 92 296 119 330 119 H480";
 
 function cubicPoint(start: number, controlA: number, controlB: number, end: number, time: number) {
   const inverse = 1 - time;
@@ -43,6 +46,34 @@ const journeyTicks = Array.from({ length: 55 }, (_, index) => {
   const x = curveXAt(y);
   const length = index % 6 === 0 ? 22 : 10;
   return { x1: x - length - 4, x2: x - 4, y };
+}).filter(({ y }) => y >= pathTrim && y <= pathHeight - pathTrim);
+
+function mobileCurveYAt(x: number) {
+  if (x <= 150 || x >= 330) return 119;
+
+  const firstHalf = x < 240;
+  const start = firstHalf ? { x: 150, y: 119 } : { x: 240, y: 92 };
+  const controlA = firstHalf ? { x: 184, y: 119 } : { x: 285, y: 92 };
+  const controlB = firstHalf ? { x: 195, y: 92 } : { x: 296, y: 119 };
+  const end = firstHalf ? { x: 240, y: 92 } : { x: 330, y: 119 };
+  let low = 0;
+  let high = 1;
+
+  for (let index = 0; index < 12; index += 1) {
+    const time = (low + high) / 2;
+    const pointX = cubicPoint(start.x, controlA.x, controlB.x, end.x, time);
+    if (pointX < x) low = time;
+    else high = time;
+  }
+
+  return cubicPoint(start.y, controlA.y, controlB.y, end.y, (low + high) / 2);
+}
+
+const mobileJourneyTicks = Array.from({ length: 33 }, (_, index) => {
+  const x = index * 15;
+  const y = mobileCurveYAt(x);
+  const length = index === 16 ? 20 : index % 8 === 0 ? 14 : 8;
+  return { x, y1: y - length - 7, y2: y - 7 };
 });
 
 export function JourneySection() {
@@ -53,13 +84,13 @@ export function JourneySection() {
   const [mobileActive, setMobileActive] = useState(2);
   const [railHeight, setRailHeight] = useState(pathHeight);
   const reducedMotion = useReducedMotion();
-  const progress = useSectionProgress(section, "top top", "bottom bottom", false);
+  const progress = useSectionProgress(section, "top bottom", "bottom top", false);
 
   useMotionValueEvent(progress, "change", (latest) => {
+    if (window.innerWidth <= 900) return;
     const next = Math.min(timeline.length - 1, Math.max(0, Math.round(latest * (timeline.length - 1))));
     setActive((previous) => previous === next ? previous : next);
-    const scrollTime = reducedMotion ? 0 : latest * (timeline.length - 1) * 1.45;
-    pulse.current?.style.setProperty("--journey-pulse-time", `${-scrollTime}s`);
+    pulse.current?.style.setProperty("--journey-pulse-time", `${-latest * (timeline.length - 1) * 1.45}s`);
   });
 
   useEffect(() => {
@@ -75,6 +106,22 @@ export function JourneySection() {
 
   const current = timeline[active];
   const mobileCurrent = timeline[mobileActive];
+  const handleMobileSwipe = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const swipeIntent = info.offset.x + info.velocity.x * 0.16;
+    if (Math.abs(swipeIntent) < 42) return;
+    setMobileActive((previous) => Math.min(
+      timeline.length - 1,
+      Math.max(0, previous + (swipeIntent < 0 ? 1 : -1)),
+    ));
+  };
+  const handleMobileKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    setMobileActive((previous) => Math.min(
+      timeline.length - 1,
+      Math.max(0, previous + (event.key === "ArrowRight" ? 1 : -1)),
+    ));
+  };
 
   return (
     <section
@@ -85,7 +132,6 @@ export function JourneySection() {
       aria-label="Entrepreneurial experience: The climb was never linear."
     >
       <div className="journey-motion__desktop">
-        <div className="journey-motion__ambient" aria-hidden />
         <div className="container journey-motion__grid">
           <header className="journey-motion__intro">
             <h2>The climb was never linear.</h2>
@@ -114,8 +160,8 @@ export function JourneySection() {
                   <line key={tick.y} x1={tick.x1} x2={tick.x2} y1={tick.y} y2={tick.y} />
                 ))}
               </g>
-              <path d="M146 0 V326 C146 365 127 385 127 450 C127 515 146 535 146 574 V900" fill="none" stroke="rgba(255,255,255,.08)" strokeWidth="1.25" />
-              <path d="M146 0 V326 C146 365 127 385 127 450 C127 515 146 535 146 574 V900" fill="none" stroke="url(#journey-line)" strokeWidth="1.75" filter="url(#journey-neon)" />
+              <path d={journeyPath} fill="none" stroke="rgba(255,255,255,.08)" strokeWidth="1.25" />
+              <path d={journeyPath} fill="none" stroke="url(#journey-line)" strokeWidth="1.75" filter="url(#journey-neon)" />
             </svg>
 
             <motion.div
@@ -138,11 +184,8 @@ export function JourneySection() {
                       width: `calc(${rowX / 2.2}% - 18px)`,
                     }}
                     onClick={() => {
-                      const bounds = section.current?.getBoundingClientRect();
-                      if (!bounds) return;
-                      const sectionTop = window.scrollY + bounds.top;
-                      const travel = Math.max(0, bounds.height - window.innerHeight);
-                      window.scrollTo({ top: sectionTop + travel * (index / (timeline.length - 1)), behavior: reducedMotion ? "auto" : "smooth" });
+                      setActive(index);
+                      pulse.current?.style.setProperty("--journey-pulse-time", `${-index * 1.45}s`);
                     }}
                     aria-label={`Show ${milestone.year}: ${milestone.title}`}
                     aria-current={active === index ? "step" : undefined}
@@ -181,24 +224,45 @@ export function JourneySection() {
       </div>
 
       <div className="journey-motion__mobile container">
-        <div className="journey-motion__ambient journey-motion__ambient--mobile" aria-hidden />
         <header>
           <h2><span>The climb was</span><span>never linear.</span></h2>
           <p>Every venture added a new capability. Every setback sharpened the next decision. This is the path from first business to global products and technology.</p>
         </header>
-        <div className="journey-motion__mobile-timeline" aria-label={`Current milestone: ${mobileCurrent.year}`}>
+        <motion.div
+          className="journey-motion__mobile-timeline"
+          aria-label={`Current milestone: ${mobileCurrent.year}. Swipe left or right to explore.`}
+          onPanEnd={handleMobileSwipe}
+          onKeyDown={handleMobileKeyDown}
+          tabIndex={0}
+        >
+          <div className="journey-motion__mobile-center-glow" aria-hidden />
           <svg viewBox="0 0 480 160" preserveAspectRatio="none" aria-hidden>
             <defs>
               <filter id="journey-mobile-neon" x="-20%" y="-120%" width="140%" height="340%">
-                <feGaussianBlur stdDeviation="4" result="blur" />
+                <feGaussianBlur stdDeviation="3" result="blur" />
                 <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
               </filter>
+              <filter id="journey-mobile-halo" x="-20%" y="-180%" width="140%" height="460%">
+                <feGaussianBlur stdDeviation="6" />
+              </filter>
+              <linearGradient id="journey-mobile-line" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stopColor="#98c92e" stopOpacity=".18" />
+                <stop offset=".24" stopColor="#b9ef3a" stopOpacity=".5" />
+                <stop offset=".5" stopColor="#e5ff4d" />
+                <stop offset=".76" stopColor="#b9ef3a" stopOpacity=".5" />
+                <stop offset="1" stopColor="#98c92e" stopOpacity=".18" />
+              </linearGradient>
             </defs>
-            <path className="journey-motion__mobile-line-shadow" d="M0 119 H145 C178 119 185 88 240 88 C295 88 302 119 335 119 H480" />
-            <path className="journey-motion__mobile-line" d="M0 119 H145 C178 119 185 88 240 88 C295 88 302 119 335 119 H480" filter="url(#journey-mobile-neon)" />
+            <path className="journey-motion__mobile-line-glow" d={mobileJourneyPath} stroke="url(#journey-mobile-line)" filter="url(#journey-mobile-halo)" />
+            <path className="journey-motion__mobile-line-shadow" d={mobileJourneyPath} />
+            <path className="journey-motion__mobile-line" d={mobileJourneyPath} stroke="url(#journey-mobile-line)" filter="url(#journey-mobile-neon)" />
+            <g className="journey-motion__mobile-ticks" aria-hidden>
+              {mobileJourneyTicks.map((tick) => (
+                <line key={tick.x} x1={tick.x} x2={tick.x} y1={tick.y1} y2={tick.y2} />
+              ))}
+            </g>
           </svg>
 
-          <div className="journey-motion__mobile-ticks" aria-hidden />
           {timeline.map((milestone, index) => {
             const distance = Math.abs(index - mobileActive);
             return (
@@ -208,7 +272,7 @@ export function JourneySection() {
                 className={`journey-motion__mobile-year ${index === mobileActive ? "journey-motion__mobile-year--active" : ""}`}
                 style={{
                   left: `calc(50% + ${(index - mobileActive) * 85}px)`,
-                  top: distance % 2 === 0 ? 37 : 67,
+                  top: mobileCurveYAt(240 + (index - mobileActive) * 85) - 52,
                   opacity: Math.max(0.18, 1 - distance * 0.2),
                 }}
                 onClick={() => setMobileActive(index)}
@@ -220,7 +284,7 @@ export function JourneySection() {
             );
           })}
 
-          <div className="journey-motion__mobile-pulse" aria-hidden>
+          <div key={`mobile-pulse-${mobileActive}`} className="journey-motion__mobile-pulse" aria-hidden>
             <span>
               <svg viewBox="0 0 34 34" role="presentation">
                 <path d="M6 22.5 17 13l11 9.5" />
@@ -229,7 +293,7 @@ export function JourneySection() {
               </svg>
             </span>
           </div>
-        </div>
+        </motion.div>
 
         <motion.div
           key={`${mobileCurrent.year}-${mobileCurrent.title}`}

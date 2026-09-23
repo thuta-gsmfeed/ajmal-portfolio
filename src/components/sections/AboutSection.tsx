@@ -42,11 +42,14 @@ export function AboutSection() {
         <div className="about-dossier__story">
           <blockquote className="about-dossier__lead" aria-label={biography}>
             <span className="about-quote-copy" aria-hidden="true">
-              “{biography.split(" ").map((word, index, words) => (
+              {biography.split(" ").map((word, index, words) => (
                 <Fragment key={`${word}-${index}`}>
-                  <span className="about-word">{word}</span>{index < words.length - 1 ? " " : ""}
+                  <span className="about-word">
+                    {index === 0 ? "“" : ""}{word}{index === words.length - 1 ? "”" : ""}
+                  </span>
+                  {index < words.length - 1 ? " " : ""}
                 </Fragment>
-              ))}”
+              ))}
             </span>
           </blockquote>
 
@@ -58,21 +61,23 @@ export function AboutSection() {
         </div>
 
         <figure className="about-frame about-dossier__portrait">
-          <Image
-            src={media.portrait.src}
-            alt={media.portrait.alt}
-            fill
-            sizes="(max-width:900px) 100vw, 52vw"
-            className="about-photo object-contain object-bottom"
-          />
-          <Image
-            src="/images/about/ajmal-gholzad-signature.svg"
-            alt=""
-            width={400}
-            height={240}
-            className="about-signature"
-            aria-hidden="true"
-          />
+          <div className="about-portrait__visual">
+            <Image
+              src={media.portrait.src}
+              alt={media.portrait.alt}
+              fill
+              sizes="(max-width:900px) 100vw, 760px"
+              className="about-photo object-cover object-bottom"
+            />
+            <Image
+              src="/images/about/ajmal-gholzad-signature.webp"
+              alt=""
+              width={515}
+              height={390}
+              className="about-signature"
+              aria-hidden="true"
+            />
+          </div>
         </figure>
       </div>
     </section>

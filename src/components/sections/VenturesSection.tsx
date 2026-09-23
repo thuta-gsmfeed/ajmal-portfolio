@@ -9,7 +9,7 @@ const ventures = [
   {
     name: "Coolmix",
     logo: "/images/logo/coolmix-logo.svg",
-    image: "/images/venture.webp",
+    image: "/images/ventures/coolmix.webp",
     imageAlt: "A premium Coolmix inventory of boxed Apple devices",
     title: "Global Mobile Distribution",
     description: "Coolmix is a global mobile trading and distribution company specializing in Apple devices, serving professional buyers across international markets.",
@@ -19,7 +19,7 @@ const ventures = [
   {
     name: "gsmfeed",
     logo: "/images/logo/gsmfeed-logo.svg",
-    image: "/images/content/everything-u-need/everything-you-need.png",
+    image: "/images/ventures/gsmfeed.webp",
     imageAlt: "gsmfeed digital trading tools",
     title: "AI-Powered Global Marketplace",
     description: "A global electronics marketplace connecting verified traders, distributors, and retailers through intelligent tools and trusted market data.",
@@ -29,7 +29,7 @@ const ventures = [
   {
     name: "Projectmix",
     logo: "/images/logo/projectmix-logo.svg",
-    image: "/images/banner/gholzad-banner.webp",
+    image: "/images/ventures/projectmix.webp",
     imageAlt: "Projectmix technology and automation",
     title: "Trading ERP & Automation",
     description: "Projectmix brings customer management, orders, quality control, returns, repairs, and shipping into one streamlined trading workflow.",
@@ -39,7 +39,7 @@ const ventures = [
   {
     name: "Dubai Marina Yachts",
     logo: "/images/logo/yachts-logo.svg",
-    image: "/images/yacht-poster.jpg",
+    image: "/images/ventures/yachts.webp",
     imageAlt: "A luxury yacht in Dubai Marina",
     title: "Luxury Yacht Experiences",
     description: "Exclusive yacht rental in Dubai with dedicated crew, tailored packages, and memorable experiences on the Arabian Sea.",

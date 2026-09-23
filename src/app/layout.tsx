@@ -1,7 +1,15 @@
 import type { Metadata, Viewport } from "next";
+import { Poppins } from "next/font/google";
 import { SectionTransitions } from "@/components/animation/SectionTransitions";
 import { SmoothScroll } from "@/components/animation/SmoothScroll";
 import "./globals.css";
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-poppins",
+});
 
 export const viewport: Viewport = {
   themeColor: "#030506",
@@ -113,7 +121,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className={`dark ${poppins.variable}`}>
       <head>
         <script
           type="application/ld+json"

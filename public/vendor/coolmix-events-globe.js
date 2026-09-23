@@ -496,7 +496,7 @@
         renderer.setSize(width, height, false);
         camera.position.y = tightEdgeFit ? 0 : 7;
         camera.position.z = mode === 'shipping'
-            ? (window.innerWidth <= 767 ? 350 : 300)
+            ? (window.innerWidth <= 767 ? 410 : 360)
             : (mode === 'partners'
                 ? (width < 560 ? 340 : (tightEdgeFit ? 325 : (dotTheme === 'white' ? 325 : 300)))
                 : (width < 560 ? 355 : 320));

@@ -34,7 +34,9 @@ export function FutureTogetherSection() {
         <small className="future-together__copyright">© {new Date().getFullYear()} All rights reserved Gholzad</small>
       </div>
 
-      <div className="future-together__wordmark" aria-hidden>GHOLZAD</div>
+      <div className="future-together__wordmark" aria-hidden>
+        <Image src="/images/logo/gholzad-wordmark.png" alt="" width={1176} height={342} />
+      </div>
     </section>
   );
 }
