@@ -8,7 +8,7 @@ import { SplitText } from "gsap/SplitText";
 import { useGSAP } from "@gsap/react";
 import { media } from "@/data/content";
 
-const biography = "I've spent more than 15 years turning opportunities into operating businesses—from marketing and iPhone distribution to e-commerce and AI software.";
+const biography = "I've spent more than 15 years turning opportunities into operating businesses — from marketing and iPhone distribution to e-commerce and AI software.";
 
 export function AboutSection() {
   const section = useRef<HTMLElement>(null);
@@ -19,8 +19,9 @@ export function AboutSection() {
 
     match.add("(prefers-reduced-motion: no-preference)", () => {
       const stackedLayout = window.matchMedia("(max-width: 900px)").matches;
+      const mobileQuote = window.matchMedia("(max-width: 600px)").matches;
       const textBlocks = gsap.utils.toArray<HTMLElement>(
-        ".about-quote-copy, .about-bio-copy > p",
+        `${mobileQuote ? ".about-quote-copy--mobile" : ".about-quote-copy--desktop"}, .about-bio-copy > p`,
       );
 
       const splits = textBlocks.map((block) => SplitText.create(block, {
@@ -73,8 +74,11 @@ export function AboutSection() {
       <div className="about-split container">
         <div className="about-dossier__story">
           <blockquote className="about-dossier__lead" aria-label={biography}>
-            <span className="about-quote-copy" aria-hidden="true">
-              “I&apos;ve spent more than 15 years turning<br className="about-quote-mobile-break" /> opportunities into operating<br className="about-quote-mobile-break" /> businesses<span className="about-quote-desktop-dash">—</span><span className="about-quote-mobile-space"> </span>from marketing and<br className="about-quote-mobile-break" /> iPhone distribution to e-commerce<br className="about-quote-mobile-break" /> and AI software.”
+            <span className="about-quote-copy about-quote-copy--desktop" aria-hidden="true">
+              “I&apos;ve spent more than 15 years<br />turning opportunities into<br />operating businesses — from<br />marketing and iPhone distribution<br />to e-commerce and AI software.”
+            </span>
+            <span className="about-quote-copy about-quote-copy--mobile" aria-hidden="true">
+              “I&apos;ve spent more than 15 years turning<br />opportunities into operating<br />businesses from marketing and<br />iPhone distribution to e-commerce<br />and AI software.”
             </span>
           </blockquote>
 
