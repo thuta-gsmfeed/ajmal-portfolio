@@ -121,7 +121,7 @@ export function JourneySection() {
       <div className="journey-motion__desktop">
         <div className="container journey-motion__grid">
           <header className="journey-motion__intro">
-            <h2>The climb was never linear.</h2>
+            <h2>The climb was<br />never linear.</h2>
             <p>Every venture added a new capability. Every setback sharpened the next decision. This is the path from first business to global products and technology.</p>
           </header>
 

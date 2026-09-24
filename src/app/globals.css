@@ -37,7 +37,7 @@
   --surface-light-text:#091012;
 }
 @media (min-width:1024px) {
-  :root { --type-heading-xl:60px; }
+  :root { --type-heading-xl:60px; --tracking-heading:.01em; }
 }
 * { box-sizing:border-box; }
 main > section { position:relative; }
@@ -150,6 +150,9 @@ img { user-select:none; }
 .case-study__hero-title { font-size:var(--type-display); font-weight:var(--weight-medium); line-height:.88; letter-spacing:var(--tracking-display); }
 .case-study__hero-tagline { max-width:var(--measure-wide); font-size:var(--type-heading-md); line-height:1.25; letter-spacing:-.025em; }
 .case-study__metric { font-size:var(--type-heading-xl); line-height:1; letter-spacing:-.05em; }
+@media (min-width:1024px) {
+  .case-study__metric { letter-spacing:var(--tracking-heading); }
+}
 .case-study__lead { max-width:var(--measure-wide); font-size:var(--type-heading-md); line-height:1.4; letter-spacing:-.012em; }
 .case-study__details { max-width:var(--measure-body); font-size:var(--type-body-lg); line-height:var(--leading-body); }
 .case-study__feature-title { font-size:clamp(1.125rem,1.35vw,1.25rem); line-height:1.25; }
@@ -283,6 +286,9 @@ img { user-select:none; }
 .journey-motion__details h3 { max-width:var(--measure-compact); margin:12px 0 0; font-size:var(--type-heading-md); font-weight:var(--weight-regular); line-height:1.12; letter-spacing:-.03em; }
 .journey-motion__details div > p:last-child { max-width:var(--measure-compact); margin:12px 0 0; color:rgba(255,255,255,.74); font-size:var(--type-body); line-height:var(--leading-body); }
 .journey-motion__active-year { margin:0; color:#fff; font-size:var(--type-heading-xl)!important; font-weight:var(--weight-regular); line-height:1; letter-spacing:-.05em; }
+@media (min-width:1101px) {
+  .journey-motion__active-year { letter-spacing:var(--tracking-heading); }
+}
 .journey-motion__mobile { display:none; }
 @media (min-width:901px) and (max-width:1100px) {
   .journey-motion__grid { grid-template-columns:49% 23% 28%; }
@@ -1735,6 +1741,9 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
   line-height:1.08;
   letter-spacing:-.04em;
 }
+@media (min-width:1024px) {
+  .coolmix-delivery__headline h2 { letter-spacing:var(--tracking-heading); }
+}
 .coolmix-delivery__headline h2 span {
   background:linear-gradient(90deg,#007aff,#5856d6,#af52de,#ff2d55,#ff9500);
   -webkit-background-clip:text;
@@ -1758,7 +1767,7 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
 }
 .coolmix-delivery__overview h3 {
   margin:0 0 10px;
-  font-size:clamp(.95rem,1.05vw,1.15rem);
+  font-size:16px;
   font-weight:var(--weight-semibold);
 }
 .coolmix-delivery__overview p {
@@ -1813,7 +1822,7 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
   .coolmix-delivery__headline { padding-inline:28px; }
   .coolmix-delivery__headline h2 { font-size:clamp(2rem,8vw,2.6rem); }
   .coolmix-delivery__overview { padding:0 28px; }
-  .coolmix-delivery__overview h3 { font-size:1.2rem; }
+  .coolmix-delivery__overview h3 { font-size:16px; }
   .coolmix-delivery__overview p { max-width:34ch; font-size:.95rem; }
   .coolmix-delivery__stat { align-items:flex-start; padding:0 28px; text-align:left; }
   .coolmix-delivery__stat img { width:48px; height:48px; }
@@ -1915,7 +1924,7 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
 .yacht-stage__features svg { flex:none; }
 @media (min-width:1024px) {
   .yacht-stage__content { width:min(850px,calc(100vw - 112px)); }
-  .yacht-stage__title.yacht-stage__desktop-intro { max-width:none; font-size:60px; text-wrap:nowrap; white-space:nowrap; }
+  .yacht-stage__title.yacht-stage__desktop-intro { max-width:none; font-size:60px; letter-spacing:var(--tracking-heading); text-wrap:nowrap; white-space:nowrap; }
   .yacht-stage__shade {
     background:linear-gradient(90deg,rgba(2,7,15,.9) 0%,rgba(2,7,15,.78) 35%,rgba(2,7,15,.5) 65%,transparent 100%),
       linear-gradient(0deg,rgba(2,7,15,.4),transparent 25%,transparent 75%,rgba(2,7,15,.16));
@@ -1950,7 +1959,7 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
 .projectmix-section__title { margin:7px 0 0; font-size:clamp(38px,4vw,54px); font-weight:700; line-height:1.03; letter-spacing:-.055em; }
 .projectmix-section__visual { position:relative; width:min(760px,100%); aspect-ratio:1448/483; margin:50px auto 0; }
 @media (min-width:1024px) {
-  .projectmix-section__title { font-size:60px; letter-spacing:.01em; }
+  .projectmix-section__title { font-size:60px; letter-spacing:var(--tracking-heading); }
 }
 .projectmix-section__laptop { position:absolute; top:0; left:24%; z-index:0; width:52%; height:auto; }
 .projectmix-section__widget {
@@ -2311,7 +2320,7 @@ body :is(input,textarea,select) {
 
 @media (min-width:1024px) {
   .immersive-section--gsmfeed .immersive-gsmfeed-logo { width:clamp(220px,18vw,250px); }
-  .immersive-section--gsmfeed .immersive-title { font-size:60px; }
+  .immersive-section--gsmfeed .immersive-title { font-size:60px; letter-spacing:var(--tracking-heading); }
 }
 @media (min-width:1024px) and (max-width:1199px) {
   .immersive-section--gsmfeed .immersive-card { grid-template-columns:47% 53%; }
