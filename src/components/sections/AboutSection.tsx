@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { Fragment, useRef } from "react";
+import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
 import { useGSAP } from "@gsap/react";
 import { media } from "@/data/content";
 
@@ -13,24 +14,55 @@ export function AboutSection() {
   const section = useRef<HTMLElement>(null);
 
   useGSAP(() => {
-    gsap.registerPlugin(ScrollTrigger);
+    gsap.registerPlugin(ScrollTrigger, SplitText);
     const match = gsap.matchMedia();
 
     match.add("(prefers-reduced-motion: no-preference)", () => {
-      const timeline = gsap.timeline({
-        defaults: { ease: "power3.out" },
+      const stackedLayout = window.matchMedia("(max-width: 900px)").matches;
+      const textBlocks = gsap.utils.toArray<HTMLElement>(
+        ".about-quote-copy, .about-bio-copy > p",
+      );
+
+      const splits = textBlocks.map((block) => SplitText.create(block, {
+        type: "lines",
+        autoSplit: true,
+        aria: block.classList.contains("about-quote-copy") ? "hidden" : "auto",
+        onSplit: (split) => gsap.fromTo(split.lines, {
+          maskImage: "linear-gradient(90deg, #000 45%, transparent 55%)",
+          maskSize: "250% 100%",
+          maskRepeat: "no-repeat",
+          maskPosition: "100% 0%",
+          opacity: 0.7,
+        }, {
+          maskPosition: "0% 0%",
+          opacity: 1,
+          duration: 1.3,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: stackedLayout
+              ? block.classList.contains("about-quote-copy")
+                ? ".about-dossier__lead"
+                : ".about-bio-copy"
+              : section.current,
+            start: "top 85%",
+            toggleActions: "play none none none",
+          },
+        }),
+      }));
+
+      const portrait = gsap.timeline({
         scrollTrigger: {
-          trigger: section.current,
-          start: "top 76%",
-          toggleActions: "play none none reverse",
+          trigger: ".about-frame",
+          start: "top 85%",
+          toggleActions: "play none none none",
         },
       });
 
-      timeline
-        .fromTo(".about-word", { opacity: 0, y: 28 }, { opacity: 1, y: 0, stagger: 0.025, duration: 0.62 }, 0)
-        .fromTo(".about-bio-copy > p", { opacity: 0, y: 20 }, { opacity: 1, y: 0, stagger: 0.13, duration: 0.65 }, 0.28)
-        .fromTo(".about-frame", { opacity: 0, x: 54 }, { opacity: 1, x: 0, duration: 1.05, ease: "power3.inOut" }, 0.08)
-        .fromTo(".about-signature", { opacity: 0, scale: 0.88 }, { opacity: 1, scale: 1, duration: 0.7 }, 0.78);
+      portrait
+        .fromTo(".about-frame", { opacity: 0, x: 54 }, { opacity: 1, x: 0, duration: 1.05, ease: "power3.inOut" }, 0)
+        .fromTo(".about-signature", { opacity: 0, scale: 0.88 }, { opacity: 1, scale: 1, duration: 0.7, ease: "power3.out" }, 0.7);
+
+      return () => splits.forEach((split) => split.revert());
     });
 
     return () => match.revert();
@@ -42,14 +74,7 @@ export function AboutSection() {
         <div className="about-dossier__story">
           <blockquote className="about-dossier__lead" aria-label={biography}>
             <span className="about-quote-copy" aria-hidden="true">
-              {biography.split(" ").map((word, index, words) => (
-                <Fragment key={`${word}-${index}`}>
-                  <span className="about-word">
-                    {index === 0 ? "“" : ""}{word}{index === words.length - 1 ? "”" : ""}
-                  </span>
-                  {index < words.length - 1 ? " " : ""}
-                </Fragment>
-              ))}
+              “{biography}”
             </span>
           </blockquote>
 

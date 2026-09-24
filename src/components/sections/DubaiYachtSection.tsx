@@ -1,32 +1,30 @@
 "use client";
 
 import Image from "next/image";
-import { motion, useTransform } from "framer-motion";
+import { Gem, ShipWheel, SlidersHorizontal, UsersRound } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useMotionSettings, useSectionProgress } from "@/components/animation/motion";
-import { ArrowDown, ArrowUpRight } from "lucide-react";
-import { useEffect, useRef } from "react";
+
+const features = [
+  { label: "Luxury Service", icon: Gem },
+  { label: "Flexible Plan", icon: SlidersHorizontal },
+  { label: "Professional Crew", icon: UsersRound },
+  { label: "Experienced Captain", icon: ShipWheel },
+] as const;
 
 export function DubaiYachtSection() {
   const section = useRef<HTMLElement>(null);
-  const stage = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
+  const mobileVideos = useRef<(HTMLVideoElement | null)[]>([]);
+  const [visibleMobileVideo, setVisibleMobileVideo] = useState(0);
   const targetTime = useRef(0);
-  const { desktop, reduced, lightweight } = useMotionSettings();
-  const reducedMotion = reduced;
+  const { reduced, lightweight } = useMotionSettings();
   const scrollYProgress = useSectionProgress(section, "top top", "bottom bottom", false);
-
-  const introOpacity = useTransform(scrollYProgress, [0, 0.055, 0.23, 0.31], [0, 1, 1, 0]);
-  const introY = useTransform(scrollYProgress, [0, 0.22], [32, 0]);
-  const occasionsOpacity = useTransform(scrollYProgress, [0.28, 0.37, 0.54, 0.63], [0, 1, 1, 0]);
-  const occasionsY = useTransform(scrollYProgress, [0.28, 0.52], [38, 0]);
-  const seaOpacity = useTransform(scrollYProgress, [0.6, 0.7, 0.94, 1], [0, 1, 1, 0.7]);
-  const seaY = useTransform(scrollYProgress, [0.6, 0.86], [38, 0]);
 
   useEffect(() => {
     const element = video.current;
     const container = section.current;
-    if (!element || !container || reducedMotion) return;
-
+    if (!element || !container || reduced || lightweight || matchMedia("(max-width: 767px)").matches) return;
 
     let frame = 0;
     let active = false;
@@ -77,7 +75,10 @@ export function DubaiYachtSection() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         active = entry.isIntersecting;
-        if (active && element.preload !== "auto") { element.preload = "auto"; element.load(); }
+        if (active && element.preload !== "auto") {
+          element.preload = "auto";
+          element.load();
+        }
         if (active) requestRender();
         if (!active && frame) {
           cancelAnimationFrame(frame);
@@ -94,7 +95,7 @@ export function DubaiYachtSection() {
     observer.observe(container);
     if (element.readyState >= 1) onMetadata();
 
-  return () => {
+    return () => {
       unsubscribe();
       observer.disconnect();
       element.removeEventListener("loadedmetadata", onMetadata);
@@ -102,97 +103,145 @@ export function DubaiYachtSection() {
       element.removeEventListener("seeked", onSeeked);
       if (frame) cancelAnimationFrame(frame);
     };
-  }, [reducedMotion, lightweight, scrollYProgress]);
+  }, [reduced, lightweight, scrollYProgress]);
 
   useEffect(() => {
-    const element = video.current;
-    if (!element || desktop) return;
-    const observer = new IntersectionObserver(([entry]) => { if (!entry.isIntersecting) element.pause(); });
-    observer.observe(element);
-    return () => { observer.disconnect(); element.pause(); };
-  }, [desktop, lightweight]);
+    const container = section.current;
+    const clips = mobileVideos.current;
+    if (!container || reduced || lightweight || !matchMedia("(max-width: 767px)").matches || clips.some((clip) => !clip)) return;
+
+    let active = 0;
+    let transitioning = false;
+    let fadeTimer = 0;
+    const fadeDuration = 550;
+    const start = () => clips[active]?.play().catch(() => {});
+    const crossfade = () => {
+      if (transitioning) return;
+      const next = 1 - active;
+      const incoming = clips[next];
+      const outgoing = clips[active];
+      if (!incoming || !outgoing) return;
+      transitioning = true;
+      incoming.currentTime = 0;
+      incoming.play().then(() => {
+        setVisibleMobileVideo(next);
+        fadeTimer = window.setTimeout(() => {
+          outgoing.pause();
+          outgoing.currentTime = 0;
+          active = next;
+          transitioning = false;
+        }, fadeDuration);
+      }).catch(() => { transitioning = false; });
+    };
+    const onTimeUpdate = (index: number) => {
+      const clip = clips[index];
+      if (index === active && clip && Number.isFinite(clip.duration) && clip.duration - clip.currentTime <= .7) crossfade();
+    };
+    const onEnded = (index: number) => { if (index === active) crossfade(); };
+    const timeHandlers = clips.map((clip, index) => {
+      const time = () => onTimeUpdate(index);
+      const ended = () => onEnded(index);
+      clip?.addEventListener("timeupdate", time);
+      clip?.addEventListener("ended", ended);
+      return { clip, time, ended };
+    });
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        clips.forEach((clip) => { if (clip) clip.preload = "auto"; });
+        start();
+      } else {
+        clips.forEach((clip) => clip?.pause());
+      }
+    });
+    observer.observe(container);
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(fadeTimer);
+      timeHandlers.forEach(({ clip, time, ended }) => {
+        clip?.removeEventListener("timeupdate", time);
+        clip?.removeEventListener("ended", ended);
+        clip?.pause();
+      });
+    };
+  }, [reduced, lightweight]);
 
   return (
     <section
       ref={section}
       id="yachts"
-      className={`yacht-section relative bg-[#02070a] ${reducedMotion ? "" : "h-[300svh] md:h-[250svh]"}`}
-      aria-label="Dubai Marina Yachts story"
+      className={`yacht-section relative bg-[#02070a] ${reduced ? "" : "h-[250svh]"}`}
+      aria-label="Dubai Marina Yachts"
+      data-header-theme="dark"
     >
-      <div ref={stage} className={`yacht-stage ${reducedMotion ? "relative min-h-svh" : "sticky top-0 h-svh"} overflow-hidden bg-[#02070a] text-white`}>
-        {lightweight ? (
-          <Image
-            src="/images/yacht-poster.jpg"
-            alt="A silver and black luxury yacht cruising on the water"
-            fill
-            sizes="100vw"
-            className="object-cover"
-          />
-        ) : (
-          <video
-            ref={video}
-            muted
-            playsInline
-            preload="none"
-            poster="/images/yacht-poster.jpg"
-            controls={reducedMotion}
-            aria-label="A silver and black luxury yacht cruising from a side view into an aerial view"
-            className={reducedMotion ? "relative aspect-video w-full object-cover" : "absolute inset-0 size-full object-cover"}
-          >
-            <source src="/videos/yachts-scroll.scrub.mp4" type="video/mp4" />
-          </video>
-        )}
-
-        <div hidden={reducedMotion} className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(2,7,10,.76)_0%,rgba(2,7,10,.22)_46%,transparent_70%),linear-gradient(0deg,rgba(2,7,10,.82)_0%,rgba(2,7,10,.4)_48%,transparent_78%,rgba(2,7,10,.3)_100%)]" />
-        <div className="grain" />
-
-        <div className={`container pointer-events-none ${reducedMotion ? "relative pt-8" : "absolute inset-x-0 top-[25px] md:top-[31px]"} z-10 flex items-center justify-center border-b border-white/15 pb-4`}>
-          <Image src="/images/logo/dubai-marina-yachts-logo.svg" alt="Dubai Marina Yachts" width={246} height={36} className="h-auto w-[180px] sm:w-[220px]" />
+      <div className={`yacht-stage relative ${reduced ? "min-h-svh" : "sticky top-0 h-svh"} overflow-hidden bg-[#02070a] text-white`}>
+        <div className="yacht-stage__media">
+          {lightweight || reduced ? (
+            <Image
+              src="/images/dubai-marina-yachts-poster.jpg"
+              alt="Dubai Marina yacht cruising across the sea"
+              fill
+              sizes="100vw"
+              className="yacht-stage__visual object-cover"
+            />
+          ) : (
+            <>
+              <video
+                ref={video}
+                muted
+                playsInline
+                preload="none"
+                poster="/images/dubai-marina-yachts-poster.jpg"
+                aria-label="Dubai Marina yacht cruising across the sea"
+                className="yacht-stage__visual yacht-stage__desktop-video absolute inset-0 size-full object-cover"
+              >
+                <source src="/videos/dubai-marina-yachts-scroll.mp4" type="video/mp4" />
+              </video>
+              {[0, 1].map((index) => (
+                <video
+                  key={index}
+                  ref={(element) => { mobileVideos.current[index] = element; }}
+                  muted
+                  playsInline
+                  preload="none"
+                  poster="/images/dubai-marina-yachts-poster.jpg"
+                  aria-hidden="true"
+                  className={`yacht-stage__visual yacht-stage__mobile-video ${visibleMobileVideo === index ? "is-visible" : ""}`}
+                >
+                  <source src="/videos/dubai-marina-yachts-scroll.mp4" type="video/mp4" />
+                </video>
+              ))}
+            </>
+          )}
+          <div className="yacht-stage__shade pointer-events-none absolute inset-0" aria-hidden="true" />
+          <div className="yacht-stage__mobile-intro">
+            <Image src="/images/logo/dubai-marina-yachts-logo.svg" alt="Dubai Marina Yachts" width={246} height={36} className="yacht-stage__logo h-auto" />
+            <h2 className="yacht-stage__title">Experience Unmatched Luxury with Dubai Marina Yachts.</h2>
+          </div>
         </div>
 
-        {reducedMotion ? (
-          <div className="container relative z-10 pb-16 pt-8">
-            <div>
-              <p className="font-mono text-sm uppercase tracking-[.14em] text-cyan-200">Dubai Marina Yachts</p>
-              <h2 className="section-title mt-5 max-w-4xl uppercase">No. 1 yacht rental<br />in Dubai.</h2>
-              <p className="section-description mt-6">Exclusive yacht rental in Dubai with dedicated crew, tailored packages and the best service.</p>
-              <h3 className="mt-8 text-2xl">Your moment. Your horizon.</h3>
-              <p className="section-description mt-4">Weddings, engagements, celebrations, parties, sea adventures, and fishing—made unforgettable on the water.</p>
-              <h3 className="mt-8 text-2xl">The Arabian Sea, entirely yours.</h3>
-              <p className="section-description mt-4">Exclusive yacht rental services created for freedom, privacy, and unparalleled luxury on Dubai&apos;s pristine waters.</p>
-              <a href="https://dubaimarinayachts.ae/" target="_blank" rel="noreferrer" className="pill mt-8 bg-black/25">Explore the fleet <ArrowUpRight size={15} /></a>
-            </div>
-          </div>
-        ) : (
-          <>
-            <motion.div style={{ opacity: introOpacity, y: introY }} className="container pointer-events-none absolute inset-x-0 bottom-[12vh] z-10 block">
-              <p className="font-mono text-sm uppercase tracking-[.14em] text-cyan-200">01 · Dubai Marina Yachts</p>
-              <h2 className="section-title mt-5 max-w-4xl uppercase">No. 1 yacht rental<br />in Dubai.</h2>
-              <p className="section-description mt-6">Exclusive yacht rental in Dubai with dedicated crew, tailored packages and the best service.</p>
-            </motion.div>
-
-            <motion.div style={{ opacity: occasionsOpacity, y: occasionsY }} className="container pointer-events-none absolute inset-x-0 bottom-[12vh] z-10 flex lg:justify-end">
-              <div className="max-w-2xl text-left lg:text-right">
-                <p className="font-mono text-sm uppercase tracking-[.14em] text-cyan-200">02 · Every occasion</p>
-                <h3 className="section-title mt-5">Your moment.<br />Your horizon.</h3>
-                <p className="section-description ml-auto mt-6">Weddings, engagements, celebrations, parties, sea adventures, and fishing—made unforgettable on the water.</p>
-              </div>
-            </motion.div>
-
-            <motion.div style={{ opacity: seaOpacity, y: seaY }} className="container absolute inset-x-0 bottom-[12vh] z-10 block">
-              <p className="font-mono text-sm uppercase tracking-[.14em] text-cyan-200">03 · Open water</p>
-              <h3 className="section-title mt-5 max-w-4xl">The Arabian Sea,<br />entirely yours.</h3>
-              <p className="section-description mt-6">Exclusive yacht rental services created for freedom, privacy, and unparalleled luxury on Dubai&apos;s pristine waters.</p>
-              <a href="https://dubaimarinayachts.ae/" target="_blank" rel="noreferrer" className="pill mt-8 bg-black/25 backdrop-blur-sm">Explore the fleet <ArrowUpRight size={15} /></a>
-            </motion.div>
-
-            <div className="container pointer-events-none absolute inset-x-0 bottom-5 z-10 flex items-center gap-3 sm:gap-5">
-              <span className="flex items-center gap-2 font-mono text-sm uppercase tracking-[.12em] text-white/50"><ArrowDown size={13} />Scroll the voyage</span>
-              <div className="h-px flex-1 bg-white/15"><motion.div style={{ scaleX: scrollYProgress }} className="h-full origin-left bg-cyan-200" /></div>
-              <span className="hidden font-mono text-sm uppercase tracking-[.12em] text-white/50 sm:block">Dubai Marina Yachts</span>
-            </div>
-          </>
-        )}
+        <div className="yacht-stage__content relative z-10 flex h-full flex-col justify-center">
+          <Image
+            src="/images/logo/dubai-marina-yachts-logo.svg"
+            alt="Dubai Marina Yachts"
+            width={246}
+            height={36}
+            className="yacht-stage__logo yacht-stage__desktop-intro h-auto"
+          />
+          <h2 className="yacht-stage__title yacht-stage__desktop-intro">
+            Experience Unmatched<br />Luxury with Dubai<br />Marina Yachts.
+          </h2>
+          <p className="yacht-stage__description">
+            Set sail into matchless luxury with Dubai Marina Yachts — your trusted partner for the ultimate Arabian getaway. From weddings and celebrations to sea adventures and fishing, discover the pristine waters of the Arabian Sea with a dedicated crew by your side.
+          </p>
+          <ul className="yacht-stage__features" aria-label="Yacht services">
+            {features.map(({ label, icon: Icon }) => (
+              <li key={label}>
+                <Icon aria-hidden="true" size={19} strokeWidth={1.8} />
+                <span>{label}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   );

@@ -1,8 +1,7 @@
 "use client";
 
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
-import { motion, type PanInfo, useMotionValueEvent, useReducedMotion } from "framer-motion";
-import { useSectionProgress } from "@/components/animation/motion";
+import { motion, type PanInfo, useReducedMotion } from "framer-motion";
 import { timeline } from "@/data/content";
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -77,22 +76,11 @@ const mobileJourneyTicks = Array.from({ length: 33 }, (_, index) => {
 });
 
 export function JourneySection() {
-  const section = useRef<HTMLElement>(null);
   const rail = useRef<HTMLDivElement>(null);
-  const pulse = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const [mobileActive, setMobileActive] = useState(2);
   const [railHeight, setRailHeight] = useState(pathHeight);
   const reducedMotion = useReducedMotion();
-  const progress = useSectionProgress(section, "top bottom", "bottom top", false);
-
-  useMotionValueEvent(progress, "change", (latest) => {
-    if (window.innerWidth <= 900) return;
-    const next = Math.min(timeline.length - 1, Math.max(0, Math.round(latest * (timeline.length - 1))));
-    setActive((previous) => previous === next ? previous : next);
-    pulse.current?.style.setProperty("--journey-pulse-time", `${-latest * (timeline.length - 1) * 1.45}s`);
-  });
-
   useEffect(() => {
     const element = rail.current;
     if (!element) return;
@@ -125,7 +113,6 @@ export function JourneySection() {
 
   return (
     <section
-      ref={section}
       id="journey"
       data-header-theme="dark"
       className="journey-motion"
@@ -185,7 +172,6 @@ export function JourneySection() {
                     }}
                     onClick={() => {
                       setActive(index);
-                      pulse.current?.style.setProperty("--journey-pulse-time", `${-index * 1.45}s`);
                     }}
                     aria-label={`Show ${milestone.year}: ${milestone.title}`}
                     aria-current={active === index ? "step" : undefined}
@@ -197,7 +183,7 @@ export function JourneySection() {
               })}
             </motion.div>
 
-            <div ref={pulse} className="journey-motion__pulse" aria-hidden>
+            <div key={active} className="journey-motion__pulse" aria-hidden>
               <span>
                 <svg viewBox="0 0 34 34" role="presentation">
                   <path d="M6 22.5 17 13l11 9.5" />
