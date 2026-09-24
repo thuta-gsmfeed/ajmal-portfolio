@@ -74,7 +74,7 @@ export function AboutSection() {
         <div className="about-dossier__story">
           <blockquote className="about-dossier__lead" aria-label={biography}>
             <span className="about-quote-copy" aria-hidden="true">
-              “{biography}”
+              “I&apos;ve spent more than 15 years turning<br className="about-quote-mobile-break" /> opportunities into operating<br className="about-quote-mobile-break" /> businesses<span className="about-quote-desktop-dash">—</span><span className="about-quote-mobile-space"> </span>from marketing and<br className="about-quote-mobile-break" /> iPhone distribution to e-commerce<br className="about-quote-mobile-break" /> and AI software.”
             </span>
           </blockquote>
 

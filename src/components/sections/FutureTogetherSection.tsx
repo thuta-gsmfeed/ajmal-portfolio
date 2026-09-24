@@ -9,20 +9,20 @@ export function FutureTogetherSection() {
     <section id="contact" className="future-together" aria-labelledby="future-together-title">
       <div className="future-together__glow" aria-hidden />
       <div className="future-together__content">
-        <a className="future-together__brand" href="#home" aria-label="Gholzad — back to home">
+        <a className="future-together__brand" href="#home" aria-label="Gholzad — back to home" data-section-reveal="up">
           <Image src="/images/logo/gholzad-logo.svg" alt="" width={44} height={44} priority={false} />
           <span>GHOLZAD</span>
           <small>Management Group</small>
         </a>
 
-        <h2 id="future-together-title">Let&apos;s Build the Future Together</h2>
-        <p>
+        <h2 id="future-together-title" data-section-reveal="up" data-reveal-order="1">Let&apos;s Build the Future Together</h2>
+        <p data-section-reveal="up" data-reveal-order="2">
           Whether you&apos;re looking to grow your business,
           <br className="future-together__desktop-break" /> embrace automation, or explore new opportunities,
           <br className="future-together__desktop-break" /> Gholzad.com is here to help.
         </p>
 
-        <div className="future-together__links" aria-label="Contact options">
+        <div className="future-together__links" aria-label="Contact options" data-section-reveal="up" data-reveal-order="3">
           <a href={`mailto:${site.email}`} aria-label={`Email ${site.email}`} data-cursor="EMAIL">
             <Mail aria-hidden size={20} strokeWidth={1.9} />
           </a>
@@ -31,10 +31,10 @@ export function FutureTogetherSection() {
           </a>
         </div>
 
-        <small className="future-together__copyright">© {new Date().getFullYear()} All rights reserved Gholzad</small>
+        <small className="future-together__copyright" data-section-reveal="up" data-reveal-order="4">© {new Date().getFullYear()} All rights reserved Gholzad</small>
       </div>
 
-      <div className="future-together__wordmark" aria-hidden>
+      <div className="future-together__wordmark" aria-hidden data-section-reveal="up" data-reveal-order="5">
         <Image src="/images/logo/gholzad-wordmark.png" alt="" width={1176} height={342} />
       </div>
     </section>

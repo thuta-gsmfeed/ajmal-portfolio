@@ -53,7 +53,7 @@ function ProductTitle({ product, className }: { product: Product; className: str
   const fullLogo = product.slug === "coolmix"
     ? { src: "/images/logo/logo-white.svg", width: 411, height: 88 }
     : product.slug === "projectmix"
-      ? { src: "/images/logo/projectfulllogo.svg", width: 523, height: 106 }
+      ? { src: "/images/logo/projectfulllogo-white.svg", width: 523, height: 106 }
       : null;
 
   if (fullLogo) {

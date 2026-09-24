@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Apple, BadgeCheck } from "lucide-react";
+import { BadgeCheck } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useMotionSettings, useSceneVisibility } from "@/components/animation/motion";
 import { SceneBoundary } from "@/components/three/SceneBoundary";
@@ -55,15 +55,14 @@ export function ImmersiveSplineSection() {
         </div>
 
         <div className="immersive-content">
-          <Image className="immersive-gsmfeed-logo" src="/images/logo/gsmfeed-full-logo.png" alt="gsmfeed" width={294} height={75} />
-          <p className="immersive-gsmfeed-eyebrow">Connect. Trade. Grow.</p>
-          <h2 id="immersive-title" className="immersive-title">
+          <Image className="immersive-gsmfeed-logo" src="/images/logo/gsmfeed-full-logo.png" alt="gsmfeed" width={294} height={75} data-section-reveal="up" />
+          <p className="immersive-gsmfeed-eyebrow" data-section-reveal="up" data-reveal-order="1">Connect. Trade. Grow.</p>
+          <h2 id="immersive-title" className="immersive-title" data-section-reveal="up" data-reveal-order="2">
             AI-powered platform<br />with verified <span className="immersive-title-final">traders <BadgeCheck aria-hidden="true" /></span>
           </h2>
-          <p className="immersive-description">Download the gsmfeed app today and join the global trading community.</p>
+          <p className="immersive-description" data-section-reveal="up" data-reveal-order="3">Download the gsmfeed app today and join the global trading community.</p>
           <a className="immersive-app-store" href={APP_STORE_URL} target="_blank" rel="noopener noreferrer" aria-label="Download gsmfeed on the App Store">
-            <Apple aria-hidden="true" size={24} fill="currentColor" strokeWidth={1.5} />
-            <span><small>Download on the</small><strong>App Store</strong></span>
+            <Image src="/images/gsmfeed/app-store-button.svg" alt="" width={182} height={54} aria-hidden="true" />
           </a>
         </div>
       </div>

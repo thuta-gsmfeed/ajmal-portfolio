@@ -17,15 +17,14 @@ export function ProjectmixSection() {
   return (
     <section id="projectmix" className="projectmix-section" aria-labelledby="projectmix-title" data-header-theme="light">
       <div className="projectmix-section__inner">
-        <div className="projectmix-section__brand" aria-label="projectmix">
-          <Image src="/images/logo/projectmix-logo.svg" alt="" width={37} height={34} />
-          <span>projectmix<sup>®</sup></span>
+        <div className="projectmix-section__brand" data-section-reveal="up">
+          <Image src="/images/logo/projectfulllogo.svg" alt="projectmix" width={523} height={106} />
         </div>
 
-        <p className="projectmix-section__eyebrow">CRM SYSTEM</p>
-        <h2 id="projectmix-title" className="projectmix-section__title">Say hello to<br />projectmix Ai</h2>
+        <p className="projectmix-section__eyebrow" data-section-reveal="up" data-reveal-order="1">CRM SYSTEM</p>
+        <h2 id="projectmix-title" className="projectmix-section__title" data-section-reveal="up" data-reveal-order="2">Say hello to<br />projectmix Ai</h2>
 
-        <div className="projectmix-section__visual" role="img" aria-label="Projectmix dashboard widgets around a laptop">
+        <div className="projectmix-section__visual" role="img" aria-label="Projectmix dashboard widgets around a laptop" data-section-reveal="scale" data-reveal-order="3">
           <Image className="projectmix-section__laptop" src="/images/projectmix-laptop.svg" alt="" width={776} height={450} aria-hidden="true" />
           {widgets.map(({ name, file, left, top, width, height, ...widget }) => (
             <div
@@ -39,10 +38,10 @@ export function ProjectmixSection() {
           ))}
         </div>
 
-        <p className="projectmix-section__description">
+        <p className="projectmix-section__description" data-section-reveal="up" data-reveal-order="4">
           Automating your trading business with the world&apos;s first advanced ERP solution. An easy-to-use software, without a manual.
         </p>
-        <a className="projectmix-section__link" href="https://projectmix.ai/" target="_blank" rel="noopener noreferrer">
+        <a className="projectmix-section__link" href="https://projectmix.ai/" target="_blank" rel="noopener noreferrer" data-section-reveal="up" data-reveal-order="5">
           Visit website <ArrowUpRight aria-hidden="true" size={17} />
         </a>
       </div>

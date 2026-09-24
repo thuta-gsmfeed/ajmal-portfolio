@@ -1,15 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { Gem, ShipWheel, SlidersHorizontal, UsersRound } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useMotionSettings, useSectionProgress } from "@/components/animation/motion";
 
 const features = [
-  { label: "Luxury Service", icon: Gem },
-  { label: "Flexible Plan", icon: SlidersHorizontal },
-  { label: "Professional Crew", icon: UsersRound },
-  { label: "Experienced Captain", icon: ShipWheel },
+  { label: "Luxury Service", icon: "/images/yachts/features/luxury-service.svg" },
+  { label: "Flexible Plan", icon: "/images/yachts/features/flexible-plan.svg" },
+  { label: "Professional Crew", icon: "/images/yachts/features/professional-crew.svg" },
+  { label: "Experienced Captain", icon: "/images/yachts/features/experienced-captain.svg" },
 ] as const;
 
 export function DubaiYachtSection() {
@@ -214,8 +213,8 @@ export function DubaiYachtSection() {
           )}
           <div className="yacht-stage__shade pointer-events-none absolute inset-0" aria-hidden="true" />
           <div className="yacht-stage__mobile-intro">
-            <Image src="/images/logo/dubai-marina-yachts-logo.svg" alt="Dubai Marina Yachts" width={246} height={36} className="yacht-stage__logo h-auto" />
-            <h2 className="yacht-stage__title">Experience Unmatched Luxury with Dubai Marina Yachts.</h2>
+            <Image src="/images/logo/dubai-marina-yachts-logo.svg" alt="Dubai Marina Yachts" width={246} height={36} className="yacht-stage__logo h-auto" data-section-reveal="up" />
+            <h2 className="yacht-stage__title" data-section-reveal="up" data-reveal-order="1">Experience Unmatched Luxury with Dubai Marina Yachts.</h2>
           </div>
         </div>
 
@@ -226,17 +225,18 @@ export function DubaiYachtSection() {
             width={246}
             height={36}
             className="yacht-stage__logo yacht-stage__desktop-intro h-auto"
+            data-section-reveal="up"
           />
-          <h2 className="yacht-stage__title yacht-stage__desktop-intro">
+          <h2 className="yacht-stage__title yacht-stage__desktop-intro" data-section-reveal="up" data-reveal-order="1">
             Experience Unmatched<br />Luxury with Dubai<br />Marina Yachts.
           </h2>
-          <p className="yacht-stage__description">
-            Set sail into matchless luxury with Dubai Marina Yachts — your trusted partner for the ultimate Arabian getaway. From weddings and celebrations to sea adventures and fishing, discover the pristine waters of the Arabian Sea with a dedicated crew by your side.
+          <p className="yacht-stage__description" data-section-reveal="up" data-reveal-order="2">
+            Set sail into matchless luxury with Dubai Marina Yachts – Your trusted partner for the Ultimate Arabian Getaway. We are offering yachts for any occasion and demand. From weddings, engagements, celebrations, and parties to fun on the sea by sailing on the pristine waters of the Arabian Sea or even fishing, we promise a catch for you.
           </p>
           <ul className="yacht-stage__features" aria-label="Yacht services">
-            {features.map(({ label, icon: Icon }) => (
-              <li key={label}>
-                <Icon aria-hidden="true" size={19} strokeWidth={1.8} />
+            {features.map(({ label, icon }, index) => (
+              <li key={label} data-section-reveal="up" data-reveal-order={index + 2}>
+                <Image src={icon} alt="" width={33} height={33} className="yacht-stage__feature-icon" aria-hidden="true" />
                 <span>{label}</span>
               </li>
             ))}

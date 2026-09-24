@@ -109,6 +109,30 @@ export default function ImmersiveSplineCanvas({
     };
   }, [active, app, syncLogoToChest]);
 
+  useEffect(() => {
+    if (!app) return;
+    const camera = (app as SplineInternals)._camera as (Camera & {
+      zoom?: number;
+      updateProjectionMatrix?: () => void;
+    }) | undefined;
+    if (!camera || typeof camera.zoom !== "number" || !camera.updateProjectionMatrix) return;
+
+    const originalZoom = camera.zoom;
+    const updateFraming = () => {
+      camera.zoom = originalZoom * (matchMedia("(max-width: 767px)").matches ? 1.23 : 1);
+      camera.updateProjectionMatrix?.();
+      syncLogoToChest(app);
+    };
+
+    updateFraming();
+    window.addEventListener("resize", updateFraming);
+    return () => {
+      window.removeEventListener("resize", updateFraming);
+      camera.zoom = originalZoom;
+      camera.updateProjectionMatrix?.();
+    };
+  }, [app, syncLogoToChest]);
+
   const handleLoad = (application: Application) => {
     setApp(application);
     window.requestAnimationFrame(() => syncLogoToChest(application));

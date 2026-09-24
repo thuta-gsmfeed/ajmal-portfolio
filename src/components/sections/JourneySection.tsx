@@ -121,8 +121,8 @@ export function JourneySection() {
       <div className="journey-motion__desktop">
         <div className="container journey-motion__grid">
           <header className="journey-motion__intro">
-            <h2>The climb was<br />never linear.</h2>
-            <p>Every venture added a new capability. Every setback sharpened the next decision. This is the path from first business to global products and technology.</p>
+            <h2 data-section-reveal="up">The climb was<br />never linear.</h2>
+            <p data-section-reveal="up" data-reveal-order="1">Every venture added a new capability. Every setback sharpened the next decision. This is the path from first business to global products and technology.</p>
           </header>
 
           <div ref={rail} className="journey-motion__rail" aria-label={`Current milestone: ${current.year}`}>
@@ -211,8 +211,8 @@ export function JourneySection() {
 
       <div className="journey-motion__mobile container">
         <header>
-          <h2><span>The climb was</span><span>never linear.</span></h2>
-          <p>Every venture added a new capability. Every setback sharpened the next decision. This is the path from first business to global products and technology.</p>
+          <h2 data-section-reveal="up"><span>The climb was</span><span>never linear.</span></h2>
+          <p data-section-reveal="up" data-reveal-order="1">Every venture added a new capability. Every setback sharpened the next decision. This is the path from first business to global products and technology.</p>
         </header>
         <motion.div
           className="journey-motion__mobile-timeline"

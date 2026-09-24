@@ -2,6 +2,7 @@ import { Header } from "@/components/layout/Header";
 import { SectionRail } from "@/components/navigation/SectionRail";
 import { BackToTop } from "@/components/navigation/BackToTop";
 import { Loader } from "@/components/layout/Loader";
+import { SectionMotion } from "@/components/animation/SectionMotion";
 // Temporarily hidden. Uncomment together with the render below to restore the original footer.
 // import { Footer } from "@/components/layout/Footer";
 import { HeroSection } from "@/components/sections/HeroSection";
@@ -27,4 +28,4 @@ import { TrustedPartnershipsSection } from "@/components/sections/TrustedPartner
 // import { ContactSection } from "@/components/sections/ContactSection";
 import { FutureTogetherSection } from "@/components/sections/FutureTogetherSection";
 
-export default function Home(){return <><a className="skip-link" href="#main">Skip to content</a><Loader/><Header/><SectionRail/><BackToTop/><main id="main" className="site-content"><HeroSection/><AboutSection/><BusinessesSection/><JourneySection/>{/* <ParticleJourneySection/> */}{/* <MagnifierRevealSection/> */}<div className="journey-ventures-transition" aria-hidden="true" /><VenturesSection/><CoolmixDeliverySection/><ImmersiveSplineSection/><DubaiYachtSection/><ProjectmixSection/><div className="network-transition ventures-transition--exit" aria-hidden="true" /><GlobalNetworkSection/>{/*<ProductsSection/> */} {/* <PhilosophySection/> */}{/* <NowNextSection/> */}<TrustedPartnershipsSection/>{/* <ContactSection/> */}<FutureTogetherSection/></main>{/* <Footer/> */}</>}
+export default function Home(){return <><a className="skip-link" href="#main">Skip to content</a><Loader/><Header/><SectionRail/><BackToTop/><SectionMotion/><main id="main" className="site-content"><HeroSection/><AboutSection/><BusinessesSection/><JourneySection/>{/* <ParticleJourneySection/> */}{/* <MagnifierRevealSection/> */}<div className="journey-ventures-transition" aria-hidden="true" /><VenturesSection/><CoolmixDeliverySection/><ImmersiveSplineSection/><DubaiYachtSection/><ProjectmixSection/><div className="network-transition ventures-transition--exit" aria-hidden="true" /><GlobalNetworkSection/>{/*<ProductsSection/> */} {/* <PhilosophySection/> */}{/* <NowNextSection/> */}<TrustedPartnershipsSection/>{/* <ContactSection/> */}<FutureTogetherSection/></main>{/* <Footer/> */}</>}

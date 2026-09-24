@@ -19,17 +19,17 @@ function CoolmixServiceContent() {
   return (
     <div className="coolmix-delivery__service-track">
       <div className="coolmix-delivery__headline">
-        <h2><span>Europe’s trusted</span><br />Apple Distributor<br />since 2014</h2>
+        <h2 data-section-reveal="up"><span>Europe’s trusted</span><br />Apple Distributor<br />since 2014</h2>
         <a href="https://coolmix.eu/" target="_blank" rel="noopener noreferrer">
           Visit website <span aria-hidden="true">↗</span>
         </a>
       </div>
       <div className="coolmix-delivery__overview">
-        <h3>Global Mobile Distribution</h3>
-        <p>Coolmix is a global mobile trading and distribution company specializing in Apple devices, serving professional buyers across international markets.</p>
+        <h3 data-section-reveal="up">Global Mobile Distribution</h3>
+        <p data-section-reveal="up" data-reveal-order="1">Coolmix is a global mobile trading and distribution company specializing in Apple devices, serving professional buyers across international markets.</p>
       </div>
-      {stats.map((stat) => (
-        <div className="coolmix-delivery__stat" key={stat.value}>
+      {stats.map((stat, index) => (
+        <div className="coolmix-delivery__stat" key={stat.value} data-section-reveal="up" data-reveal-order={index % 3}>
           <Image src={stat.icon} alt="" width={48} height={48} aria-hidden="true" />
           <strong>{stat.value}</strong>
           <p>{stat.label}<br />{stat.detail}</p>
@@ -265,7 +265,7 @@ export function CoolmixDeliverySection() {
     });
     addTrackMotion("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", -24.2424);
     addTrackMotion("(min-width: 768px) and (max-width: 1023px) and (prefers-reduced-motion: no-preference)", -66.6667);
-    addTrackMotion("(max-width: 767px) and (prefers-reduced-motion: no-preference)", -83.3333);
+    addTrackMotion("(max-width: 767px) and (prefers-reduced-motion: no-preference)", -75);
     return () => media.revert();
   }, { scope: section });
 
