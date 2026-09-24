@@ -1,177 +1,298 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion,  } from "framer-motion";
-import { useSectionProgress } from "@/components/animation/motion";
-import { ArrowUpRight } from "lucide-react";
+import { type KeyboardEvent, useEffect, useRef, useState } from "react";
+import { motion, type PanInfo, useReducedMotion } from "framer-motion";
 import { timeline } from "@/data/content";
 
-const route = "M 55 430 C 125 402, 158 360, 220 348 S 315 382, 350 330 S 420 260, 485 286 S 575 240, 615 194 S 690 170, 730 118 S 805 92, 862 48";
-const points = [
-  [55, 430], [220, 348], [350, 330], [485, 286], [615, 194], [730, 118], [862, 48],
-];
+const ease = [0.22, 1, 0.36, 1] as const;
+const stepHeight = 98;
+const pathHeight = 900;
+const pathTrim = 90;
+const journeyPath = `M146 ${pathTrim} V326 C146 365 127 385 127 450 C127 515 146 535 146 574 V${pathHeight - pathTrim}`;
+const mobileJourneyPath = "M0 119 H150 C184 119 195 92 240 92 C285 92 296 119 330 119 H480";
 
-const mobileTitleLines: Record<string, [string, string]> = {
-  "Premium mobile products": ["Premium", "mobile products"],
-  "Resilience under pressure": ["Resilience", "under pressure"],
-  "A new chapter in Dubai": ["A new chapter", "in Dubai"],
-  "Building what comes next": ["Building what", "comes next"],
-};
-
-function MobileMilestoneTitle({ title }: { title: string }) {
-  const lines = mobileTitleLines[title];
-
-  if (!lines) return title;
-
-  return lines.map((line) => <span key={line} className="block">{line}</span>);
+function cubicPoint(start: number, controlA: number, controlB: number, end: number, time: number) {
+  const inverse = 1 - time;
+  return inverse ** 3 * start
+    + 3 * inverse ** 2 * time * controlA
+    + 3 * inverse * time ** 2 * controlB
+    + time ** 3 * end;
 }
 
+function curveXAt(y: number) {
+  if (y <= 326 || y >= 574) return 146;
+
+  const firstHalf = y < 450;
+  const start = firstHalf ? { x: 146, y: 326 } : { x: 127, y: 450 };
+  const controlA = firstHalf ? { x: 146, y: 365 } : { x: 127, y: 515 };
+  const controlB = firstHalf ? { x: 127, y: 385 } : { x: 146, y: 535 };
+  const end = firstHalf ? { x: 127, y: 450 } : { x: 146, y: 574 };
+  let low = 0;
+  let high = 1;
+
+  for (let index = 0; index < 12; index += 1) {
+    const time = (low + high) / 2;
+    const pointY = cubicPoint(start.y, controlA.y, controlB.y, end.y, time);
+    if (pointY < y) low = time;
+    else high = time;
+  }
+
+  return cubicPoint(start.x, controlA.x, controlB.x, end.x, (low + high) / 2);
+}
+
+const journeyTicks = Array.from({ length: 55 }, (_, index) => {
+  const y = 18 + index * 16;
+  const x = curveXAt(y);
+  const length = index % 6 === 0 ? 22 : 10;
+  return { x1: x - length - 4, x2: x - 4, y };
+}).filter(({ y }) => y >= pathTrim && y <= pathHeight - pathTrim);
+
+function mobileCurveYAt(x: number) {
+  if (x <= 150 || x >= 330) return 119;
+
+  const firstHalf = x < 240;
+  const start = firstHalf ? { x: 150, y: 119 } : { x: 240, y: 92 };
+  const controlA = firstHalf ? { x: 184, y: 119 } : { x: 285, y: 92 };
+  const controlB = firstHalf ? { x: 195, y: 92 } : { x: 296, y: 119 };
+  const end = firstHalf ? { x: 240, y: 92 } : { x: 330, y: 119 };
+  let low = 0;
+  let high = 1;
+
+  for (let index = 0; index < 12; index += 1) {
+    const time = (low + high) / 2;
+    const pointX = cubicPoint(start.x, controlA.x, controlB.x, end.x, time);
+    if (pointX < x) low = time;
+    else high = time;
+  }
+
+  return cubicPoint(start.y, controlA.y, controlB.y, end.y, (low + high) / 2);
+}
+
+const mobileJourneyTicks = Array.from({ length: 33 }, (_, index) => {
+  const x = index * 15;
+  const y = mobileCurveYAt(x);
+  const length = index === 16 ? 20 : index % 8 === 0 ? 14 : 8;
+  return { x, y1: y - length - 7, y2: y - 7 };
+});
+
 export function JourneySection() {
+  const rail = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
-  const section = useRef<HTMLElement>(null);
-  const steps = useRef<Array<HTMLElement | null>>([]);
+  const [mobileActive, setMobileActive] = useState(2);
+  const [railHeight, setRailHeight] = useState(pathHeight);
   const reducedMotion = useReducedMotion();
-  const journeyProgress = useSectionProgress(section, "top 85%", "bottom 35%", false);
-
   useEffect(() => {
-    const update = () => {
-      let nearest = 0;
-      let distance = Infinity;
-      steps.current.forEach((step, index) => {
-        if (!step || !step.offsetParent) return;
-        const bounds = step.getBoundingClientRect();
-        const next = Math.abs(bounds.top + bounds.height / 2 - innerHeight / 2);
-        if (next < distance) { distance = next; nearest = index; }
-      });
-      setActive(nearest);
-    };
-    update();
-    return journeyProgress.on("change", update);
-  }, [journeyProgress]);
+    const element = rail.current;
+    if (!element) return;
 
+    const updateHeight = () => setRailHeight(element.getBoundingClientRect().height || pathHeight);
+    updateHeight();
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
-
+  const current = timeline[active];
+  const mobileCurrent = timeline[mobileActive];
+  const handleMobileSwipe = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const swipeIntent = info.offset.x + info.velocity.x * 0.16;
+    if (Math.abs(swipeIntent) < 42) return;
+    setMobileActive((previous) => Math.min(
+      timeline.length - 1,
+      Math.max(0, previous + (swipeIntent < 0 ? 1 : -1)),
+    ));
+  };
+  const handleMobileKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    setMobileActive((previous) => Math.min(
+      timeline.length - 1,
+      Math.max(0, previous + (event.key === "ArrowRight" ? 1 : -1)),
+    ));
+  };
 
   return (
-    <section ref={section} id="journey" data-header-theme="light" className="relative border-y border-black/10 bg-[#edf0ef] text-[#091012]" aria-label="Entrepreneurial experience: The climb was never linear.">
-      <div className="container py-16 md:hidden">
-        <div className="border-b border-black/15 pb-7">
-          <p className="eyebrow !text-black/45">Entrepreneurial experience</p>
-          <h2 className="section-title mt-6">
-            The climb was<br />never linear.
-          </h2>
-          <div className="mt-6 flex items-center justify-between font-mono text-sm uppercase tracking-[.1em] text-black/45">
-            <span>2009 — Today</span>
-            <span>{timeline.length} chapters</span>
-          </div>
-        </div>
+    <section
+      id="journey"
+      data-header-theme="dark"
+      className="journey-motion"
+      aria-label="Entrepreneurial experience: The climb was never linear."
+    >
+      <div className="journey-motion__desktop">
+        <div className="container journey-motion__grid">
+          <header className="journey-motion__intro">
+            <h2 data-section-reveal="up">The climb was<br />never linear.</h2>
+            <p data-section-reveal="up" data-reveal-order="1">Every venture added a new capability. Every setback sharpened the next decision. This is the path from first business to global products and technology.</p>
+          </header>
 
-        <div className="relative mt-4">
-          <div aria-hidden className="absolute bottom-10 left-[7px] top-5 w-px bg-black/15" />
-          <motion.div
-            aria-hidden
-            className="absolute bottom-10 left-[7px] top-5 w-px origin-top bg-cyan-700"
-            style={{ scaleY: reducedMotion ? 1 : journeyProgress }}
-          />
+          <div ref={rail} className="journey-motion__rail" aria-label={`Current milestone: ${current.year}`}>
+            <svg className="journey-motion__path" viewBox="0 0 220 900" preserveAspectRatio="none" aria-hidden>
+              <defs>
+                <filter id="journey-neon" x="-80%" y="-20%" width="260%" height="140%">
+                  <feGaussianBlur stdDeviation="6" result="blur" />
+                  <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                </filter>
+                <linearGradient id="journey-line" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor="#c8ff38" stopOpacity="0" />
+                  <stop offset=".28" stopColor="#c8ff38" stopOpacity=".14" />
+                  <stop offset=".4" stopColor="#c8ff38" stopOpacity=".46" />
+                  <stop offset=".5" stopColor="#d9ff42" />
+                  <stop offset=".6" stopColor="#c8ff38" stopOpacity=".46" />
+                  <stop offset=".72" stopColor="#c8ff38" stopOpacity=".14" />
+                  <stop offset="1" stopColor="#c8ff38" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <g className="journey-motion__ticks">
+                {journeyTicks.map((tick) => (
+                  <line key={tick.y} x1={tick.x1} x2={tick.x2} y1={tick.y} y2={tick.y} />
+                ))}
+              </g>
+              <path d={journeyPath} fill="none" stroke="rgba(255,255,255,.08)" strokeWidth="1.25" />
+              <path d={journeyPath} fill="none" stroke="url(#journey-line)" strokeWidth="1.75" filter="url(#journey-neon)" />
+            </svg>
 
-          {timeline.map((milestone, index) => (
-            <motion.article
-              key={`mobile-${milestone.year}-${milestone.title}`}
-              initial={reducedMotion ? false : { opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.32 }}
-              transition={{ duration: 0.65, delay: index === 0 ? 0 : 0.04, ease: [0.22, 1, 0.36, 1] }}
-              className="relative border-b border-black/10 py-8 pl-9 last:border-b-0 last:pb-2"
+            <motion.div
+              className="journey-motion__years"
+              initial={false}
+              animate={{ y: -(active * stepHeight) - stepHeight / 2 }}
+              transition={{ duration: reducedMotion ? 0 : 0.7, ease }}
             >
-              <motion.span
-                aria-hidden
-                initial={reducedMotion ? false : { scale: 0.55, backgroundColor: "#edf0ef" }}
-                whileInView={{ scale: 1, backgroundColor: "#008fab" }}
-                viewport={{ once: true, amount: 0.5 }}
-                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                className="absolute left-0 top-[2.3rem] size-[15px] rounded-full border-[3px] border-[#edf0ef] ring-1 ring-cyan-800/30"
-              />
-              <p className="font-mono text-sm tracking-[.12em] text-cyan-800">
-                0{index + 1} · {milestone.year}
-              </p>
-              <h3 className="mt-3 text-[clamp(2rem,9vw,2.75rem)] font-medium leading-[1.08] tracking-[-.03em]">
-                <MobileMilestoneTitle title={milestone.title} />
-              </h3>
-              <p className="mt-4 text-base leading-7 text-black/60">
-                {milestone.description}
-              </p>
-            </motion.article>
-          ))}
+              {timeline.map((milestone, index) => {
+                const distance = Math.abs(active - index);
+                const rowY = pathHeight / 2 + (index - active) * stepHeight * pathHeight / railHeight;
+                const rowX = curveXAt(rowY);
+                return (
+                  <button
+                    key={milestone.year}
+                    type="button"
+                    className={`journey-motion__year ${active === index ? "journey-motion__year--active" : ""}`}
+                    style={{
+                      opacity: Math.max(0.12, 1 - distance * 0.24),
+                      width: `calc(${rowX / 2.2}% - 18px)`,
+                    }}
+                    onClick={() => {
+                      setActive(index);
+                    }}
+                    aria-label={`Show ${milestone.year}: ${milestone.title}`}
+                    aria-current={active === index ? "step" : undefined}
+                  >
+                    <span>{milestone.year}</span>
+                    <i aria-hidden />
+                  </button>
+                );
+              })}
+            </motion.div>
+
+            <div key={active} className="journey-motion__pulse" aria-hidden>
+              <span>
+                <svg viewBox="0 0 34 34" role="presentation">
+                  <path d="M6 22.5 17 13l11 9.5" />
+                  <path d="M6 16.5 17 7l11 9.5" />
+                  <path d="M6 28.5 17 19l11 9.5" />
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <div className="journey-motion__details" aria-live="polite">
+            <motion.div
+              key={`${current.year}-${current.title}`}
+              initial={reducedMotion ? false : { opacity: 0, y: 28, filter: "blur(8px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: reducedMotion ? 0 : 0.55, ease }}
+            >
+              <p className="journey-motion__active-year">{current.year}</p>
+              <h3>{current.title}</h3>
+              <p>{current.description}</p>
+            </motion.div>
+          </div>
         </div>
       </div>
 
-      <div className="container hidden md:grid lg:grid-cols-[1.2fr_.8fr]">
-        <div className="self-start py-20 motion-safe:lg:sticky lg:top-20 lg:flex lg:min-h-[calc(100svh-5rem)] lg:flex-col lg:py-10">
-          <div>
-            <p className="eyebrow !text-black/45">Entrepreneurial experience</p>
-            <h2 className="section-title mt-7 max-w-3xl">
-              <span className="block">The climb was</span>
-              <span className="block">never linear.</span>
-            </h2>
-            <p className="section-description section-description--dark mt-5">Every venture added a new capability. Every setback sharpened the next decision. This is the path from first business to global products and technology.</p>
-          </div>
-
-          <div className="relative mt-3 hidden h-[clamp(300px,39vh,430px)] max-w-4xl overflow-hidden lg:block">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_65%_55%,rgba(0,158,188,.11),transparent_36%)]" />
-            <motion.div key={timeline[active].year} initial={{ opacity: 0, y: 14 }} animate={{ opacity: .055, y: 0 }} className="absolute right-5 top-2 text-[clamp(6rem,10vw,10rem)] font-semibold leading-none tracking-[-.09em]">{timeline[active].year}</motion.div>
-            <svg viewBox="0 0 920 480" className="relative h-full w-full" role="img" aria-label={`Journey progress: ${timeline[active].year}, ${timeline[active].title}`}>
-              <path d="M0 465 L110 408 L198 424 L292 354 L372 390 L470 298 L550 330 L650 218 L720 246 L820 98 L920 160 L920 480 L0 480 Z" fill="rgba(0,0,0,.045)" />
-              <path d={route} fill="none" stroke="rgba(0,0,0,.16)" strokeWidth="2" strokeDasharray="7 9" />
-              <motion.path d={route} fill="none" stroke="#008fab" strokeWidth="3" strokeLinecap="round" initial={false} style={{ pathLength: reducedMotion ? 1 : journeyProgress }} transition={{ duration: .75, ease: [0.22, 1, 0.36, 1] }} />
-              {points.map(([x, y], index) => (
-                <motion.g key={timeline[index].year} onClick={() => steps.current[index]?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "center" })} className="cursor-pointer">
-                  <motion.circle cx={x} cy={y} r="15" fill="rgba(0,143,171,.12)" animate={{ scale: index === active ? 1 : 0 }} style={{ transformOrigin: `${x}px ${y}px` }} />
-                  <circle cx={x} cy={y} r={index === active ? 7 : 4} fill={index <= active ? "#008fab" : "#aab2b4"} stroke="#edf0ef" strokeWidth="3" />
-                </motion.g>
+      <div className="journey-motion__mobile container">
+        <header>
+          <h2 data-section-reveal="up"><span>The climb was</span><span>never linear.</span></h2>
+          <p data-section-reveal="up" data-reveal-order="1">Every venture added a new capability. Every setback sharpened the next decision. This is the path from first business to global products and technology.</p>
+        </header>
+        <motion.div
+          className="journey-motion__mobile-timeline"
+          aria-label={`Current milestone: ${mobileCurrent.year}. Swipe left or right to explore.`}
+          onPanEnd={handleMobileSwipe}
+          onKeyDown={handleMobileKeyDown}
+          tabIndex={0}
+        >
+          <div className="journey-motion__mobile-center-glow" aria-hidden />
+          <svg viewBox="0 0 480 160" preserveAspectRatio="none" aria-hidden>
+            <defs>
+              <filter id="journey-mobile-neon" x="-20%" y="-120%" width="140%" height="340%">
+                <feGaussianBlur stdDeviation="3" result="blur" />
+                <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+              </filter>
+              <filter id="journey-mobile-halo" x="-20%" y="-180%" width="140%" height="460%">
+                <feGaussianBlur stdDeviation="6" />
+              </filter>
+              <linearGradient id="journey-mobile-line" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stopColor="#98c92e" stopOpacity=".18" />
+                <stop offset=".24" stopColor="#b9ef3a" stopOpacity=".5" />
+                <stop offset=".5" stopColor="#e5ff4d" />
+                <stop offset=".76" stopColor="#b9ef3a" stopOpacity=".5" />
+                <stop offset="1" stopColor="#98c92e" stopOpacity=".18" />
+              </linearGradient>
+            </defs>
+            <path className="journey-motion__mobile-line-glow" d={mobileJourneyPath} stroke="url(#journey-mobile-line)" filter="url(#journey-mobile-halo)" />
+            <path className="journey-motion__mobile-line-shadow" d={mobileJourneyPath} />
+            <path className="journey-motion__mobile-line" d={mobileJourneyPath} stroke="url(#journey-mobile-line)" filter="url(#journey-mobile-neon)" />
+            <g className="journey-motion__mobile-ticks" aria-hidden>
+              {mobileJourneyTicks.map((tick) => (
+                <line key={tick.x} x1={tick.x} x2={tick.x} y1={tick.y1} y2={tick.y2} />
               ))}
-              <motion.g initial={false} animate={{ x: points[active][0] - 862, y: points[active][1] - 48 }} transition={{ duration: .75, ease: [0.22, 1, 0.36, 1] }}>
-                <path d="M862 22 V48" stroke="#091012" strokeWidth="3" />
-                <path d="M864 22 L890 31 L864 40 Z" fill="#008fab" />
-              </motion.g>
-            </svg>
-          </div>
+            </g>
+          </svg>
 
-          <div className="mt-6 flex items-end justify-between border-t border-black/15 pt-4 lg:mt-auto">
-            <div><p className="font-mono text-sm uppercase tracking-[.14em] text-black/45">Current chapter</p><p className="mt-1 text-base md:text-lg">{timeline[active].year} · {timeline[active].title}</p></div>
-            <p className="font-mono text-sm text-cyan-700">0{active + 1} / 0{timeline.length}</p>
-          </div>
-        </div>
-
-        <div className="border-t border-black/10 lg:border-l lg:border-t-0 lg:pl-10">
-          {timeline.map((milestone, index) => (
-            <article
-              key={`${milestone.year}-${milestone.title}`}
-              ref={(node) => { steps.current[index] = node; }}
-              data-index={index}
-              data-cursor="CHAPTER"
-              className="group flex items-center border-b border-black/10 py-8 last:border-b-0 sm:min-h-[38vh] sm:py-12 lg:min-h-[62vh] lg:py-16"
-            >
-              <motion.div
-                animate={{
-                  opacity: reducedMotion || active === index ? 1 : 0.78,
-                  x: reducedMotion || active === index ? 0 : 10,
-                  rotate: 0,
-                  scale: 1,
+          {timeline.map((milestone, index) => {
+            const distance = Math.abs(index - mobileActive);
+            return (
+              <button
+                key={milestone.year}
+                type="button"
+                className={`journey-motion__mobile-year ${index === mobileActive ? "journey-motion__mobile-year--active" : ""}`}
+                style={{
+                  left: `calc(50% + ${(index - mobileActive) * 85}px)`,
+                  top: mobileCurveYAt(240 + (index - mobileActive) * 85) - 52,
+                  opacity: Math.max(0.18, 1 - distance * 0.2),
                 }}
-                transition={{ duration: reducedMotion ? 0 : .4, ease: [0.22, 1, 0.36, 1] }}
-                className="relative w-full rounded-[1.75rem] border border-black/10 bg-white/55 p-6 shadow-[0_24px_70px_rgba(9,16,18,.08)] backdrop-blur-sm md:p-8"
+                onClick={() => setMobileActive(index)}
+                aria-label={`Show ${milestone.year}: ${milestone.title}`}
+                aria-current={index === mobileActive ? "step" : undefined}
               >
-                <span aria-hidden className="absolute left-1/2 top-0 h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full border-[7px] border-[#edf0ef] bg-cyan-700 shadow-[0_5px_12px_rgba(0,80,96,.22)]" />
-                <div className="flex items-center justify-between">
-                  <p className="font-mono text-sm text-cyan-700 transition-[letter-spacing,color] duration-500 group-hover:tracking-[.08em] group-hover:text-cyan-600">{milestone.year}</p>
-                  <span className={`grid size-11 place-items-center rounded-full border transition-colors ${active === index ? "border-[#091012] bg-[#091012] text-white" : "border-black/15 text-black/35"}`}><ArrowUpRight size={16} /></span>
-                </div>
-                <h3 className="mt-5 text-[clamp(1.75rem,4.2vw,3.5rem)] leading-[1.12] tracking-[-.025em] transition-[color,transform] duration-500 ease-out group-hover:translate-x-2 group-hover:text-cyan-800 md:mt-8">{milestone.title}</h3>
-                <p className="mt-4 line-clamp-2 max-w-xl text-base leading-7 text-black/60 transition-[color,transform] duration-500 ease-out group-hover:translate-x-2 group-hover:text-black/75 sm:line-clamp-none md:mt-7 md:text-lg md:leading-relaxed">{milestone.description}</p>
-              </motion.div>
-            </article>
-          ))}
-        </div>
+                {milestone.year}
+              </button>
+            );
+          })}
+
+          <div key={`mobile-pulse-${mobileActive}`} className="journey-motion__mobile-pulse" aria-hidden>
+            <span>
+              <svg viewBox="0 0 34 34" role="presentation">
+                <path d="M6 22.5 17 13l11 9.5" />
+                <path d="M6 16.5 17 7l11 9.5" />
+                <path d="M6 28.5 17 19l11 9.5" />
+              </svg>
+            </span>
+          </div>
+        </motion.div>
+
+        <motion.div
+          key={`${mobileCurrent.year}-${mobileCurrent.title}`}
+          className="journey-motion__mobile-detail"
+          initial={reducedMotion ? false : { opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: reducedMotion ? 0 : 0.45, ease }}
+          aria-live="polite"
+        >
+          <p>{mobileCurrent.year}</p>
+          <h3>{mobileCurrent.title}</h3>
+          <p>{mobileCurrent.description}</p>
+        </motion.div>
       </div>
     </section>
   );

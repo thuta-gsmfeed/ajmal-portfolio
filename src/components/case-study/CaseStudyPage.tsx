@@ -66,10 +66,10 @@ export function CaseStudyPage({ product }: { product: Product }) {
         <div className="grain" />
 
         <div className="container relative z-10 flex min-h-[110svh] items-end pb-20 pt-32 md:pb-24">
-          <div className="max-w-5xl">
+          <div className="case-study__hero-copy">
             <motion.p initial={reducedMotion ? false : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="eyebrow">{product.category}</motion.p>
-            <motion.h1 initial={reducedMotion ? false : { opacity: 0, y: 46 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.28, duration: 0.85, ease: [0.22, 1, 0.36, 1] }} className="mt-7 text-[clamp(3.6rem,10vw,9.5rem)] font-medium leading-[.88] tracking-[-.055em]">{product.name}</motion.h1>
-            <motion.p initial={reducedMotion ? false : { opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.42, duration: 0.75 }} className="mt-8 max-w-3xl text-[clamp(1.35rem,2.4vw,2.4rem)] leading-tight text-white/80">{product.tagline}</motion.p>
+            <motion.h1 initial={reducedMotion ? false : { opacity: 0, y: 46 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.28, duration: 0.85, ease: [0.22, 1, 0.36, 1] }} className="case-study__hero-title mt-7">{product.name}</motion.h1>
+            <motion.p initial={reducedMotion ? false : { opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.42, duration: 0.75 }} className="case-study__hero-tagline mt-8 text-white/80">{product.tagline}</motion.p>
           </div>
         </div>
       </section>
@@ -78,7 +78,7 @@ export function CaseStudyPage({ product }: { product: Product }) {
         <div className="container grid gap-8 md:grid-cols-3">
           {product.metrics.map((metric, index) => (
             <motion.div key={metric.label} initial={reducedMotion ? false : { opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.45 }} transition={{ delay: index * 0.08, duration: 0.65 }} className="border-l border-cyan-700/35 pl-5">
-              <strong className="block text-[clamp(2.5rem,5vw,5.5rem)] font-medium leading-none tracking-[-.05em] text-cyan-800">{metric.value}</strong>
+              <strong className="case-study__metric block font-medium text-cyan-800">{metric.value}</strong>
               <span className="mt-3 block font-mono text-sm uppercase tracking-[.12em] text-black/45">{metric.label}</span>
             </motion.div>
           ))}
@@ -93,8 +93,8 @@ export function CaseStudyPage({ product }: { product: Product }) {
             <a href={product.url} target="_blank" rel="noreferrer" className="pill mt-9">Visit {product.name}<ArrowUpRight size={16} /></a>
           </div>
           <div>
-            <p className="text-[clamp(1.35rem,2.5vw,2.3rem)] font-normal leading-[1.4] tracking-[-.012em] text-white/86">{product.description}</p>
-            <div className="mt-10 space-y-7 border-t border-white/10 pt-9 text-base leading-8 text-white/58 md:text-lg">
+            <p className="case-study__lead font-normal text-white/86">{product.description}</p>
+            <div className="case-study__details mt-10 space-y-7 border-t border-white/10 pt-9 text-white/58">
               {product.details.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
             </div>
             {product.features && (
@@ -102,8 +102,8 @@ export function CaseStudyPage({ product }: { product: Product }) {
                 {product.features.map((feature, index) => (
                   <motion.article key={feature.title} initial={reducedMotion ? false : { opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.4 }} transition={{ delay: index * 0.06 }} className="rounded-2xl border border-white/10 bg-white/[.025] p-5">
                     <span className="font-mono text-sm text-cyan-200">0{index + 1}</span>
-                    <h3 className="mt-5 text-xl font-medium">{feature.title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-white/48">{feature.description}</p>
+                    <h3 className="case-study__feature-title mt-5 font-medium">{feature.title}</h3>
+                    <p className="case-study__feature-copy mt-2 text-white/48">{feature.description}</p>
                   </motion.article>
                 ))}
               </div>
@@ -116,7 +116,7 @@ export function CaseStudyPage({ product }: { product: Product }) {
         <div className="container">
           <p className="font-mono text-sm uppercase tracking-[.13em] text-black/45">Next case study</p>
           <CinematicLink href={`/work/${next.slug}`} className="group mt-5 flex items-end justify-between gap-7 border-b border-black/20 pb-8">
-            <span className="text-[clamp(3rem,9vw,9rem)] font-medium leading-none tracking-[-.06em]">{next.name}</span>
+            <span className="case-study__next-title font-medium">{next.name}</span>
             <span className="grid size-14 shrink-0 place-items-center rounded-full border border-black/25 transition-transform duration-500 group-hover:rotate-45 group-hover:bg-black group-hover:text-white md:size-20"><ArrowUpRight /></span>
           </CinematicLink>
         </div>

@@ -6,25 +6,44 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-const chapters = [
-  { label: "Trusted sourcing", title: "Premium devices", body: "Reliable access to quality used Apple devices through established European supply relationships.", word: "SOURCED" },
-  { label: "Quality control", title: "Every device checked", body: "A disciplined quality process at every handoff, built around consistency and trust.", word: "CHECKED" },
-  { label: "International logistics", title: "Across borders", body: "Inventory moves through a connected distribution network with speed and operational clarity.", word: "MOVING" },
-  { label: "Reliable delivery", title: "Delivered with confidence", body: "From warehouse to destination, every shipment closes the loop with dependable execution.", word: "DELIVERED" },
-  { label: "Device grading", title: "Consistent standards", body: "Clear grading makes every device easier to evaluate, compare, and move with confidence.", word: "GRADED" },
-  { label: "Secure packaging", title: "Ready for transit", body: "Protective handling and careful preparation keep every shipment secure from pickup to arrival.", word: "PACKED" },
+const stats = [
+  { icon: "/images/coolmix-delivery/experience.svg", value: "12+", label: "Years of experience", detail: "(since 2014)" },
+  { icon: "/images/coolmix-delivery/satisfaction.svg", value: "100%", label: "Customer satisfaction", detail: "guaranteed" },
+  { icon: "/images/coolmix-delivery/devices.svg", value: "2.300.000+", label: "Devices Sold", detail: "Worldwide" },
+  { icon: "/images/coolmix-delivery/clients.svg", value: "700+", label: "Active wholesale", detail: "clients globally" },
 ] as const;
 
 const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 
+function CoolmixServiceContent() {
+  return (
+    <div className="coolmix-delivery__service-track">
+      <div className="coolmix-delivery__headline">
+        <h2 data-section-reveal="up"><span>Europe’s trusted</span><br />Apple Distributor<br />since 2014</h2>
+        <a href="https://coolmix.eu/" target="_blank" rel="noopener noreferrer">
+          Visit website <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+      <div className="coolmix-delivery__overview">
+        <h3 data-section-reveal="up">Global Mobile Distribution</h3>
+        <p data-section-reveal="up" data-reveal-order="1">Coolmix is a global mobile trading and distribution company specializing in Apple devices, serving professional buyers across international markets.</p>
+      </div>
+      {stats.map((stat, index) => (
+        <div className="coolmix-delivery__stat" key={stat.value} data-section-reveal="up" data-reveal-order={index % 3}>
+          <Image src={stat.icon} alt="" width={48} height={48} aria-hidden="true" />
+          <strong>{stat.value}</strong>
+          <p>{stat.label}<br />{stat.detail}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function CoolmixDeliverySection() {
   const section = useRef<HTMLElement>(null);
   const stage = useRef<HTMLDivElement>(null);
-  const transitionWipe = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const speedLabel = useRef<HTMLSpanElement>(null);
-  const cardTrack = useRef<HTMLDivElement>(null);
-  const cardElements = useRef<Array<HTMLElement | null>>([]);
   const progress = useRef(0);
   const velocity = useRef(0);
   const lastProgress = useRef(0);
@@ -43,10 +62,7 @@ export function CoolmixDeliverySection() {
     }
 
     const van = new window.Image();
-    const logo = new window.Image();
     let vanLoaded = false;
-    let logoLoaded = false;
-    let whiteLogo: HTMLCanvasElement | null = null;
     let active = false;
     let disposed = false;
     let width = 1;
@@ -54,7 +70,6 @@ export function CoolmixDeliverySection() {
     let dpr = 1;
     let wheelFaces: HTMLCanvasElement[] = [];
     let speedResetTimer = 0;
-    const fontSans = window.getComputedStyle(document.body).fontFamily || 'Inter, "Helvetica Neue", Arial, sans-serif';
 
     const resize = () => {
       const bounds = canvasElement.getBoundingClientRect();
@@ -76,15 +91,6 @@ export function CoolmixDeliverySection() {
 
       const currentProgress = clamp(progress.current);
       const currentSpeed = clamp(velocity.current * 42);
-      const wordSize = Math.min(width * (width < 700 ? 0.23 : 0.205), height * 0.42);
-      const wordSpacing = width * (width < 700 ? 1.12 : 0.94);
-      const wordX = width * 0.1 - currentProgress * wordSpacing * (chapters.length - 1);
-      context.save();
-      context.fillStyle = "#eef0f2";
-      context.font = `600 ${wordSize}px ${fontSans}`;
-      context.textBaseline = "middle";
-      chapters.forEach((chapter, index) => context.fillText(chapter.word, wordX + index * wordSpacing, height * 0.49));
-      context.restore();
 
       if (vanLoaded) {
         const vehicleWidth = Math.min(width < 700 ? width * 0.72 : width * 0.41, 650);
@@ -92,7 +98,7 @@ export function CoolmixDeliverySection() {
         const vehicleScale = vehicleWidth / van.naturalWidth;
         const travel = Math.sin(currentProgress * Math.PI * 2) * Math.min(14, width * 0.012);
         const vehicleX = width * 0.5 - vehicleWidth * 0.5 + travel;
-        const vehicleY = roadY - vehicleHeight * 0.895;
+        const vehicleY = roadY - vehicleHeight;
         const bob = Math.sin(currentProgress * Math.PI * 34) * currentSpeed * 1.6;
 
         context.save();
@@ -135,16 +141,9 @@ export function CoolmixDeliverySection() {
 
         // Keep the rotated faces mounted after scrolling stops. Removing this layer at
         // zero velocity makes the wheels visibly snap back to the source-image angle.
-        drawWheelFace(356, 746, wheelFaces[0]);
-        drawWheelFace(1310, 746, wheelFaces[1]);
-
-        if (logoLoaded) {
-          const decalWidth = vehicleWidth * 0.215;
-          const decalHeight = decalWidth * (logo.naturalHeight / logo.naturalWidth);
-          const decalX = vehicleX + vehicleWidth * 0.255;
-          const decalY = vehicleY + bob + vehicleHeight * 0.265;
-          context.drawImage(whiteLogo ?? logo, decalX, decalY, decalWidth, decalHeight);
-        }
+        drawWheelFace(785, 1535, wheelFaces[0]);
+        drawWheelFace(1315, 1535, wheelFaces[1]);
+        drawWheelFace(3820, 1535, wheelFaces[2]);
 
         if (speedLabel.current) {
           const displayedSpeed = Math.round(currentSpeed * 80);
@@ -182,8 +181,8 @@ export function CoolmixDeliverySection() {
     resizeObserver.observe(canvasElement);
 
     van.onload = () => {
-      const wheelFaceSize = 176;
-      wheelFaces = [[356, 746], [1310, 746]].map(([centerX, centerY]) => {
+      const wheelFaceSize = 230;
+      wheelFaces = [[785, 1535], [1315, 1535], [3820, 1535]].map(([centerX, centerY]) => {
         const face = document.createElement("canvas");
         face.width = wheelFaceSize;
         face.height = wheelFaceSize;
@@ -218,26 +217,7 @@ export function CoolmixDeliverySection() {
       draw.current?.();
     };
     van.onerror = () => setCanvasFailed(true);
-    logo.onload = () => {
-      const tintWidth = 512;
-      const tintHeight = Math.max(1, Math.round(tintWidth * (logo.naturalHeight / logo.naturalWidth)));
-      const tintCanvas = document.createElement("canvas");
-      const tintContext = tintCanvas.getContext("2d");
-      tintCanvas.width = tintWidth;
-      tintCanvas.height = tintHeight;
-      if (tintContext) {
-        tintContext.drawImage(logo, 0, 0, tintWidth, tintHeight);
-        tintContext.globalCompositeOperation = "source-in";
-        tintContext.fillStyle = "#fff";
-        tintContext.fillRect(0, 0, tintWidth, tintHeight);
-        tintContext.globalCompositeOperation = "source-over";
-        whiteLogo = tintCanvas;
-      }
-      logoLoaded = true;
-      draw.current?.();
-    };
-    van.src = "/images/coolmix-delivery/step-van-v2.webp";
-    logo.src = "/images/logo/coolmix-logo-for-car.png";
+    van.src = "/images/coolmix-delivery/coolmix-truck.webp";
     resize();
 
     return () => {
@@ -255,28 +235,6 @@ export function CoolmixDeliverySection() {
     gsap.registerPlugin(ScrollTrigger);
     const media = gsap.matchMedia();
     media.add("(prefers-reduced-motion: no-preference)", () => {
-      const reveal = gsap.fromTo(
-        transitionWipe.current,
-        { clipPath: "inset(0% 0% 0% 0%)" },
-        {
-          clipPath: "inset(0% 0% 0% 100%)",
-          ease: "none",
-          scrollTrigger: {
-            trigger: section.current,
-            start: "top 92%",
-            end: "top 18%",
-            scrub: 0.5,
-          },
-        },
-      );
-      const cards = cardElements.current.filter(Boolean);
-      let activeCard = -1;
-      const updateCards = (value: number) => {
-        const nextActiveCard = Math.round(value * (chapters.length - 1));
-        if (nextActiveCard === activeCard) return;
-        activeCard = nextActiveCard;
-        cards.forEach((card, index) => gsap.to(card, { opacity: index === activeCard ? 1 : 0.32, y: index === activeCard ? -10 : 0, duration: 0.35, ease: "power2.out", overwrite: true }));
-      };
       const trigger = ScrollTrigger.create({
         trigger: section.current,
         start: "top top",
@@ -288,68 +246,42 @@ export function CoolmixDeliverySection() {
           velocity.current = Math.max(velocity.current, Math.abs(next - lastProgress.current));
           lastProgress.current = next;
           progress.current = next;
-          updateCards(next);
           draw.current?.();
         },
-        onRefresh: (self) => { progress.current = self.progress; updateCards(self.progress); draw.current?.(); },
+        onRefresh: (self) => { progress.current = self.progress; draw.current?.(); },
       });
-      updateCards(0);
-      return () => { reveal.kill(); trigger.kill(); progress.current = 0; lastProgress.current = 0; velocity.current = 0; };
+      return () => { trigger.kill(); progress.current = 0; lastProgress.current = 0; velocity.current = 0; };
     });
 
     const addTrackMotion = (query: string, xPercent: number) => media.add(query, () => {
-      if (!cardTrack.current) return;
-      const tween = gsap.to(cardTrack.current, {
+      const track = section.current?.querySelector<HTMLElement>(".coolmix-delivery__stage .coolmix-delivery__service-track");
+      if (!track) return;
+      const tween = gsap.to(track, {
         xPercent,
         ease: "none",
         scrollTrigger: { trigger: section.current, start: "top top", end: "bottom bottom", scrub: 0.35 },
       });
       return () => tween.kill();
     });
-    addTrackMotion("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", -33.3333);
+    addTrackMotion("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", -24.2424);
     addTrackMotion("(min-width: 768px) and (max-width: 1023px) and (prefers-reduced-motion: no-preference)", -66.6667);
-    addTrackMotion("(max-width: 767px) and (prefers-reduced-motion: no-preference)", -83.3333);
+    addTrackMotion("(max-width: 767px) and (prefers-reduced-motion: no-preference)", -75);
     return () => media.revert();
   }, { scope: section });
 
   return (
     <section ref={section} id="coolmix-delivery" data-header-theme="light" className="coolmix-delivery coolmix-delivery--rail" aria-label="Coolmix delivery journey" data-no-section-transition>
       <div ref={stage} className="coolmix-delivery__stage">
-        <div ref={transitionWipe} data-header-theme="dark" className="coolmix-delivery__transition-wipe" aria-hidden="true" />
         <canvas ref={canvas} className={`coolmix-delivery__canvas ${canvasReady ? "is-ready" : ""}`} aria-hidden="true" />
         {(!canvasReady || canvasFailed) && (
           <div className="coolmix-delivery__visual-fallback" aria-hidden="true">
-            <Image src="/images/coolmix-delivery/step-van-v2.webp" alt="" width={1636} height={961} />
-            <Image className="coolmix-delivery__fallback-decal" src="/images/logo/coolmix-logo-for-car.png" alt="" width={3839} height={2154} />
+            <Image src="/images/coolmix-delivery/coolmix-truck.webp" alt="" width={4627} height={1762} />
           </div>
         )}
-        <div className="coolmix-delivery__topbar">
-          <div className="coolmix-delivery__brand" aria-label="Coolmix">
-            <Image src="/images/logo/logo-white.svg" alt="" width={411} height={88} />
-          </div>
-        </div>
         <span ref={speedLabel} className="coolmix-delivery__speed" aria-hidden="true">00 KM/H</span>
         <div data-header-theme="dark" className="coolmix-delivery__service-panel">
-          <div ref={cardTrack} className="coolmix-delivery__service-track">
-            {chapters.map((chapter, index) => (
-              <article key={chapter.label} ref={(node) => { cardElements.current[index] = node; }} className="coolmix-delivery__service-card">
-                <p>{chapter.label}</p>
-                <h2>{chapter.title}</h2>
-                <span>{chapter.body}</span>
-              </article>
-            ))}
-          </div>
-          <a
-            className="coolmix-delivery__website-link"
-            href="https://coolmix.eu/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Visit Coolmix website (opens in a new tab)"
-          >
-            <span>Visit Coolmix</span>
-          </a>
+          <CoolmixServiceContent />
         </div>
-        <p className="sr-only">A Coolmix delivery journey from trusted sourcing and quality control through international logistics to reliable delivery.</p>
       </div>
 
       <div className="coolmix-delivery__reduced">
@@ -358,26 +290,11 @@ export function CoolmixDeliverySection() {
           <span>coolmix</span>
         </div>
         <div className="coolmix-delivery__reduced-van-wrap">
-          <Image className="coolmix-delivery__reduced-van" src="/images/coolmix-delivery/step-van-v2.webp" alt="Coolmix delivery van" width={1636} height={961} />
-          <Image className="coolmix-delivery__reduced-decal" src="/images/logo/coolmix-logo-for-car.png" alt="" width={3839} height={2154} />
+          <Image className="coolmix-delivery__reduced-van" src="/images/coolmix-delivery/coolmix-truck.webp" alt="Blue Coolmix delivery truck" width={4627} height={1762} />
         </div>
-        <div className="coolmix-delivery__reduced-list">
-          {chapters.map((chapter) => (
-            <article key={`reduced-${chapter.label}`}>
-              <span>{chapter.label}</span>
-              <h2>{chapter.title}</h2>
-              <p>{chapter.body}</p>
-            </article>
-          ))}
+        <div className="coolmix-delivery__service-panel coolmix-delivery__service-panel--reduced">
+          <CoolmixServiceContent />
         </div>
-        <a
-          className="coolmix-delivery__website-link coolmix-delivery__website-link--reduced"
-          href="https://coolmix.eu/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span>Visit Coolmix</span>
-        </a>
       </div>
     </section>
   );

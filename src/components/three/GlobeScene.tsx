@@ -27,6 +27,52 @@ type CountryGeometry = {
   coordinates: number[][][] | number[][][][];
 };
 
+const pointInRing = (lon: number, lat: number, ring: number[][]) => {
+  let inside = false;
+  for (let index = 0, previous = ring.length - 1; index < ring.length; previous = index, index += 1) {
+    const [x, y] = ring[index];
+    const [previousX, previousY] = ring[previous];
+    if ((y > lat) !== (previousY > lat) && lon < ((previousX - x) * (lat - y)) / (previousY - y) + x) inside = !inside;
+  }
+  return inside;
+};
+
+const coordinateIsLand = (lon: number, lat: number, geometries: CountryGeometry[]) => geometries.some((geometry) => {
+  const polygons = geometry.type === "Polygon"
+    ? [geometry.coordinates as number[][][]]
+    : geometry.coordinates as number[][][][];
+  return polygons.some((polygon) => pointInRing(lon, lat, polygon[0]) && !polygon.slice(1).some((hole) => pointInRing(lon, lat, hole)));
+});
+
+function CountryDots() {
+  const geometry = useMemo(() => {
+    const world = feature(
+      countries as unknown as Parameters<typeof feature>[0],
+      countries.objects.countries as unknown as Parameters<typeof feature>[1],
+    ) as unknown as { features: Array<{ geometry: CountryGeometry }> };
+    const geometries = world.features.map((country) => country.geometry);
+    const points: THREE.Vector3[] = [];
+    const count = 11500;
+    const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+
+    for (let index = 0; index < count; index += 1) {
+      const y = 1 - (index / (count - 1)) * 2;
+      const lat = (Math.asin(y) * 180) / Math.PI;
+      let lon = ((goldenAngle * index * 180) / Math.PI) % 360;
+      if (lon > 180) lon -= 360;
+      if (coordinateIsLand(lon, lat, geometries)) points.push(globePoint(lat, lon, GLOBE_RADIUS + 0.022));
+    }
+
+    return new THREE.BufferGeometry().setFromPoints(points);
+  }, []);
+
+  return (
+    <points geometry={geometry}>
+      <pointsMaterial color="#f4f8ff" size={0.026} transparent opacity={0.78} depthWrite={false} sizeAttenuation />
+    </points>
+  );
+}
+
 function CountryOutlines() {
   const geometry = useMemo(() => {
     const world = feature(
@@ -58,7 +104,7 @@ function CountryOutlines() {
 
   return (
     <lineSegments geometry={geometry}>
-      <lineBasicMaterial color="#88dbe8" transparent opacity={0.38} depthWrite={false} />
+      <lineBasicMaterial color="#c8d9ea" transparent opacity={0.19} depthWrite={false} />
     </lineSegments>
   );
 }
@@ -108,20 +154,11 @@ function LocationMarker({ location, index, mobile, enabled, onSelect }: { locati
   const pulse = useRef<THREE.Mesh>(null);
   const label = useRef<HTMLDivElement>(null);
   const position = useMemo(() => globePoint(...location.coordinates, GLOBE_RADIUS + 0.055), [location]);
-  const worldPosition = useMemo(() => new THREE.Vector3(), []);
-  const globeCenter = useMemo(() => new THREE.Vector3(), []);
-  const normal = useMemo(() => new THREE.Vector3(), []);
-  const cameraDirection = useMemo(() => new THREE.Vector3(), []);
   const [labelX, labelY] = location.labelOffset ?? [0, -18];
 
-  useFrame(({ camera, clock }) => {
+  useFrame(({ clock }) => {
     if (!group.current) return;
-    group.current.getWorldPosition(worldPosition);
-    group.current.parent?.getWorldPosition(globeCenter);
-    normal.copy(worldPosition).sub(globeCenter).normalize();
-    cameraDirection.copy(camera.position).sub(worldPosition).normalize();
-    const visible = normal.dot(cameraDirection) > -0.02;
-    if (label.current) label.current.style.opacity = visible ? "1" : "0";
+    if (label.current) label.current.style.opacity = "1";
     if (pulse.current) {
       const scale = 1.15 + Math.sin(clock.elapsedTime * 2.2 + index * 0.7) * 0.28;
       pulse.current.scale.setScalar(scale);
@@ -146,11 +183,11 @@ function LocationMarker({ location, index, mobile, enabled, onSelect }: { locati
         <meshBasicMaterial color="#68e7ff" transparent opacity={0.16} depthWrite={false} />
       </mesh>
       {location.showLabel !== false && (
-        <Html center position={[0, 0, 0]} distanceFactor={mobile ? 3.2 : 4.2} zIndexRange={[30, 0]}>
+        <Html center position={[0, 0, 0]} distanceFactor={mobile ? 1.85 : 2.15} zIndexRange={[60, 40]}>
           <div
             ref={label}
             style={{ transform: `translate(${labelX}px, ${labelY}px)` }}
-            className="pointer-events-none whitespace-nowrap rounded-sm border border-white/15 bg-[#061014]/88 px-1.5 py-1 font-mono text-[10px] uppercase tracking-[.11em] text-white/75 shadow-[0_6px_24px_rgba(0,0,0,.4)] backdrop-blur-sm transition-opacity duration-300"
+            className="network-globe-label"
           >
             {location.name}
           </div>
@@ -169,7 +206,7 @@ function NetworkGlobe({ mobile, interactive }: { mobile: boolean } & GlobeIntera
       if (mobile) {
         group.current.rotation.y += delta * 0.07;
       } else {
-        group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, -1.38, 0.065);
+        group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, -2.4, 0.065);
         group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, state.pointer.y * 0.09 - 0.08, 0.025);
         group.current.rotation.z = THREE.MathUtils.lerp(group.current.rotation.z, state.pointer.x * -0.035, 0.02);
       }
@@ -177,11 +214,12 @@ function NetworkGlobe({ mobile, interactive }: { mobile: boolean } & GlobeIntera
   });
 
   return (
-    <group ref={group} rotation={[-0.08, -1.38, 0]}>
+    <group ref={group} rotation={[-0.08, -2.4, 0]}>
       <mesh receiveShadow>
-        <sphereGeometry args={[GLOBE_RADIUS, mobile ? 48 : 64, mobile ? 48 : 64]} />
-        <meshPhysicalMaterial color="#041116" roughness={0.72} metalness={0.5} clearcoat={0.2} />
+        <sphereGeometry args={[GLOBE_RADIUS * 0.83, mobile ? 48 : 64, mobile ? 48 : 64]} />
+        <meshPhysicalMaterial color="#010204" roughness={0.76} metalness={0.56} clearcoat={0.18} />
       </mesh>
+      <CountryDots />
       <CountryOutlines />
       <mesh>
         <sphereGeometry args={[GLOBE_RADIUS + 0.095, 48, 48]} />
@@ -233,9 +271,9 @@ export default function GlobeScene({ active }: { active: boolean }) {
       gl={{ antialias: !mobile, alpha: true, powerPreference: "high-performance" }}
       performance={{ min: 0.55 }}
     >
-      <ambientLight intensity={0.55} color="#bdeaf0" />
-      <directionalLight position={[4, 4, 5]} intensity={3.2} color="#c9f6ff" />
-      <directionalLight position={[-4, -1, 2]} intensity={1.2} color="#d4c997" />
+      <ambientLight intensity={0.22} color="#a9c8ff" />
+      <directionalLight position={[4, 4, 5]} intensity={2.9} color="#ff9447" />
+      <directionalLight position={[-4, -2, 3]} intensity={2.4} color="#3975ff" />
       <NetworkGlobe mobile={mobile} interactive={interactive} />
       <Sparkles count={mobile ? 28 : 42} scale={[8, 7, 5]} size={0.75} speed={0.08} opacity={0.18} />
       <OrbitControls

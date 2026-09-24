@@ -1,98 +1,112 @@
 "use client";
 
 import Image from "next/image";
-import { Fragment, useRef } from "react";
+import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
 import { useGSAP } from "@gsap/react";
 import { media } from "@/data/content";
 
-const biography = "I've spent more than 15 years turning opportunities into operating businesses—from marketing and iPhone distribution to e-commerce and AI software.";
+const biography = "I've spent more than 15 years turning opportunities into operating businesses — from marketing and iPhone distribution to e-commerce and AI software.";
 
 export function AboutSection() {
   const section = useRef<HTMLElement>(null);
 
   useGSAP(() => {
-    gsap.registerPlugin(ScrollTrigger);
+    gsap.registerPlugin(ScrollTrigger, SplitText);
     const match = gsap.matchMedia();
+
     match.add("(prefers-reduced-motion: no-preference)", () => {
-      const timeline = gsap.timeline({
-        defaults: { ease: "power3.out" },
+      const stackedLayout = window.matchMedia("(max-width: 900px)").matches;
+      const mobileQuote = window.matchMedia("(max-width: 600px)").matches;
+      const textBlocks = gsap.utils.toArray<HTMLElement>(
+        `${mobileQuote ? ".about-quote-copy--mobile" : ".about-quote-copy--desktop"}, .about-bio-copy > p`,
+      );
+
+      const splits = textBlocks.map((block) => SplitText.create(block, {
+        type: "lines",
+        autoSplit: true,
+        aria: block.classList.contains("about-quote-copy") ? "hidden" : "auto",
+        onSplit: (split) => gsap.fromTo(split.lines, {
+          maskImage: "linear-gradient(90deg, #000 45%, transparent 55%)",
+          maskSize: "250% 100%",
+          maskRepeat: "no-repeat",
+          maskPosition: "100% 0%",
+          opacity: 0.7,
+        }, {
+          maskPosition: "0% 0%",
+          opacity: 1,
+          duration: 1.3,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: stackedLayout
+              ? block.classList.contains("about-quote-copy")
+                ? ".about-dossier__lead"
+                : ".about-bio-copy"
+              : section.current,
+            start: "top 85%",
+            toggleActions: "play none none none",
+          },
+        }),
+      }));
+
+      const portrait = gsap.timeline({
         scrollTrigger: {
-          trigger: section.current,
-          start: "top 78%",
-          toggleActions: "play none none reverse",
+          trigger: ".about-frame",
+          start: "top 85%",
+          toggleActions: "play none none none",
         },
       });
 
-      timeline
-        .fromTo(".about-kicker", { opacity: 0, x: -22 }, { opacity: 1, x: 0, duration: 0.55 }, 0)
-        .fromTo(".about-frame", { clipPath: "inset(0% 0% 0% 100%)", xPercent: 7 }, { clipPath: "inset(0% 0% 0% 0%)", xPercent: 0, duration: 1.05, ease: "power3.inOut" }, 0.04)
-        .fromTo(".about-quote-mark", { opacity: 0, scale: 0.55, rotate: -12 }, { opacity: 1, scale: 1, rotate: 0, duration: 0.55, ease: "back.out(1.8)" })
-        .fromTo(".about-caption", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.55 }, 0.72);
+      portrait
+        .fromTo(".about-frame", { opacity: 0, x: 54 }, { opacity: 1, x: 0, duration: 1.05, ease: "power3.inOut" }, 0)
+        .fromTo(".about-signature", { opacity: 0, scale: 0.88 }, { opacity: 1, scale: 1, duration: 0.7, ease: "power3.out" }, 0.7);
 
-      gsap.fromTo(".about-word", {
-        opacity: 0.08,
-        y: "0.7em",
-        filter: "blur(8px)",
-      }, {
-        opacity: 1,
-        y: 0,
-        filter: "blur(0px)",
-        stagger: 0.06,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: ".about-dossier__story",
-          start: "top 92%",
-          end: "center 38%",
-          scrub: 0.65,
-        },
-      });
-
-      gsap.fromTo(".about-photo", { scale: 1.1, yPercent: -2 }, {
-        scale: 1.02,
-        yPercent: 3,
-        ease: "none",
-        scrollTrigger: { trigger: section.current, start: "top bottom", end: "bottom top", scrub: 0.6 },
-      });
+      return () => splits.forEach((split) => split.revert());
     });
+
     return () => match.revert();
   }, { scope: section });
 
   return (
-    <section ref={section} id="about" data-header-theme="light" className="about-section section-light overflow-hidden">
-      <div className="about-split">
+    <section ref={section} id="about" data-header-theme="dark" className="about-section">
+      <div className="about-split container">
         <div className="about-dossier__story">
-          <p className="about-kicker eyebrow">About me</p>
           <blockquote className="about-dossier__lead" aria-label={biography}>
-            <span className="about-quote-mark about-quote-mark--open" aria-hidden="true">“</span>
-            <span className="about-quote-copy" aria-hidden="true">
-              {biography.split(" ").map((word, index, words) => (
-                <Fragment key={`${word}-${index}`}>
-                  <span className="about-word">{word}</span>{index < words.length - 1 ? " " : ""}
-                </Fragment>
-              ))}
-              <span className="about-quote-mark about-quote-mark--close">”</span>
+            <span className="about-quote-copy about-quote-copy--desktop" aria-hidden="true">
+              “I&apos;ve spent more than 15 years<br />turning opportunities into<br />operating businesses — from<br />marketing and iPhone distribution<br />to e-commerce and AI software.”
+            </span>
+            <span className="about-quote-copy about-quote-copy--mobile" aria-hidden="true">
+              “I&apos;ve spent more than 15 years turning<br />opportunities into operating<br />businesses from marketing and<br />iPhone distribution to e-commerce<br />and AI software.”
             </span>
           </blockquote>
+
+          <div className="about-bio-copy">
+            <p><strong>Ajmal Gholzad</strong> is an entrepreneur and business builder who started his journey in 2009. Over the years, he has built businesses across mobile distribution, global trading, e-commerce, technology and AI.</p>
+            <p>What began with identifying opportunities has grown into a group of businesses connecting people, products and markets across different industries and countries.</p>
+            <p>Today, his focus is on building practical businesses, using technology to solve real problems and creating new opportunities for the future.</p>
+          </div>
         </div>
 
         <figure className="about-frame about-dossier__portrait">
-          <Image
-            src={media.portrait.src}
-            alt={media.portrait.alt}
-            fill
-            sizes="(max-width:767px) calc(100vw - 48px), 40vw"
-            className="about-photo object-cover object-top"
-          />
-          <div className="about-dossier__portrait-shade" />
-          <figcaption className="about-caption about-dossier__caption">
-            <div>
-              <p>Ajmal Gholzad</p>
-              <span>Founder · Entrepreneur · Technologist</span>
-            </div>
-            <span className="about-dossier__since">Since 2009</span>
-          </figcaption>
+          <div className="about-portrait__visual">
+            <Image
+              src={media.portrait.src}
+              alt={media.portrait.alt}
+              fill
+              sizes="(max-width:900px) 100vw, 760px"
+              className="about-photo object-cover object-bottom"
+            />
+            <Image
+              src="/images/about/ajmal-gholzad-signature.webp"
+              alt=""
+              width={515}
+              height={390}
+              className="about-signature"
+              aria-hidden="true"
+            />
+          </div>
         </figure>
       </div>
     </section>

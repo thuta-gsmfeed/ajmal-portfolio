@@ -7,13 +7,12 @@ export function TrustedPartnershipsSection() {
       <div className="container">
         <div className="network-partners">
           <div className="network-partners__intro">
-            <p className="eyebrow">Trusted partnerships</p>
-            <h3>Built through relationships.</h3>
-            <p>Selected partnerships supporting international trade, payments, logistics, and operations.</p>
+            <h3 data-section-reveal="up">Built through relationships.</h3>
+            <p data-section-reveal="up" data-reveal-order="1">Selected partnerships supporting international trade, payments, logistics, and operations.</p>
           </div>
           <ul className="network-partners__grid">
-            {partners.map((partner) => (
-              <li key={partner.name} className="network-partner">
+            {partners.map((partner, index) => (
+              <li key={partner.name} className="network-partner" data-section-reveal="up" data-reveal-order={index % 6}>
                 <div className="relative h-9 w-full">
                   <Image
                     src={partner.logo}

@@ -1,5 +1,19 @@
-import Image from "next/image";
-import { ventures } from "@/data/content";
-import { SectionTitle } from "@/components/ui/SectionTitle";
-import { ArrowUpRight } from "lucide-react";
-export function VenturesSection(){return <section id="ventures" className="bg-[#0a0c0d] py-28 md:py-40"><div className="container"><SectionTitle kicker="Ventures" title="Businesses built to move." body="Experience across the full arc—from shaping demand and moving products to building digital systems."/><div className="mt-24 space-y-5">{ventures.map((v,i)=><article key={v.title} className={`group grid gap-7 border-t border-white/15 pt-5 md:grid-cols-12 ${i%2?"md:text-right":""}`}><div className={`md:col-span-7 ${i%2?"md:col-start-6":""}`}><div className="image-wrap relative aspect-[16/9]"><Image src={v.image.src} alt={v.image.alt} fill sizes="(max-width:768px) 100vw, 58vw" className="object-cover grayscale transition duration-700 group-hover:grayscale-0"/></div></div><div className={`flex flex-col justify-between pb-10 md:col-span-5 ${i%2?"md:col-start-1 md:row-start-1":""}`}><div className="flex items-center justify-between"><span className="font-mono text-xs text-cyan-200">0{i+1} / {v.category}</span><ArrowUpRight className="transition-transform group-hover:rotate-45"/></div><div><h3 className="mt-8 text-4xl tracking-[-.045em] md:text-6xl">{v.title}</h3><p className="mt-5 text-white/50">{v.description}</p><p className="mt-3 text-xs uppercase tracking-widest text-white/30">{v.period}</p></div></div></article>)}</div></div></section>}
+export function VenturesSection() {
+  return (
+    <section
+      id="ventures"
+      data-header-theme="light"
+      className="ventures-showcase ventures-showcase--intro"
+      aria-labelledby="ventures-title"
+    >
+      <div className="container ventures-showcase__inner">
+        <header className="ventures-showcase__header">
+          <h2 id="ventures-title" data-section-reveal="up">Our Ventures</h2>
+          <p data-section-reveal="up" data-reveal-order="1"><strong>Businesses built from experience.</strong></p>
+          <p data-section-reveal="up" data-reveal-order="2">What started with entrepreneurship and commerce has grown into a portfolio of companies serving different markets.</p>
+          <p data-section-reveal="up" data-reveal-order="3">Today, Gholzad&apos;s ventures bring together global electronics distribution, AI-powered trading, business automation, and luxury experiences.</p>
+        </header>
+      </div>
+    </section>
+  );
+}

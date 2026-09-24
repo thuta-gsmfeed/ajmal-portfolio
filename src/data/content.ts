@@ -40,8 +40,8 @@ export const nav = [
 ] as const;
 
 export const media = {
-  hero: { src: "/images/banner/gholzad-banner.webp", alt: "Ajmal Gholzad in Dubai", replacement: "Verified Ajmal Gholzad portfolio banner." },
-  portrait: { src: "/images/about/about.webp", alt: "Ajmal Gholzad", replacement: "Verified Ajmal Gholzad portrait." },
+  hero: { src: "/images/banner/hero.webp", alt: "Ajmal Gholzad seated in a dark studio portrait", replacement: "Verified Ajmal Gholzad portfolio hero portrait." },
+  portrait: { src: "/images/about/about-portrait.webp", alt: "Ajmal Gholzad seated in a suit", replacement: "Verified Ajmal Gholzad portrait." },
   manifesto: { src: "https://images.unsplash.com/photo-1517976547714-720226b864c1?auto=format&fit=crop&w=2200&q=80", alt: "Earth viewed from space", replacement: "Replace with subtle global-network background, 2200×1400." },
 } satisfies Record<string, MediaAsset>;
 
@@ -54,7 +54,7 @@ export const currentVentures: CurrentVenture[] = [
 export const timeline: TimelineMilestone[] = [
   { year: "2009", title: "Entrepreneurship begins", description: "A career begins with marketing, commercial instinct, and a willingness to learn every part of building a business." },
   { year: "2014", title: "Smartphone commerce", description: "Ajmal develops the idea of selling smartphone gear and gadgets online, opening a new chapter in digital commerce." },
-  { year: "2015", title: "Premium mobile products", description: "The product range expands into smartphones from leading global brands, supported by a strong focus on trust and service." },
+  { year: "2015", title: "Mobile Business Expands", description: "The focus grows into smartphones and international product opportunities." },
   { year: "2017", title: "Resilience under pressure", description: "After a major setback, more than 195 investors help fund the next stage—proof that trusted relationships can rebuild momentum." },
   { year: "2020", title: "A new chapter in Dubai", description: "Ajmal clears earlier business debts, responds quickly to changing demand, and begins a new international chapter in Dubai." },
   { year: "2022", title: "Operations meet technology", description: "New warehouse, quality-control, and technology capabilities turn years of commercial experience into a software vision." },

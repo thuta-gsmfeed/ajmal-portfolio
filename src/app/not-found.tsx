@@ -15,7 +15,7 @@ export default function NotFound() {
           href="/"
           className="pill mt-8 bg-white text-[#030506] hover:bg-cyan-100"
         >
-          Return to portfolio
+          Return to home
         </Link>
       </div>
     </main>
