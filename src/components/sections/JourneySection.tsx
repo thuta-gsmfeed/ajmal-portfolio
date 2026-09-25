@@ -2,6 +2,10 @@
 
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { motion, type PanInfo, useReducedMotion } from "framer-motion";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
 import { timeline } from "@/data/content";
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -80,12 +84,67 @@ const nextMilestoneLabel = (index: number) => index === timeline.length - 1
   ? `Restart timeline at ${timeline[0].year}`
   : `Next milestone: ${timeline[index + 1].year}`;
 
+function revealJourneyBlocks(blocks: HTMLElement[], trigger: HTMLElement) {
+  return blocks.map((block, index) => SplitText.create(block, {
+    type: "lines",
+    linesClass: "journey-reveal-line",
+    autoSplit: true,
+    aria: "auto",
+    onSplit: (split) => gsap.fromTo(split.lines,
+      { "--bg-progress": 30 },
+      {
+        "--bg-progress": 100,
+        duration: 1.55,
+        delay: index * 0.08,
+        ease: "none",
+        scrollTrigger: { trigger, start: "top 95%", toggleActions: "play none none none" },
+      },
+    ),
+  }));
+}
+
+function JourneyDetail({ milestone, mobile = false }: { milestone: (typeof timeline)[number]; mobile?: boolean }) {
+  const detail = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !detail.current) return;
+    gsap.registerPlugin(ScrollTrigger, SplitText);
+    const blocks = Array.from(detail.current.children) as HTMLElement[];
+    const splits = revealJourneyBlocks(blocks, detail.current);
+    return () => splits.forEach((split) => split.revert());
+  }, { scope: detail });
+
+  return (
+    <div ref={detail} className={mobile ? "journey-motion__mobile-detail" : undefined} aria-live="polite">
+      <p className={mobile ? undefined : "journey-motion__active-year"}>{milestone.year}</p>
+      <h3>{milestone.title}</h3>
+      <p>{milestone.description}</p>
+    </div>
+  );
+}
+
 export function JourneySection() {
+  const section = useRef<HTMLElement>(null);
   const rail = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const [mobileActive, setMobileActive] = useState(2);
   const [railHeight, setRailHeight] = useState(pathHeight);
   const reducedMotion = useReducedMotion();
+  useGSAP(() => {
+    gsap.registerPlugin(ScrollTrigger, SplitText);
+    const match = gsap.matchMedia();
+    const addIntro = (query: string, selector: string) => match.add(query, () => {
+      const header = section.current?.querySelector<HTMLElement>(selector);
+      if (!header) return;
+      const blocks = Array.from(header.children) as HTMLElement[];
+      const splits = revealJourneyBlocks(blocks, header);
+      return () => splits.forEach((split) => split.revert());
+    });
+
+    addIntro("(min-width: 901px) and (prefers-reduced-motion: no-preference)", ".journey-motion__intro");
+    addIntro("(max-width: 900px) and (prefers-reduced-motion: no-preference)", ".journey-motion__mobile > header");
+    return () => match.revert();
+  }, { scope: section });
   useEffect(() => {
     const element = rail.current;
     if (!element) return;
@@ -118,6 +177,7 @@ export function JourneySection() {
 
   return (
     <section
+      ref={section}
       id="journey"
       data-header-theme="dark"
       className="journey-motion"
@@ -126,8 +186,8 @@ export function JourneySection() {
       <div className="journey-motion__desktop">
         <div className="container journey-motion__grid">
           <header className="journey-motion__intro">
-            <h2 data-section-reveal="up">The climb was<br />never linear.</h2>
-            <p data-section-reveal="up" data-reveal-order="1">Every venture added a new capability. Every setback sharpened the next decision. This is the path from first business to global products and technology.</p>
+            <h2>The climb was<br />never linear.</h2>
+            <p>Every venture added a new capability. Every setback sharpened the next decision. This is the path from first business to global products and technology.</p>
           </header>
 
           <div ref={rail} className="journey-motion__rail" aria-label={`Current milestone: ${current.year}`}>
@@ -203,25 +263,16 @@ export function JourneySection() {
             </button>
           </div>
 
-          <div className="journey-motion__details" aria-live="polite">
-            <motion.div
-              key={`${current.year}-${current.title}`}
-              initial={reducedMotion ? false : { opacity: 0, y: 28, filter: "blur(8px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ duration: reducedMotion ? 0 : 0.55, ease }}
-            >
-              <p className="journey-motion__active-year">{current.year}</p>
-              <h3>{current.title}</h3>
-              <p>{current.description}</p>
-            </motion.div>
+          <div className="journey-motion__details">
+            <JourneyDetail key={`${current.year}-${current.title}`} milestone={current} />
           </div>
         </div>
       </div>
 
       <div className="journey-motion__mobile container">
         <header>
-          <h2 data-section-reveal="up"><span>The climb was</span><span>never linear.</span></h2>
-          <p data-section-reveal="up" data-reveal-order="1">Every venture added a new capability. Every setback sharpened the next decision. This is the path from first business to global products and technology.</p>
+          <h2><span>The climb was</span><span>never linear.</span></h2>
+          <p>Every venture added a new capability. Every setback sharpened the next decision. This is the path from first business to global products and technology.</p>
         </header>
         <motion.div
           className="journey-motion__mobile-timeline"
@@ -296,18 +347,7 @@ export function JourneySection() {
           </button>
         </motion.div>
 
-        <motion.div
-          key={`${mobileCurrent.year}-${mobileCurrent.title}`}
-          className="journey-motion__mobile-detail"
-          initial={reducedMotion ? false : { opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reducedMotion ? 0 : 0.45, ease }}
-          aria-live="polite"
-        >
-          <p>{mobileCurrent.year}</p>
-          <h3>{mobileCurrent.title}</h3>
-          <p>{mobileCurrent.description}</p>
-        </motion.div>
+        <JourneyDetail key={`${mobileCurrent.year}-${mobileCurrent.title}`} milestone={mobileCurrent} mobile />
       </div>
     </section>
   );

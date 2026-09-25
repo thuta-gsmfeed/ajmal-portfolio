@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
 
 const stats = [
   { icon: "/images/coolmix-delivery/experience.svg", value: "12+", label: "Years of experience", detail: "(since 2014)" },
@@ -19,17 +20,21 @@ function CoolmixServiceContent() {
   return (
     <div className="coolmix-delivery__service-track">
       <div className="coolmix-delivery__headline">
-        <h2 data-section-reveal="up"><span>Europe’s trusted</span><br />Apple Distributor<br />since 2014</h2>
+        <h2>
+          <span className="coolmix-delivery__rainbow-reveal">Europe’s trusted</span><br />
+          <span className="coolmix-delivery__text-reveal">Apple Distributor</span><br />
+          <span className="coolmix-delivery__text-reveal">since 2014</span>
+        </h2>
         <a href="https://coolmix.eu/" target="_blank" rel="noopener noreferrer">
-          Visit website <span aria-hidden="true">↗</span>
+          <span className="coolmix-delivery__text-reveal">Visit website <span aria-hidden="true">↗</span></span>
         </a>
       </div>
       <div className="coolmix-delivery__overview">
-        <h3 data-section-reveal="up">Global Mobile Distribution</h3>
-        <p data-section-reveal="up" data-reveal-order="1">Coolmix is a global mobile trading and distribution company specializing in Apple devices, serving professional buyers across international markets.</p>
+        <h3>Global Mobile Distribution</h3>
+        <p>Coolmix is a global mobile trading and distribution company specializing in Apple devices, serving professional buyers across international markets.</p>
       </div>
-      {stats.map((stat, index) => (
-        <div className="coolmix-delivery__stat" key={stat.value} data-section-reveal="up" data-reveal-order={index % 3}>
+      {stats.map((stat) => (
+        <div className="coolmix-delivery__stat" key={stat.value}>
           <Image src={stat.icon} alt="" width={48} height={48} aria-hidden="true" />
           <strong>{stat.value}</strong>
           <p>{stat.label}<br />{stat.detail}</p>
@@ -44,6 +49,7 @@ export function CoolmixDeliverySection() {
   const stage = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const progress = useRef(0);
+  const entrance = useRef(0);
   const velocity = useRef(0);
   const lastProgress = useRef(0);
   const frame = useRef<number>(0);
@@ -95,7 +101,8 @@ export function CoolmixDeliverySection() {
         const vehicleHeight = vehicleWidth * (van.naturalHeight / van.naturalWidth);
         const vehicleScale = vehicleWidth / van.naturalWidth;
         const travel = Math.sin(currentProgress * Math.PI * 2) * Math.min(14, width * 0.012);
-        const vehicleX = width * 0.5 - vehicleWidth * 0.5 + travel;
+        const entranceOffset = -(width * 0.5 + vehicleWidth * 0.5 + 40) * (1 - entrance.current);
+        const vehicleX = width * 0.5 - vehicleWidth * 0.5 + travel + entranceOffset;
         const vehicleY = roadY - vehicleHeight;
         const bob = Math.sin(currentProgress * Math.PI * 34) * currentSpeed * 1.6;
 
@@ -110,7 +117,7 @@ export function CoolmixDeliverySection() {
 
         // Rotate a softly masked copy of each rim. The tyre and wheel arch stay in the
         // base image, which prevents square crop edges and keeps the road contact solid.
-        const wheelRotation = currentProgress * Math.PI * 28;
+        const wheelRotation = currentProgress * Math.PI * 28 + entrance.current * Math.PI * 6;
         const drawWheelFace = (sourceX: number, sourceY: number, face: HTMLCanvasElement | undefined) => {
           if (!face) return;
           const wheelX = vehicleX + sourceX * vehicleScale;
@@ -204,9 +211,77 @@ export function CoolmixDeliverySection() {
   }, []);
 
   useGSAP(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    gsap.registerPlugin(SplitText);
+    const track = section.current?.querySelector<HTMLElement>(".coolmix-delivery__stage .coolmix-delivery__service-track");
+    if (!track) return;
+
+    const cards = Array.from(track.children) as HTMLElement[];
+    const revealedCards = new WeakSet<HTMLElement>();
+    const animations = cards.map((card) => {
+      const headline = card.classList.contains("coolmix-delivery__headline");
+      const blocks = headline
+        ? Array.from(card.querySelectorAll<HTMLElement>("h2 > span, a > .coolmix-delivery__text-reveal"))
+        : Array.from(card.querySelectorAll<HTMLElement>(card.classList.contains("coolmix-delivery__overview") ? "h3, p" : "strong, p"));
+      const splits = headline ? [] : blocks.map((block) => SplitText.create(block, {
+        type: "lines",
+        linesClass: "coolmix-delivery__reveal-line",
+        autoSplit: true,
+        aria: "auto",
+        onSplit: (split) => {
+          gsap.set(split.lines, { "--bg-progress": revealedCards.has(card) ? 100 : 30 });
+        },
+      }));
+      const groups = headline ? blocks : splits.map((split) => split.lines);
+      const reveal = gsap.timeline({ paused: true });
+      groups.forEach((group, index) => {
+        gsap.set(group, { "--bg-progress": headline && index === 0 ? 0 : 30 });
+        reveal.to(group, { "--bg-progress": 100, duration: 1.55, ease: "none" }, index * 0.08);
+      });
+      return { card, reveal, splits };
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const animation = animations.find(({ card }) => card === entry.target);
+        if (animation) revealedCards.add(animation.card);
+        animation?.reveal.play();
+        observer.unobserve(entry.target);
+      });
+    }, { rootMargin: "0px -2% 0px -2%", threshold: 0.1 });
+    animations.forEach(({ card }) => observer.observe(card));
+
+    return () => {
+      observer.disconnect();
+      animations.forEach(({ reveal, splits }) => {
+        reveal.kill();
+        splits.forEach((split) => split.revert());
+      });
+    };
+  }, { scope: section });
+
+  useGSAP(() => {
     gsap.registerPlugin(ScrollTrigger);
     const media = gsap.matchMedia();
     media.add("(prefers-reduced-motion: no-preference)", () => {
+      let entranceTween: gsap.core.Tween | undefined;
+      const startEntrance = () => {
+        if (entranceTween || entrance.current === 1) return;
+        entranceTween = gsap.to(entrance, {
+          current: 1,
+          duration: 1.5,
+          ease: "power2.out",
+          onUpdate: () => draw.current?.(),
+        });
+      };
+      const entranceTrigger = ScrollTrigger.create({
+        trigger: section.current,
+        start: "top 60%",
+        once: true,
+        onEnter: startEntrance,
+        onRefresh: (self) => { if (self.progress > 0) startEntrance(); },
+      });
       const trigger = ScrollTrigger.create({
         trigger: section.current,
         start: "top top",
@@ -222,22 +297,30 @@ export function CoolmixDeliverySection() {
         },
         onRefresh: (self) => { progress.current = self.progress; draw.current?.(); },
       });
-      return () => { trigger.kill(); progress.current = 0; lastProgress.current = 0; velocity.current = 0; };
+      return () => {
+        entranceTrigger.kill();
+        entranceTween?.kill();
+        trigger.kill();
+        progress.current = 0;
+        lastProgress.current = 0;
+        velocity.current = 0;
+      };
     });
 
-    const addTrackMotion = (query: string, xPercent: number, hold = 0) => media.add(query, () => {
+    const addTrackMotion = (query: string, startXPercent: number, endXPercent: number) => media.add(query, () => {
       const track = section.current?.querySelector<HTMLElement>(".coolmix-delivery__stage .coolmix-delivery__service-track");
       if (!track) return;
-      const timeline = gsap.timeline({
+      gsap.set(track, { x: 0, xPercent: startXPercent });
+      const animation = gsap.to(track, {
+        xPercent: endXPercent,
+        ease: "none",
         scrollTrigger: { trigger: section.current, start: "top top", end: "bottom bottom", scrub: 0.35 },
       });
-      if (hold > 0) timeline.to(track, { xPercent: 0, duration: hold, ease: "none" });
-      timeline.to(track, { xPercent, duration: 1 - hold, ease: "none" });
-      return () => timeline.kill();
+      return () => animation.kill();
     });
-    addTrackMotion("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", -24.2424, 0.3);
-    addTrackMotion("(min-width: 768px) and (max-width: 1023px) and (prefers-reduced-motion: no-preference)", -66.6667);
-    addTrackMotion("(max-width: 767px) and (prefers-reduced-motion: no-preference)", -75);
+    addTrackMotion("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", 75.7576, -24.2424);
+    addTrackMotion("(min-width: 768px) and (max-width: 1023px) and (prefers-reduced-motion: no-preference)", 33.3333, -66.6667);
+    addTrackMotion("(max-width: 767px) and (prefers-reduced-motion: no-preference)", 25, -75);
     return () => media.revert();
   }, { scope: section });
 
@@ -245,7 +328,7 @@ export function CoolmixDeliverySection() {
     <section ref={section} id="coolmix-delivery" data-header-theme="light" className="coolmix-delivery coolmix-delivery--rail" aria-label="Coolmix delivery journey" data-no-section-transition>
       <div ref={stage} className="coolmix-delivery__stage">
         <canvas ref={canvas} className={`coolmix-delivery__canvas ${canvasReady ? "is-ready" : ""}`} aria-hidden="true" />
-        {(!canvasReady || canvasFailed) && (
+        {canvasFailed && (
           <div className="coolmix-delivery__visual-fallback" aria-hidden="true">
             <Image src="/images/coolmix-delivery/coolmix-truck.webp" alt="" width={4627} height={1762} />
           </div>

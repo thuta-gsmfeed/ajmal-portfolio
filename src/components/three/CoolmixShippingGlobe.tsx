@@ -1,20 +1,37 @@
 "use client";
 
 import Script from "next/script";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function CoolmixShippingGlobe() {
   const [threeReady, setThreeReady] = useState(false);
+  const [shouldLoad, setShouldLoad] = useState(false);
+  const globe = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const element = globe.current;
+    if (!element || !('IntersectionObserver' in window)) {
+      setShouldLoad(true);
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      setShouldLoad(true);
+      observer.disconnect();
+    }, { rootMargin: "900px 0px" });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <>
-      <Script
+      {shouldLoad && <Script
         id="coolmix-three-runtime"
         src="/vendor/three-r128.min.js"
         strategy="afterInteractive"
         onLoad={() => setThreeReady(true)}
         onReady={() => setThreeReady(true)}
-      />
+      />}
       {threeReady && (
         <Script
           id="coolmix-shipping-globe-runtime"
@@ -23,7 +40,7 @@ export function CoolmixShippingGlobe() {
         />
       )}
 
-      <div className="network-globe" data-events-globe data-globe-mode="shipping">
+      <div ref={globe} className="network-globe" data-events-globe data-globe-mode="shipping">
         <div className="network-globe__shadow network-globe__shadow--orange" aria-hidden="true" />
         <div className="network-globe__shadow network-globe__shadow--blue" aria-hidden="true" />
         <div className="network-globe__shadow network-globe__shadow--blue-plus" aria-hidden="true" />
