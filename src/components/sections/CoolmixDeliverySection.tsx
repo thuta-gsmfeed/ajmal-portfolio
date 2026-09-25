@@ -43,7 +43,6 @@ export function CoolmixDeliverySection() {
   const section = useRef<HTMLElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
-  const speedLabel = useRef<HTMLSpanElement>(null);
   const progress = useRef(0);
   const velocity = useRef(0);
   const lastProgress = useRef(0);
@@ -69,7 +68,6 @@ export function CoolmixDeliverySection() {
     let height = 1;
     let dpr = 1;
     let wheelFaces: HTMLCanvasElement[] = [];
-    let speedResetTimer = 0;
 
     const resize = () => {
       const bounds = canvasElement.getBoundingClientRect();
@@ -102,19 +100,6 @@ export function CoolmixDeliverySection() {
         const bob = Math.sin(currentProgress * Math.PI * 34) * currentSpeed * 1.6;
 
         context.save();
-        context.globalAlpha = 0.08 + currentSpeed * 0.16;
-        context.strokeStyle = "#0071e3";
-        context.lineWidth = 1.15;
-        for (let trail = 0; trail < 4; trail += 1) {
-          const trailY = vehicleY + vehicleHeight * (0.42 + trail * 0.1);
-          context.beginPath();
-          context.moveTo(vehicleX - 18, trailY);
-          context.lineTo(vehicleX - vehicleWidth * (0.1 + currentSpeed * (0.12 + trail * 0.025)), trailY);
-          context.stroke();
-        }
-        context.restore();
-
-        context.save();
         context.fillStyle = `rgba(8,15,20,${0.08 + currentSpeed * 0.03})`;
         context.beginPath();
         context.ellipse(vehicleX + vehicleWidth * 0.52, roadY - 3, vehicleWidth * 0.4, vehicleHeight * 0.035, 0, 0, Math.PI * 2);
@@ -145,18 +130,6 @@ export function CoolmixDeliverySection() {
         drawWheelFace(1315, 1535, wheelFaces[1]);
         drawWheelFace(3820, 1535, wheelFaces[2]);
 
-        if (speedLabel.current) {
-          const displayedSpeed = Math.round(currentSpeed * 80);
-          speedLabel.current.textContent = `${String(displayedSpeed).padStart(2, "0")} KM/H`;
-          window.clearTimeout(speedResetTimer);
-          if (displayedSpeed > 0) {
-            speedResetTimer = window.setTimeout(() => {
-              if (speedLabel.current) speedLabel.current.textContent = "00 KM/H";
-              velocity.current = 0;
-              draw.current?.();
-            }, 140);
-          }
-        }
         velocity.current = 0;
       }
     };
@@ -224,7 +197,6 @@ export function CoolmixDeliverySection() {
       disposed = true;
       active = false;
       cancelAnimationFrame(frame.current);
-      window.clearTimeout(speedResetTimer);
       intersectionObserver.disconnect();
       resizeObserver.disconnect();
       draw.current = null;
@@ -253,17 +225,17 @@ export function CoolmixDeliverySection() {
       return () => { trigger.kill(); progress.current = 0; lastProgress.current = 0; velocity.current = 0; };
     });
 
-    const addTrackMotion = (query: string, xPercent: number) => media.add(query, () => {
+    const addTrackMotion = (query: string, xPercent: number, hold = 0) => media.add(query, () => {
       const track = section.current?.querySelector<HTMLElement>(".coolmix-delivery__stage .coolmix-delivery__service-track");
       if (!track) return;
-      const tween = gsap.to(track, {
-        xPercent,
-        ease: "none",
+      const timeline = gsap.timeline({
         scrollTrigger: { trigger: section.current, start: "top top", end: "bottom bottom", scrub: 0.35 },
       });
-      return () => tween.kill();
+      if (hold > 0) timeline.to(track, { xPercent: 0, duration: hold, ease: "none" });
+      timeline.to(track, { xPercent, duration: 1 - hold, ease: "none" });
+      return () => timeline.kill();
     });
-    addTrackMotion("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", -24.2424);
+    addTrackMotion("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", -24.2424, 0.3);
     addTrackMotion("(min-width: 768px) and (max-width: 1023px) and (prefers-reduced-motion: no-preference)", -66.6667);
     addTrackMotion("(max-width: 767px) and (prefers-reduced-motion: no-preference)", -75);
     return () => media.revert();
@@ -278,7 +250,6 @@ export function CoolmixDeliverySection() {
             <Image src="/images/coolmix-delivery/coolmix-truck.webp" alt="" width={4627} height={1762} />
           </div>
         )}
-        <span ref={speedLabel} className="coolmix-delivery__speed" aria-hidden="true">00 KM/H</span>
         <div data-header-theme="dark" className="coolmix-delivery__service-panel">
           <CoolmixServiceContent />
         </div>

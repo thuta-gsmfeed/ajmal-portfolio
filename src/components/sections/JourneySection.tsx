@@ -75,6 +75,11 @@ const mobileJourneyTicks = Array.from({ length: 33 }, (_, index) => {
   return { x, y1: y - length - 7, y2: y - 7 };
 });
 
+const nextMilestone = (index: number) => (index + 1) % timeline.length;
+const nextMilestoneLabel = (index: number) => index === timeline.length - 1
+  ? `Restart timeline at ${timeline[0].year}`
+  : `Next milestone: ${timeline[index + 1].year}`;
+
 export function JourneySection() {
   const rail = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
@@ -170,9 +175,7 @@ export function JourneySection() {
                       opacity: Math.max(0.12, 1 - distance * 0.24),
                       width: `calc(${rowX / 2.2}% - 18px)`,
                     }}
-                    onClick={() => {
-                      setActive(index);
-                    }}
+                    onClick={() => setActive(index)}
                     aria-label={`Show ${milestone.year}: ${milestone.title}`}
                     aria-current={active === index ? "step" : undefined}
                   >
@@ -183,7 +186,13 @@ export function JourneySection() {
               })}
             </motion.div>
 
-            <div key={active} className="journey-motion__pulse" aria-hidden>
+            <button
+              key={active}
+              type="button"
+              className="journey-motion__pulse"
+              aria-label={nextMilestoneLabel(active)}
+              onClick={() => setActive(nextMilestone)}
+            >
               <span>
                 <svg viewBox="0 0 34 34" role="presentation">
                   <path d="M6 22.5 17 13l11 9.5" />
@@ -191,7 +200,7 @@ export function JourneySection() {
                   <path d="M6 28.5 17 19l11 9.5" />
                 </svg>
               </span>
-            </div>
+            </button>
           </div>
 
           <div className="journey-motion__details" aria-live="polite">
@@ -270,7 +279,13 @@ export function JourneySection() {
             );
           })}
 
-          <div key={`mobile-pulse-${mobileActive}`} className="journey-motion__mobile-pulse" aria-hidden>
+          <button
+            key={`mobile-pulse-${mobileActive}`}
+            type="button"
+            className="journey-motion__mobile-pulse"
+            aria-label={nextMilestoneLabel(mobileActive)}
+            onClick={() => setMobileActive(nextMilestone)}
+          >
             <span>
               <svg viewBox="0 0 34 34" role="presentation">
                 <path d="M6 22.5 17 13l11 9.5" />
@@ -278,7 +293,7 @@ export function JourneySection() {
                 <path d="M6 28.5 17 19l11 9.5" />
               </svg>
             </span>
-          </div>
+          </button>
         </motion.div>
 
         <motion.div
