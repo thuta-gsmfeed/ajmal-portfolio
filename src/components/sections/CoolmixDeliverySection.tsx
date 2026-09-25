@@ -36,7 +36,9 @@ function CoolmixServiceContent() {
       {stats.map((stat) => (
         <div className="coolmix-delivery__stat" key={stat.value}>
           <Image src={stat.icon} alt="" width={48} height={48} aria-hidden="true" />
-          <strong>{stat.value}</strong>
+          <strong aria-label={stat.value} data-count-value={stat.value}>
+            <span className="coolmix-delivery__count coolmix-delivery__reveal-line" aria-hidden="true">{stat.value}</span>
+          </strong>
           <p>{stat.label}<br />{stat.detail}</p>
         </div>
       ))}
@@ -222,7 +224,7 @@ export function CoolmixDeliverySection() {
       const headline = card.classList.contains("coolmix-delivery__headline");
       const blocks = headline
         ? Array.from(card.querySelectorAll<HTMLElement>("h2 > span, a > .coolmix-delivery__text-reveal"))
-        : Array.from(card.querySelectorAll<HTMLElement>(card.classList.contains("coolmix-delivery__overview") ? "h3, p" : "strong, p"));
+        : Array.from(card.querySelectorAll<HTMLElement>(card.classList.contains("coolmix-delivery__overview") ? "h3, p" : "p"));
       const splits = headline ? [] : blocks.map((block) => SplitText.create(block, {
         type: "lines",
         linesClass: "coolmix-delivery__reveal-line",
@@ -232,12 +234,28 @@ export function CoolmixDeliverySection() {
           gsap.set(split.lines, { "--bg-progress": revealedCards.has(card) ? 100 : 30 });
         },
       }));
-      const groups = headline ? blocks : splits.map((split) => split.lines);
+      const count = card.querySelector<HTMLElement>(".coolmix-delivery__count");
+      const groups = headline ? blocks : count ? [count, ...splits.map((split) => split.lines)] : splits.map((split) => split.lines);
       const reveal = gsap.timeline({ paused: true });
       groups.forEach((group, index) => {
         gsap.set(group, { "--bg-progress": headline && index === 0 ? 0 : 30 });
         reveal.to(group, { "--bg-progress": 100, duration: 1.55, ease: "none" }, index * 0.08);
       });
+      if (count) {
+        const finalValue = count.closest<HTMLElement>("strong")?.dataset.countValue ?? "0";
+        const target = Number(finalValue.replace(/\D/g, ""));
+        const suffix = finalValue.endsWith("%") ? "%" : "+";
+        const formatter = new Intl.NumberFormat("de-DE");
+        const counter = { value: 0 };
+        reveal.set(count, { textContent: `0${suffix}` }, 0);
+        reveal.to(counter, {
+          value: target,
+          duration: 1.8,
+          ease: "power2.out",
+          onUpdate: () => { count.textContent = `${formatter.format(Math.round(counter.value))}${suffix}`; },
+          onComplete: () => { count.textContent = finalValue; },
+        }, 0);
+      }
       return { card, reveal, splits };
     });
 
