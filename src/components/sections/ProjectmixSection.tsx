@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
+import { SectionTextReveal } from "@/components/animation/SectionTextReveal";
 
 const widgets = [
   { name: "Performance rating", file: "perf-rating-dark.png", left: "18.85%", top: "7.04%", width: "18.23%", height: "52.17%" },
@@ -21,8 +22,8 @@ export function ProjectmixSection() {
           <Image src="/images/logo/projectfulllogo.svg" alt="projectmix" width={523} height={106} />
         </div>
 
-        <p className="projectmix-section__eyebrow" data-section-reveal="up" data-reveal-order="1">CRM SYSTEM</p>
-        <h2 id="projectmix-title" className="projectmix-section__title" data-section-reveal="up" data-reveal-order="2">Say hello to<br />projectmix Ai</h2>
+        <p className="projectmix-section__eyebrow" data-gradient-reveal="clip">CRM SYSTEM</p>
+        <h2 id="projectmix-title" className="projectmix-section__title" aria-label="Say hello to projectmix Ai" data-gradient-reveal>Say hello to<br />projectmix Ai</h2>
 
         <div className="projectmix-section__visual" role="img" aria-label="Projectmix dashboard widgets around a laptop" data-section-reveal="scale" data-reveal-order="3">
           <Image className="projectmix-section__laptop" src="/images/projectmix-laptop.svg" alt="" width={776} height={450} aria-hidden="true" />
@@ -38,13 +39,14 @@ export function ProjectmixSection() {
           ))}
         </div>
 
-        <p className="projectmix-section__description" data-section-reveal="up" data-reveal-order="4">
+        <p className="projectmix-section__description" data-gradient-reveal>
           Automating your trading business with the world&apos;s first advanced ERP solution. An easy-to-use software, without a manual.
         </p>
-        <a className="projectmix-section__link" href="https://projectmix.ai/" target="_blank" rel="noopener noreferrer" data-section-reveal="up" data-reveal-order="5">
-          Visit website <ArrowUpRight aria-hidden="true" size={17} />
+        <a className="projectmix-section__link" href="https://projectmix.ai/" target="_blank" rel="noopener noreferrer">
+          <span className="section-gradient-reveal-line" data-gradient-reveal="static">Visit website</span> <ArrowUpRight aria-hidden="true" size={17} />
         </a>
       </div>
+      <SectionTextReveal rootId="projectmix" />
     </section>
   );
 }

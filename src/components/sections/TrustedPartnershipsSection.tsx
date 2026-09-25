@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { partners } from "@/data/content";
+import { SectionTextReveal } from "@/components/animation/SectionTextReveal";
 
 export function TrustedPartnershipsSection() {
   return (
@@ -7,8 +8,8 @@ export function TrustedPartnershipsSection() {
       <div className="container">
         <div className="network-partners">
           <div className="network-partners__intro">
-            <h3 data-section-reveal="up">Built through relationships.</h3>
-            <p data-section-reveal="up" data-reveal-order="1">Selected partnerships supporting international trade, payments, logistics, and operations.</p>
+            <h3 data-gradient-reveal>Built through relationships.</h3>
+            <p data-gradient-reveal>Selected partnerships supporting international trade, payments, logistics, and operations.</p>
           </div>
           <ul className="network-partners__grid">
             {partners.map((partner, index) => (
@@ -27,6 +28,7 @@ export function TrustedPartnershipsSection() {
           </ul>
         </div>
       </div>
+      <SectionTextReveal rootId="trusted-partnerships" />
     </section>
   );
 }

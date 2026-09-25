@@ -18,34 +18,26 @@ export function AboutSection() {
     const match = gsap.matchMedia();
 
     match.add("(prefers-reduced-motion: no-preference)", () => {
-      const stackedLayout = window.matchMedia("(max-width: 900px)").matches;
       const mobileQuote = window.matchMedia("(max-width: 600px)").matches;
       const textBlocks = gsap.utils.toArray<HTMLElement>(
         `${mobileQuote ? ".about-quote-copy--mobile" : ".about-quote-copy--desktop"}, .about-bio-copy > p`,
       );
 
-      const splits = textBlocks.map((block) => SplitText.create(block, {
+      const splits = textBlocks.map((block, index) => SplitText.create(block, {
         type: "lines",
+        linesClass: "about-reveal-line",
         autoSplit: true,
         aria: block.classList.contains("about-quote-copy") ? "hidden" : "auto",
         onSplit: (split) => gsap.fromTo(split.lines, {
-          maskImage: "linear-gradient(90deg, #000 45%, transparent 55%)",
-          maskSize: "250% 100%",
-          maskRepeat: "no-repeat",
-          maskPosition: "100% 0%",
-          opacity: 0.7,
+          "--bg-progress": 30,
         }, {
-          maskPosition: "0% 0%",
-          opacity: 1,
-          duration: 1.3,
-          ease: "power2.out",
+          "--bg-progress": 100,
+          duration: 1.55,
+          delay: Math.max(0, index - 1) * 0.08,
+          ease: "none",
           scrollTrigger: {
-            trigger: stackedLayout
-              ? block.classList.contains("about-quote-copy")
-                ? ".about-dossier__lead"
-                : ".about-bio-copy"
-              : section.current,
-            start: "top 85%",
+            trigger: block.classList.contains("about-quote-copy") ? ".about-dossier__lead" : ".about-bio-copy",
+            start: "top 95%",
             toggleActions: "play none none none",
           },
         }),

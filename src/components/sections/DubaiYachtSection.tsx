@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useMotionSettings, useSectionProgress } from "@/components/animation/motion";
+import { SectionTextReveal } from "@/components/animation/SectionTextReveal";
 
 const features = [
   { label: "Luxury Service", icon: "/images/yachts/features/luxury-service.svg" },
@@ -214,7 +215,7 @@ export function DubaiYachtSection() {
           <div className="yacht-stage__shade pointer-events-none absolute inset-0" aria-hidden="true" />
           <div className="yacht-stage__mobile-intro">
             <Image src="/images/logo/dubai-marina-yachts-logo.svg" alt="Dubai Marina Yachts" width={246} height={36} className="yacht-stage__logo h-auto" data-section-reveal="up" />
-            <h2 className="yacht-stage__title" data-section-reveal="up" data-reveal-order="1">Experience Unmatched Luxury with Dubai Marina Yachts.</h2>
+            <h2 className="yacht-stage__title" data-gradient-reveal>Experience Unmatched Luxury with Dubai Marina Yachts.</h2>
           </div>
         </div>
 
@@ -227,22 +228,23 @@ export function DubaiYachtSection() {
             className="yacht-stage__logo yacht-stage__desktop-intro h-auto"
             data-section-reveal="up"
           />
-          <h2 className="yacht-stage__title yacht-stage__desktop-intro" data-section-reveal="up" data-reveal-order="1">
+          <h2 className="yacht-stage__title yacht-stage__desktop-intro" aria-label="Experience Unmatched Luxury with Dubai Marina Yachts." data-gradient-reveal>
             Experience Unmatched<br />Luxury with Dubai<br />Marina Yachts.
           </h2>
-          <p className="yacht-stage__description" data-section-reveal="up" data-reveal-order="2">
+          <p className="yacht-stage__description" data-gradient-reveal>
             Set sail into matchless luxury with Dubai Marina Yachts – Your trusted partner for the Ultimate Arabian Getaway. We are offering yachts for any occasion and demand. From weddings, engagements, celebrations, and parties to fun on the sea by sailing on the pristine waters of the Arabian Sea or even fishing, we promise a catch for you.
           </p>
           <ul className="yacht-stage__features" aria-label="Yacht services">
-            {features.map(({ label, icon }, index) => (
-              <li key={label} data-section-reveal="up" data-reveal-order={index + 2}>
+            {features.map(({ label, icon }) => (
+              <li key={label}>
                 <Image src={icon} alt="" width={33} height={33} className="yacht-stage__feature-icon" aria-hidden="true" />
-                <span>{label}</span>
+                <span className="section-gradient-reveal-line" data-gradient-reveal="static">{label}</span>
               </li>
             ))}
           </ul>
         </div>
       </div>
+      <SectionTextReveal rootId="yachts" />
     </section>
   );
 }

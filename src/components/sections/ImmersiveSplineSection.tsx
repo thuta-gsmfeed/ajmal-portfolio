@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useMotionSettings, useSceneVisibility } from "@/components/animation/motion";
+import { SectionTextReveal } from "@/components/animation/SectionTextReveal";
 import { SceneBoundary } from "@/components/three/SceneBoundary";
 
 const ImmersiveSplineCanvas = dynamic(
@@ -37,8 +38,8 @@ export function ImmersiveSplineSection() {
       data-no-section-transition
       initial={reduceMotion ? false : { opacity: 0 }}
       whileInView={{ opacity: 1 }}
-      viewport={{ once: true, amount: 0.12 }}
-      transition={{ duration: reduceMotion ? 0 : 0.8, ease: revealEase }}
+      viewport={{ once: true, amount: 0.05 }}
+      transition={{ duration: reduceMotion ? 0 : 0.5, ease: revealEase }}
     >
       <div className="immersive-card">
         <div className="immersive-scene-shell">
@@ -55,16 +56,22 @@ export function ImmersiveSplineSection() {
 
         <div className="immersive-content">
           <Image className="immersive-gsmfeed-logo" src="/images/logo/gsmfeed-full-logo.png" alt="gsmfeed" width={294} height={75} data-section-reveal="up" />
-          <p className="immersive-gsmfeed-eyebrow" data-section-reveal="up" data-reveal-order="1">Connect. Trade. Grow.</p>
-          <h2 id="immersive-title" className="immersive-title" data-section-reveal="up" data-reveal-order="2">
-            AI-powered platform<br />with verified <span className="immersive-title-final">traders <Image src="/images/gsmfeed/verified-badge.svg" alt="" width={51} height={51} aria-hidden="true" /></span>
+          <p className="immersive-gsmfeed-eyebrow" data-gradient-reveal>Connect. Trade. Grow.</p>
+          <h2 id="immersive-title" className="immersive-title" aria-label="AI-powered platform with verified traders">
+            <span className="section-gradient-reveal-line" data-gradient-reveal="static">AI-powered platform</span>
+            <span>
+              <span className="section-gradient-reveal-line" data-gradient-reveal="static">with verified </span>
+              <span className="immersive-title-final"><span className="section-gradient-reveal-line" data-gradient-reveal="static">traders</span> <Image src="/images/gsmfeed/verified-badge.svg" alt="" width={51} height={51} aria-hidden="true" /></span>
+            </span>
           </h2>
-          <p className="immersive-description" data-section-reveal="up" data-reveal-order="3">Download the gsmfeed app today and join the global trading community.</p>
+          <p className="immersive-description" data-gradient-reveal>Download the gsmfeed app today and join the global trading community.</p>
           <a className="immersive-app-store" href={APP_STORE_URL} target="_blank" rel="noopener noreferrer" aria-label="Download gsmfeed on the App Store">
             <Image src="/images/gsmfeed/app-store-button.svg" alt="" width={182} height={54} aria-hidden="true" />
           </a>
         </div>
       </div>
+
+      <SectionTextReveal rootId="immersive" />
 
     </motion.section>
   );
