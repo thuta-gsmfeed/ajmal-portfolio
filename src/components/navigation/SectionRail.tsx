@@ -5,8 +5,23 @@ import { useEffect, useRef, useState } from "react";
 
 type Chapter = { id: string; label: string };
 
+const chapterLabels: Record<string, string> = {
+  home: "Home",
+  about: "About Ajmal",
+  businesses: "Our Businesses",
+  journey: "The Journey",
+  ventures: "Our Ventures",
+  "coolmix-delivery": "Coolmix",
+  immersive: "GSMFeed",
+  yachts: "Dubai Marina Yachts",
+  projectmix: "Projectmix AI",
+  network: "Built Across Borders",
+  "trusted-partnerships": "Partnerships",
+  contact: "Contact",
+};
+
 const labelFromId = (id: string) =>
-  id
+  chapterLabels[id] ?? id
     .split("-")
     .filter(Boolean)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -112,6 +127,7 @@ export function SectionRail() {
               animate={{ width, opacity: hoverDistance === 0 || selected ? 1 : hoverDistance === 1 ? 0.72 : 0.42 }}
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
             />
+            <span className="section-rail__tooltip" aria-hidden="true">{chapter.label}</span>
           </button>
         );
       })}
