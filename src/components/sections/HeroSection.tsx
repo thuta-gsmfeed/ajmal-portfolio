@@ -30,19 +30,21 @@ export function HeroSection() {
     >
       <div className="absolute inset-0">
         <motion.div
-          className="absolute inset-0"
+          className="hero-portrait__media absolute inset-0"
           initial={reduced ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.8, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
         >
-          <Image
-            src={media.hero.src}
-            alt={media.hero.alt}
-            fill
-            priority
-            sizes="100vw"
-            className="hero-portrait__image object-cover"
-          />
+          <div className="hero-portrait__photo-frame absolute inset-0">
+            <Image
+              src={media.hero.src}
+              alt={media.hero.alt}
+              fill
+              priority
+              sizes="100vw"
+              className="hero-portrait__image object-cover"
+            />
+          </div>
         </motion.div>
         <div className="hero-portrait__shade absolute inset-0" />
       </div>

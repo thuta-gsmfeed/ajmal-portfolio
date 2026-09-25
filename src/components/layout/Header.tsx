@@ -25,7 +25,7 @@ export function Header() {
 
   useEffect(() => {
     let frame = 0;
-    let lastScrolled = scrollY > 36;
+    let lastScrolled = window.scrollY > 0;
     let lastLightSurface = false;
     const themeAt = (x: number, y: number) => {
       for (const element of document.elementsFromPoint(x, y)) {
@@ -38,7 +38,7 @@ export function Header() {
       if (frame) return;
       frame = requestAnimationFrame(() => {
         frame = 0;
-        const nextScrolled = scrollY > 36;
+        const nextScrolled = window.scrollY > 0;
         const nextLightSurface = themeAt(window.innerWidth - 40, 48) === "light";
         const logoBounds = logo.current?.getBoundingClientRect();
 

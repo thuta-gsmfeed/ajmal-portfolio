@@ -16,6 +16,7 @@ export function SectionRail() {
   const rail = useRef<HTMLElement>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [active, setActive] = useState("");
+  const [hovered, setHovered] = useState<number | null>(null);
   const [lightSurface, setLightSurface] = useState(false);
 
   useEffect(() => {
@@ -78,14 +79,22 @@ export function SectionRail() {
   const goTo = (id: string) => {
     const section = document.getElementById(id);
     if (!section) return;
+    const bounds = section.getBoundingClientRect();
+    const centeringOffset = Math.max(0, (window.innerHeight - bounds.height) / 2);
+    const target = id === "home" ? 0 : Math.max(0, window.scrollY + bounds.top - centeringOffset);
     window.history.pushState(null, "", `#${id}`);
-    section.scrollIntoView({ behavior: "smooth", block: "start" });
+    const request = new CustomEvent("portfolio:scroll-to-section", { detail: { top: target }, cancelable: true });
+    if (window.dispatchEvent(request)) {
+      window.scrollTo({ top: target, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    }
   };
 
   return (
-    <nav ref={rail} className={`section-rail ${lightSurface ? "section-rail--light" : ""}`} aria-label="Page sections">
-      {chapters.map((chapter) => {
+    <nav ref={rail} className={`section-rail ${lightSurface ? "section-rail--light" : ""}`} aria-label="Page sections" onMouseLeave={() => setHovered(null)}>
+      {chapters.map((chapter, index) => {
         const selected = active === chapter.id;
+        const hoverDistance = hovered === null ? Infinity : Math.abs(index - hovered);
+        const width = hoverDistance === 0 ? 46 : hoverDistance === 1 ? 30 : hoverDistance === 2 ? 22 : selected ? 32 : 18;
         return (
           <button
             key={chapter.id}
@@ -93,12 +102,15 @@ export function SectionRail() {
             className="section-rail__button"
             aria-label={`Go to ${chapter.label}`}
             aria-current={selected ? "location" : undefined}
+            onMouseEnter={() => setHovered(index)}
+            onFocus={() => setHovered(index)}
+            onBlur={() => setHovered(null)}
             onClick={() => goTo(chapter.id)}
           >
             <motion.span
               className="section-rail__line"
-              animate={{ width: selected ? 48 : 32, opacity: selected ? 1 : 0.42 }}
-              transition={{ duration: 0.48, ease: [0.22, 1, 0.36, 1] }}
+              animate={{ width, opacity: hoverDistance === 0 || selected ? 1 : hoverDistance === 1 ? 0.72 : 0.42 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
             />
           </button>
         );

@@ -3,7 +3,6 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { BadgeCheck } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useMotionSettings, useSceneVisibility } from "@/components/animation/motion";
 import { SceneBoundary } from "@/components/three/SceneBoundary";
@@ -58,7 +57,7 @@ export function ImmersiveSplineSection() {
           <Image className="immersive-gsmfeed-logo" src="/images/logo/gsmfeed-full-logo.png" alt="gsmfeed" width={294} height={75} data-section-reveal="up" />
           <p className="immersive-gsmfeed-eyebrow" data-section-reveal="up" data-reveal-order="1">Connect. Trade. Grow.</p>
           <h2 id="immersive-title" className="immersive-title" data-section-reveal="up" data-reveal-order="2">
-            AI-powered platform<br />with verified <span className="immersive-title-final">traders <BadgeCheck aria-hidden="true" /></span>
+            AI-powered platform<br />with verified <span className="immersive-title-final">traders <Image src="/images/gsmfeed/verified-badge.svg" alt="" width={51} height={51} aria-hidden="true" /></span>
           </h2>
           <p className="immersive-description" data-section-reveal="up" data-reveal-order="3">Download the gsmfeed app today and join the global trading community.</p>
           <a className="immersive-app-store" href={APP_STORE_URL} target="_blank" rel="noopener noreferrer" aria-label="Download gsmfeed on the App Store">

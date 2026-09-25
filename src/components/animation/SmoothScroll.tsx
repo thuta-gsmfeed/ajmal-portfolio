@@ -18,6 +18,16 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       });
       const update = () => ScrollTrigger.update();
       const tick = (time: number) => lenis.raf(time * 1000);
+      const navigateToSection = (event: Event) => {
+        const request = event as CustomEvent<{ top: number }>;
+        if (!Number.isFinite(request.detail?.top)) return;
+        event.preventDefault();
+        const distance = Math.abs(request.detail.top - lenis.scroll);
+        lenis.scrollTo(request.detail.top, {
+          duration: Math.min(1.6, 0.7 + distance / 7000),
+          lock: true,
+        });
+      };
       gsap.ticker.lagSmoothing(0);
       const syncVisibility = () => {
         if (document.hidden) {
@@ -29,10 +39,11 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
         }
       };
       lenis.on("scroll", update);
+      window.addEventListener("portfolio:scroll-to-section", navigateToSection);
       gsap.ticker.add(tick);
       lenis.start();
       document.addEventListener("visibilitychange", syncVisibility);
-      return () => { document.removeEventListener("visibilitychange", syncVisibility); lenis.off("scroll", update); gsap.ticker.remove(tick); lenis.destroy(); };
+      return () => { document.removeEventListener("visibilitychange", syncVisibility); window.removeEventListener("portfolio:scroll-to-section", navigateToSection); lenis.off("scroll", update); gsap.ticker.remove(tick); lenis.destroy(); };
     });
     let timer = 0;
     const settleHash = () => {

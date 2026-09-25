@@ -35,7 +35,7 @@ export function FutureTogetherSection() {
       </div>
 
       <div className="future-together__wordmark" aria-hidden data-section-reveal="up" data-reveal-order="5">
-        <Image src="/images/logo/gholzad-wordmark.png" alt="" width={1176} height={342} />
+        <span>GHOLZAD</span>
       </div>
     </section>
   );
