@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 import { type MouseEvent, useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
 
 export function Header() {
   const logo = useRef<HTMLSpanElement>(null);
+  const hiddenRef = useRef(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [lightSurface, setLightSurface] = useState(false);
 
   const scrollToSection = (event: MouseEvent<HTMLAnchorElement>, id: string) => {
@@ -27,6 +28,9 @@ export function Header() {
     let frame = 0;
     let lastScrolled = window.scrollY > 0;
     let lastLightSurface = false;
+    let lastY = window.scrollY;
+    let lastDirection = 0;
+    let directionTravel = 0;
     const themeAt = (x: number, y: number) => {
       for (const element of document.elementsFromPoint(x, y)) {
         const surface = (element as HTMLElement).closest<HTMLElement>("[data-header-theme]");
@@ -38,9 +42,29 @@ export function Header() {
       if (frame) return;
       frame = requestAnimationFrame(() => {
         frame = 0;
-        const nextScrolled = window.scrollY > 0;
-        const nextLightSurface = themeAt(window.innerWidth - 40, 48) === "light";
-        const logoBounds = logo.current?.getBoundingClientRect();
+        const currentY = Math.max(0, window.scrollY);
+        const nextScrolled = currentY > 0;
+        const movement = currentY - lastY;
+        if (Math.abs(movement) > 0.5) {
+          const direction = Math.sign(movement);
+          directionTravel = direction === lastDirection ? directionTravel + Math.abs(movement) : Math.abs(movement);
+          lastDirection = direction;
+          lastY = currentY;
+          if (directionTravel >= 12 && currentY > 32) {
+            const nextHidden = direction > 0;
+            if (nextHidden !== hiddenRef.current) {
+              hiddenRef.current = nextHidden;
+              setHidden(nextHidden);
+            }
+          }
+        }
+        if (currentY <= 32 && hiddenRef.current) {
+          hiddenRef.current = false;
+          setHidden(false);
+        }
+
+        const nextLightSurface = !nextScrolled && themeAt(window.innerWidth - 40, 48) === "light";
+        const logoBounds = !nextScrolled ? logo.current?.getBoundingClientRect() : null;
 
         if (logo.current && logoBounds) {
           const centerX = logoBounds.left + logoBounds.width / 2;
@@ -76,10 +100,11 @@ export function Header() {
   }, []);
 
   return (
-    <header className="site-header pointer-events-none fixed inset-x-0 top-0 z-50 px-3 pt-2.5 md:px-6 md:pt-3.5">
-        <motion.div
-          layout
-          transition={{ layout: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } }}
+    <header
+      className={`site-header pointer-events-none fixed inset-x-0 top-0 z-50 px-3 pt-2.5 md:px-6 md:pt-3.5 ${hidden ? "site-header--hidden" : ""}`}
+      onFocusCapture={() => { hiddenRef.current = false; setHidden(false); }}
+    >
+        <div
           className={`header-glass pointer-events-auto mx-auto overflow-hidden ${scrolled ? "header-glass--compact" : "header-glass--open"} ${lightSurface ? "header-glass--light" : ""}`}
         >
           <div className="flex h-14 items-center justify-between px-3 md:h-16 md:px-5">
@@ -99,7 +124,7 @@ export function Header() {
             </a>
           </div>
 
-        </motion.div>
+        </div>
     </header>
   );
 }
