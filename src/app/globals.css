@@ -1788,7 +1788,8 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
   top:0;
   bottom:auto;
   z-index:3;
-  height:73.15%;
+  /* The canvas road sits at 87.5% of its height, aligned with the panel edge. */
+  height:65.15%;
   pointer-events:none;
   background:transparent;
 }
@@ -1796,8 +1797,8 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
   z-index:3;
   top:auto;
   right:50%;
-  bottom:36%;
-  width:min(41vw,650px);
+  bottom:43%;
+  width:min(50vw,800px);
   transform:translate(50%,12%);
 }
 .coolmix-delivery--rail .coolmix-delivery__visual-fallback::after { bottom:5%; }
@@ -1807,7 +1808,7 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
   right:0;
   bottom:0;
   left:0;
-  height:36%;
+  height:43%;
   overflow:hidden;
   border-top:1px solid rgba(255,255,255,.12);
   background-color:#101111;
@@ -1975,14 +1976,14 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
 
 @media (max-width:1023px) {
   .coolmix-delivery--rail .coolmix-delivery__stage { min-height:0; }
-  .coolmix-delivery--rail .coolmix-delivery__visual-fallback { top:auto; bottom:36%; width:min(58vw,600px); }
+  .coolmix-delivery--rail .coolmix-delivery__visual-fallback { top:auto; bottom:43%; width:min(66vw,720px); }
 }
 
 @media (max-width:767px) {
   .coolmix-delivery--rail .coolmix-delivery__stage { height:100svh; min-height:0; }
-  .coolmix-delivery--rail .coolmix-delivery__canvas { height:68.6%; }
-  .coolmix-delivery__service-panel { height:40%; }
-  .coolmix-delivery--rail .coolmix-delivery__visual-fallback { top:auto; bottom:40%; width:74vw; }
+  .coolmix-delivery--rail .coolmix-delivery__canvas { height:61.72%; }
+  .coolmix-delivery__service-panel { height:46%; }
+  .coolmix-delivery--rail .coolmix-delivery__visual-fallback { top:auto; bottom:46%; width:84vw; }
 }
 
 @media (prefers-reduced-motion:reduce) {
@@ -2188,7 +2189,7 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
   .projectmix-section__brand img { width:120px; }
   .projectmix-section__eyebrow { margin-top:23px; font-size:10px; }
   .projectmix-section__title { font-size:clamp(33px,8vw,45px); }
-  .projectmix-section__visual { width:110%; max-width:none; margin:34px 0 0 -5%; }
+  .projectmix-section__visual { width:165%; max-width:none; margin:34px 0 0 -32.5%; }
   .projectmix-section__widget--wide { display:none; }
   .projectmix-section__description { max-width:38ch; margin-top:27px; font-size:13px; }
   .projectmix-section__link { margin-top:16px; }

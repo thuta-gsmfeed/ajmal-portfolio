@@ -103,16 +103,16 @@ function revealJourneyBlocks(blocks: HTMLElement[], trigger: HTMLElement) {
   }));
 }
 
-function JourneyDetail({ milestone, mobile = false }: { milestone: (typeof timeline)[number]; mobile?: boolean }) {
+function JourneyDetail({ milestone, mobile = false, animateOnScroll = false }: { milestone: (typeof timeline)[number]; mobile?: boolean; animateOnScroll?: boolean }) {
   const detail = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !detail.current) return;
+    if ((!mobile && !animateOnScroll) || window.matchMedia("(prefers-reduced-motion: reduce)").matches || !detail.current) return;
     gsap.registerPlugin(ScrollTrigger, SplitText);
     const blocks = Array.from(detail.current.children) as HTMLElement[];
     const splits = revealJourneyBlocks(blocks, detail.current);
     return () => splits.forEach((split) => split.revert());
-  }, { scope: detail });
+  }, { scope: detail, dependencies: [mobile, animateOnScroll], revertOnUpdate: true });
 
   return (
     <div ref={detail} className={mobile ? "journey-motion__mobile-detail" : undefined} aria-live="polite">
@@ -127,6 +127,7 @@ export function JourneySection() {
   const section = useRef<HTMLElement>(null);
   const rail = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
+  const [desktopInteracted, setDesktopInteracted] = useState(false);
   const [mobileActive, setMobileActive] = useState(2);
   const [railHeight, setRailHeight] = useState(pathHeight);
   const reducedMotion = useReducedMotion();
@@ -158,6 +159,10 @@ export function JourneySection() {
 
   const current = timeline[active];
   const mobileCurrent = timeline[mobileActive];
+  const showDesktopMilestone = (index: number) => {
+    setDesktopInteracted(true);
+    setActive(index);
+  };
   const handleMobileSwipe = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const swipeIntent = info.offset.x + info.velocity.x * 0.16;
     if (Math.abs(swipeIntent) < 42) return;
@@ -235,7 +240,7 @@ export function JourneySection() {
                       opacity: Math.max(0.12, 1 - distance * 0.24),
                       width: `calc(${rowX / 2.2}% - 18px)`,
                     }}
-                    onClick={() => setActive(index)}
+                    onClick={() => showDesktopMilestone(index)}
                     aria-label={`Show ${milestone.year}: ${milestone.title}`}
                     aria-current={active === index ? "step" : undefined}
                   >
@@ -251,7 +256,7 @@ export function JourneySection() {
               type="button"
               className="journey-motion__pulse"
               aria-label={nextMilestoneLabel(active)}
-              onClick={() => setActive(nextMilestone)}
+              onClick={() => showDesktopMilestone(nextMilestone(active))}
             >
               <span>
                 <svg viewBox="0 0 34 34" role="presentation">
@@ -264,7 +269,7 @@ export function JourneySection() {
           </div>
 
           <div className="journey-motion__details">
-            <JourneyDetail key={`${current.year}-${current.title}`} milestone={current} />
+            <JourneyDetail key={`${current.year}-${current.title}`} milestone={current} animateOnScroll={!desktopInteracted} />
           </div>
         </div>
       </div>
