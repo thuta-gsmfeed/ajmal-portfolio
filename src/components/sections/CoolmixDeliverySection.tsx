@@ -99,7 +99,7 @@ export function CoolmixDeliverySection() {
       const currentSpeed = clamp(velocity.current * 42);
 
       if (vanLoaded) {
-        const vehicleWidth = Math.min(width < 700 ? width * 0.72 : width * 0.41, 650);
+        const vehicleWidth = Math.min(width < 700 ? width * 0.84 : width * 0.5, 800);
         const vehicleHeight = vehicleWidth * (van.naturalHeight / van.naturalWidth);
         const vehicleScale = vehicleWidth / van.naturalWidth;
         const travel = Math.sin(currentProgress * Math.PI * 2) * Math.min(14, width * 0.012);
