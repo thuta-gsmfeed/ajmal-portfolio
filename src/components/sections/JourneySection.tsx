@@ -107,12 +107,12 @@ function JourneyDetail({ milestone, mobile = false, animateOnScroll = false }: {
   const detail = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    if ((!mobile && !animateOnScroll) || window.matchMedia("(prefers-reduced-motion: reduce)").matches || !detail.current) return;
+    if (!animateOnScroll || window.matchMedia("(prefers-reduced-motion: reduce)").matches || !detail.current) return;
     gsap.registerPlugin(ScrollTrigger, SplitText);
     const blocks = Array.from(detail.current.children) as HTMLElement[];
     const splits = revealJourneyBlocks(blocks, detail.current);
     return () => splits.forEach((split) => split.revert());
-  }, { scope: detail, dependencies: [mobile, animateOnScroll], revertOnUpdate: true });
+  }, { scope: detail, dependencies: [animateOnScroll], revertOnUpdate: true });
 
   return (
     <div ref={detail} className={mobile ? "journey-motion__mobile-detail" : undefined} aria-live="polite">

@@ -133,9 +133,8 @@ img { user-select:none; }
 .journey-reveal-line { width:max-content; max-width:100%; }
 .journey-motion__intro > p .journey-reveal-line { --color-final:rgba(255,255,255,.76); }
 .journey-motion__details p:last-child .journey-reveal-line { --color-final:rgba(255,255,255,.74); }
-.journey-motion__mobile header .journey-reveal-line,.journey-motion__mobile-detail .journey-reveal-line { margin-inline:auto; }
+.journey-motion__mobile header .journey-reveal-line { margin-inline:auto; }
 .journey-motion__mobile header > p .journey-reveal-line { --color-final:rgba(255,255,255,.82); }
-.journey-motion__mobile-detail p:last-child .journey-reveal-line { --color-final:rgba(255,255,255,.76); }
 .ventures-reveal-line { --color-final:#090b0c; width:max-content; max-width:100%; margin-inline:auto; }
 .ventures-showcase__header p:nth-child(3) .ventures-reveal-line,.ventures-showcase__header p:nth-child(4) .ventures-reveal-line { --color-final:rgba(9,11,12,.72); }
 .coolmix-delivery__text-reveal,.coolmix-delivery__reveal-line { --color-final:#fff; width:max-content; max-width:100%; }
