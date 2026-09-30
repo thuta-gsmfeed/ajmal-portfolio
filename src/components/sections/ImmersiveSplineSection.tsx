@@ -19,9 +19,17 @@ const APP_STORE_URL = "https://apps.apple.com/us/app/gsmfeed/id6759554515";
 export function ImmersiveSplineSection() {
   const [failed, setFailed] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const section = useRef<HTMLElement>(null);
   const { reduced: reduceMotion } = useMotionSettings();
   const { near, active } = useSceneVisibility(section);
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 767px)");
+    const update = () => setIsMobile(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
   useEffect(() => {
     if (!near || sceneReady || reduceMotion) return;
     const timer = window.setTimeout(() => setFailed(true), 15000);
@@ -37,9 +45,10 @@ export function ImmersiveSplineSection() {
       className="immersive-section immersive-section--gsmfeed"
       data-no-section-transition
       initial={reduceMotion ? false : { opacity: 0 }}
+      animate={isMobile ? { opacity: 1 } : undefined}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, amount: 0.05 }}
-      transition={{ duration: reduceMotion ? 0 : 0.5, ease: revealEase }}
+      transition={{ duration: isMobile || reduceMotion ? 0 : 0.5, ease: revealEase }}
     >
       <div className="immersive-card">
         <div className="immersive-scene-shell">

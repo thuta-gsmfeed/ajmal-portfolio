@@ -1874,6 +1874,7 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
 .coolmix-delivery__headline a:hover { color:#9dd2ff; }
 .coolmix-delivery__headline a:focus-visible { outline:2px solid #68e7ff; outline-offset:4px; }
 .coolmix-delivery__overview {
+  border-left:0;
   padding:22px var(--page-gutter) 0;
 }
 .coolmix-delivery__overview h3 {
@@ -1987,7 +1988,7 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
   /* Keep the canvas road aligned with the raised edge of the service panel. */
   .coolmix-delivery--rail .coolmix-delivery__canvas { height:54.86%; }
   .coolmix-delivery__service-panel { height:52%; }
-  .coolmix-delivery__stage .coolmix-delivery__service-track { padding-bottom:56px; }
+  .coolmix-delivery__stage .coolmix-delivery__service-track { padding-bottom:32px; }
   .coolmix-delivery--rail .coolmix-delivery__visual-fallback { top:auto; bottom:52%; width:84vw; }
 }
 

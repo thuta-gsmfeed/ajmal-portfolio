@@ -109,9 +109,14 @@ function JourneyDetail({ milestone, mobile = false, animateOnScroll = false }: {
   useGSAP(() => {
     if (!animateOnScroll || window.matchMedia("(prefers-reduced-motion: reduce)").matches || !detail.current) return;
     gsap.registerPlugin(ScrollTrigger, SplitText);
-    const blocks = Array.from(detail.current.children) as HTMLElement[];
-    const splits = revealJourneyBlocks(blocks, detail.current);
-    return () => splits.forEach((split) => split.revert());
+    const match = gsap.matchMedia();
+    match.add(mobile ? "(max-width: 900px)" : "(min-width: 901px)", () => {
+      if (!detail.current) return;
+      const blocks = Array.from(detail.current.children) as HTMLElement[];
+      const splits = revealJourneyBlocks(blocks, detail.current);
+      return () => splits.forEach((split) => split.revert());
+    });
+    return () => match.revert();
   }, { scope: detail, dependencies: [animateOnScroll], revertOnUpdate: true });
 
   return (
@@ -129,6 +134,7 @@ export function JourneySection() {
   const [active, setActive] = useState(0);
   const [desktopInteracted, setDesktopInteracted] = useState(false);
   const [mobileActive, setMobileActive] = useState(2);
+  const [mobileInteracted, setMobileInteracted] = useState(false);
   const [railHeight, setRailHeight] = useState(pathHeight);
   const reducedMotion = useReducedMotion();
   useGSAP(() => {
@@ -166,6 +172,7 @@ export function JourneySection() {
   const handleMobileSwipe = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const swipeIntent = info.offset.x + info.velocity.x * 0.16;
     if (Math.abs(swipeIntent) < 42) return;
+    setMobileInteracted(true);
     setMobileActive((previous) => Math.min(
       timeline.length - 1,
       Math.max(0, previous + (swipeIntent < 0 ? 1 : -1)),
@@ -174,6 +181,7 @@ export function JourneySection() {
   const handleMobileKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
     event.preventDefault();
+    setMobileInteracted(true);
     setMobileActive((previous) => Math.min(
       timeline.length - 1,
       Math.max(0, previous + (event.key === "ArrowRight" ? 1 : -1)),
@@ -326,7 +334,7 @@ export function JourneySection() {
                   top: mobileCurveYAt(240 + (index - mobileActive) * 85) - 52,
                   opacity: Math.max(0.18, 1 - distance * 0.2),
                 }}
-                onClick={() => setMobileActive(index)}
+                onClick={() => { setMobileInteracted(true); setMobileActive(index); }}
                 aria-label={`Show ${milestone.year}: ${milestone.title}`}
                 aria-current={index === mobileActive ? "step" : undefined}
               >
@@ -340,7 +348,7 @@ export function JourneySection() {
             type="button"
             className="journey-motion__mobile-pulse"
             aria-label={nextMilestoneLabel(mobileActive)}
-            onClick={() => setMobileActive(nextMilestone)}
+            onClick={() => { setMobileInteracted(true); setMobileActive(nextMilestone); }}
           >
             <span>
               <svg viewBox="0 0 34 34" role="presentation">
@@ -352,7 +360,7 @@ export function JourneySection() {
           </button>
         </motion.div>
 
-        <JourneyDetail key={`${mobileCurrent.year}-${mobileCurrent.title}`} milestone={mobileCurrent} mobile />
+        <JourneyDetail key={`${mobileCurrent.year}-${mobileCurrent.title}`} milestone={mobileCurrent} mobile animateOnScroll={!mobileInteracted} />
       </div>
     </section>
   );
