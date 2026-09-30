@@ -29,6 +29,9 @@ export function FutureTogetherSection() {
           <a href={whatsappUrl} target="_blank" rel="noreferrer" aria-label="Start a WhatsApp conversation" data-cursor="CHAT">
             <MessageCircle aria-hidden size={20} strokeWidth={1.9} />
           </a>
+          <a href="https://www.instagram.com/ajmalglobal/" target="_blank" rel="noopener noreferrer" aria-label="Visit Ajmal Global on Instagram" data-cursor="INSTAGRAM">
+            <span className="future-together__instagram-icon" aria-hidden="true" />
+          </a>
         </div>
 
         <small className="future-together__copyright" data-section-reveal="up" data-reveal-order="4">© {new Date().getFullYear()} All rights reserved Gholzad</small>
