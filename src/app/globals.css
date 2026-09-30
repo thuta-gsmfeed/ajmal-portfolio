@@ -1980,9 +1980,11 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
 
 @media (max-width:767px) {
   .coolmix-delivery--rail .coolmix-delivery__stage { height:100svh; min-height:0; }
-  .coolmix-delivery--rail .coolmix-delivery__canvas { height:61.72%; }
-  .coolmix-delivery__service-panel { height:46%; }
-  .coolmix-delivery--rail .coolmix-delivery__visual-fallback { top:auto; bottom:46%; width:84vw; }
+  /* Keep the canvas road aligned with the raised edge of the service panel. */
+  .coolmix-delivery--rail .coolmix-delivery__canvas { height:54.86%; }
+  .coolmix-delivery__service-panel { height:52%; }
+  .coolmix-delivery__stage .coolmix-delivery__service-track { padding-bottom:56px; }
+  .coolmix-delivery--rail .coolmix-delivery__visual-fallback { top:auto; bottom:52%; width:84vw; }
 }
 
 @media (prefers-reduced-motion:reduce) {

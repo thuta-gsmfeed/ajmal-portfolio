@@ -81,9 +81,10 @@ export function CoolmixDeliverySection() {
       const bounds = canvasElement.getBoundingClientRect();
       width = Math.max(1, bounds.width);
       height = Math.max(1, bounds.height);
-      dpr = Math.min(window.devicePixelRatio || 1, width < 768 ? 1 : 1.25);
+      dpr = Math.min(window.devicePixelRatio || 1, width < 768 ? 3 : 2);
       canvasElement.width = Math.round(width * dpr);
       canvasElement.height = Math.round(height * dpr);
+      context.imageSmoothingQuality = "high";
       draw.current?.();
     };
 
@@ -199,7 +200,7 @@ export function CoolmixDeliverySection() {
       draw.current?.();
     };
     van.onerror = () => setCanvasFailed(true);
-    van.src = "/images/coolmix-delivery/coolmix-truck.webp";
+    van.src = "/images/coolmix-delivery/coolmix-truck.png";
     resize();
 
     return () => {
@@ -348,7 +349,7 @@ export function CoolmixDeliverySection() {
         <canvas ref={canvas} className={`coolmix-delivery__canvas ${canvasReady ? "is-ready" : ""}`} aria-hidden="true" />
         {canvasFailed && (
           <div className="coolmix-delivery__visual-fallback" aria-hidden="true">
-            <Image src="/images/coolmix-delivery/coolmix-truck.webp" alt="" width={4627} height={1762} />
+            <Image src="/images/coolmix-delivery/coolmix-truck.png" alt="" width={4627} height={1762} unoptimized />
           </div>
         )}
         <div data-header-theme="dark" className="coolmix-delivery__service-panel">
@@ -362,7 +363,7 @@ export function CoolmixDeliverySection() {
           <span>coolmix</span>
         </div>
         <div className="coolmix-delivery__reduced-van-wrap">
-          <Image className="coolmix-delivery__reduced-van" src="/images/coolmix-delivery/coolmix-truck.webp" alt="Blue Coolmix delivery truck" width={4627} height={1762} />
+          <Image className="coolmix-delivery__reduced-van" src="/images/coolmix-delivery/coolmix-truck.png" alt="Blue Coolmix delivery truck" width={4627} height={1762} unoptimized />
         </div>
         <div className="coolmix-delivery__service-panel coolmix-delivery__service-panel--reduced">
           <CoolmixServiceContent />
