@@ -14,6 +14,9 @@ const stats = [
 ] as const;
 
 const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
+const wheelCenters = [[775, 1531], [1315, 1531], [3832, 1531]] as const;
+const tyreRadius = 230;
+const wheelScrollSpeed = 2.5;
 
 function CoolmixServiceContent() {
   return (
@@ -102,11 +105,10 @@ export function CoolmixDeliverySection() {
         const vehicleWidth = Math.min(width < 700 ? width * 0.84 : width * 0.5, 800);
         const vehicleHeight = vehicleWidth * (van.naturalHeight / van.naturalWidth);
         const vehicleScale = vehicleWidth / van.naturalWidth;
-        const travel = Math.sin(currentProgress * Math.PI * 2) * Math.min(14, width * 0.012);
+        const travel = currentProgress * Math.min(100, width * 0.07);
         const entranceOffset = -(width * 0.5 + vehicleWidth * 0.5 + 40) * (1 - entrance.current);
         const vehicleX = width * 0.5 - vehicleWidth * 0.5 + travel + entranceOffset;
         const vehicleY = roadY - vehicleHeight;
-        const bob = Math.sin(currentProgress * Math.PI * 34) * currentSpeed * 1.6;
 
         context.save();
         context.fillStyle = `rgba(8,15,20,${0.08 + currentSpeed * 0.03})`;
@@ -115,15 +117,15 @@ export function CoolmixDeliverySection() {
         context.fill();
         context.restore();
 
-        context.drawImage(van, vehicleX, vehicleY + bob, vehicleWidth, vehicleHeight);
+        context.drawImage(van, vehicleX, vehicleY, vehicleWidth, vehicleHeight);
 
-        // Rotate a softly masked copy of each rim. The tyre and wheel arch stay in the
-        // base image, which prevents square crop edges and keeps the road contact solid.
-        const wheelRotation = currentProgress * Math.PI * 28 + entrance.current * Math.PI * 6;
+        // Boost the visible scroll rotation while keeping the entrance roll tied to travel.
+        // Keep the tyres and arches in the base image so the contact points stay fixed.
+        const wheelRotation = (travel * wheelScrollSpeed + entranceOffset) / (tyreRadius * vehicleScale);
         const drawWheelFace = (sourceX: number, sourceY: number, face: HTMLCanvasElement | undefined) => {
           if (!face) return;
           const wheelX = vehicleX + sourceX * vehicleScale;
-          const wheelY = vehicleY + bob + sourceY * vehicleScale;
+          const wheelY = vehicleY + sourceY * vehicleScale;
           const wheelFaceRadius = (face.width / 2) * vehicleScale;
 
           context.save();
@@ -135,9 +137,7 @@ export function CoolmixDeliverySection() {
 
         // Keep the rotated faces mounted after scrolling stops. Removing this layer at
         // zero velocity makes the wheels visibly snap back to the source-image angle.
-        drawWheelFace(785, 1535, wheelFaces[0]);
-        drawWheelFace(1315, 1535, wheelFaces[1]);
-        drawWheelFace(3820, 1535, wheelFaces[2]);
+        wheelCenters.forEach(([centerX, centerY], index) => drawWheelFace(centerX, centerY, wheelFaces[index]));
 
         velocity.current = 0;
       }
@@ -165,7 +165,7 @@ export function CoolmixDeliverySection() {
 
     van.onload = () => {
       const wheelFaceSize = 230;
-      wheelFaces = [[785, 1535], [1315, 1535], [3820, 1535]].map(([centerX, centerY]) => {
+      wheelFaces = wheelCenters.map(([centerX, centerY]) => {
         const face = document.createElement("canvas");
         face.width = wheelFaceSize;
         face.height = wheelFaceSize;

@@ -2508,7 +2508,7 @@ html[data-theme="light"] .section-rail--light .section-rail__tooltip { border-co
 }
 .immersive-section--gsmfeed .immersive-gsmfeed-logo {
   display:block;
-  width:clamp(150px,15vw,200px);
+  width:clamp(120px,12vw,160px);
   height:auto;
   margin-bottom:clamp(20px,3vh,32px);
 }
@@ -2565,8 +2565,8 @@ html[data-theme="light"] .section-rail--light .section-rail__tooltip { border-co
 
 @media (min-width:1024px) {
   .yacht-stage__logo,
-  .projectmix-section__brand img,
-  .immersive-section--gsmfeed .immersive-gsmfeed-logo { width:clamp(220px,18vw,250px); }
+  .projectmix-section__brand img { width:clamp(220px,18vw,250px); }
+  .immersive-section--gsmfeed .immersive-gsmfeed-logo { width:clamp(175px,14vw,200px); }
   .immersive-section--gsmfeed .immersive-title { font-size:60px; letter-spacing:var(--tracking-heading); }
 }
 @media (min-width:1024px) and (max-width:1199px) {
@@ -2617,7 +2617,7 @@ html[data-theme="light"] .section-rail--light .section-rail__tooltip { border-co
     text-align:center;
     background:#000;
   }
-  .immersive-section--gsmfeed .immersive-gsmfeed-logo { width:120px; margin-bottom:10px; }
+  .immersive-section--gsmfeed .immersive-gsmfeed-logo { width:96px; margin-bottom:10px; }
   .immersive-section--gsmfeed .immersive-gsmfeed-eyebrow { margin-bottom:10px; }
   .immersive-section--gsmfeed .immersive-title { max-width:none; }
   .immersive-section--gsmfeed .immersive-title-final img { display:none; }
