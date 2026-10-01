@@ -19,14 +19,16 @@ export function ProjectmixSection() {
     <section id="projectmix" className="projectmix-section" aria-labelledby="projectmix-title" data-header-theme="light">
       <div className="projectmix-section__inner">
         <div className="projectmix-section__brand" data-section-reveal="up">
-          <Image src="/images/logo/projectfulllogo.svg" alt="projectmix" width={523} height={106} />
+          <Image className="projectmix-section__logo--dark" src="/images/logo/projectfulllogo-white.svg" alt="projectmix" width={523} height={106} />
+          <Image className="projectmix-section__logo--light" src="/images/logo/projectfulllogo.svg" alt="projectmix" width={523} height={106} />
         </div>
 
         <p className="projectmix-section__eyebrow" data-gradient-reveal="clip">CRM SYSTEM</p>
         <h2 id="projectmix-title" className="projectmix-section__title" aria-label="Say hello to projectmix Ai" data-gradient-reveal>Say hello to<br />projectmix Ai</h2>
 
         <div className="projectmix-section__visual" role="img" aria-label="Projectmix dashboard widgets around a laptop" data-section-reveal="scale" data-reveal-order="3">
-          <Image className="projectmix-section__laptop" src="/images/projectmix-laptop.svg" alt="" width={776} height={450} aria-hidden="true" />
+          <Image className="projectmix-section__laptop projectmix-section__laptop--dark" src="/images/projectmix-laptop-dark.svg" alt="" width={776} height={450} aria-hidden="true" />
+          <Image className="projectmix-section__laptop projectmix-section__laptop--light" src="/images/projectmix-laptop.svg" alt="" width={776} height={450} aria-hidden="true" />
           {widgets.map(({ name, file, left, top, width, height, ...widget }) => (
             <div
               key={file}
@@ -34,7 +36,8 @@ export function ProjectmixSection() {
               style={{ left, top, width, height }}
               aria-hidden="true"
             >
-              <Image src={`/images/projectmix-widgets/${file}`} alt={name} fill sizes="(max-width: 768px) 180px, 270px" />
+              <Image className="projectmix-section__widget-image--dark" src={`/images/projectmix-widgets/${file}`} alt={name} fill sizes="(max-width: 768px) 180px, 270px" />
+              <Image className="projectmix-section__widget-image--light" src={`/images/projectmix-widgets/${file.replace("-dark.png", ".webp")}`} alt="" fill sizes="(max-width: 768px) 180px, 270px" />
             </div>
           ))}
         </div>

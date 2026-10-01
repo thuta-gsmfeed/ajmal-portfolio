@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
 
 const stats = [
   { icon: "/images/coolmix-delivery/experience.svg", value: "12+", label: "Years of experience", detail: "(since 2014)" },
@@ -93,7 +92,7 @@ export function CoolmixDeliverySection() {
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
       context.clearRect(0, 0, width, height);
       const roadY = height * 0.875;
-      context.fillStyle = "#fff";
+      context.fillStyle = document.documentElement.dataset.theme === "light" ? "#050505" : "#fff";
       context.fillRect(0, 0, width, roadY);
 
       const currentProgress = clamp(progress.current);
@@ -153,6 +152,7 @@ export function CoolmixDeliverySection() {
     };
 
     draw.current = requestDraw;
+    window.addEventListener("portfolio:theme-change", requestDraw);
     const intersectionObserver = new IntersectionObserver(([entry]) => {
       active = entry.isIntersecting;
       cancelAnimationFrame(frame.current);
@@ -207,6 +207,7 @@ export function CoolmixDeliverySection() {
       disposed = true;
       active = false;
       cancelAnimationFrame(frame.current);
+      window.removeEventListener("portfolio:theme-change", requestDraw);
       intersectionObserver.disconnect();
       resizeObserver.disconnect();
       draw.current = null;
@@ -215,32 +216,21 @@ export function CoolmixDeliverySection() {
 
   useGSAP(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    gsap.registerPlugin(SplitText);
     const track = section.current?.querySelector<HTMLElement>(".coolmix-delivery__stage .coolmix-delivery__service-track");
     if (!track) return;
 
     const cards = Array.from(track.children) as HTMLElement[];
-    const revealedCards = new WeakSet<HTMLElement>();
     const animations = cards.map((card) => {
       const headline = card.classList.contains("coolmix-delivery__headline");
       const blocks = headline
         ? Array.from(card.querySelectorAll<HTMLElement>("h2 > span, a > .coolmix-delivery__text-reveal"))
         : Array.from(card.querySelectorAll<HTMLElement>(card.classList.contains("coolmix-delivery__overview") ? "h3, p" : "p"));
-      const splits = headline ? [] : blocks.map((block) => SplitText.create(block, {
-        type: "lines",
-        linesClass: "coolmix-delivery__reveal-line",
-        autoSplit: true,
-        aria: "auto",
-        onSplit: (split) => {
-          gsap.set(split.lines, { "--bg-progress": revealedCards.has(card) ? 100 : 30 });
-        },
-      }));
       const count = card.querySelector<HTMLElement>(".coolmix-delivery__count");
-      const groups = headline ? blocks : count ? [count, ...splits.map((split) => split.lines)] : splits.map((split) => split.lines);
+      const groups = count ? [count, ...blocks] : blocks;
       const reveal = gsap.timeline({ paused: true });
       groups.forEach((group, index) => {
-        gsap.set(group, { "--bg-progress": headline && index === 0 ? 0 : 30 });
-        reveal.to(group, { "--bg-progress": 100, duration: 1.55, ease: "none" }, index * 0.08);
+        gsap.set(group, { y: 14 });
+        reveal.to(group, { y: 0, duration: 0.7, ease: "power2.out" }, index * 0.06);
       });
       if (count) {
         const finalValue = count.closest<HTMLElement>("strong")?.dataset.countValue ?? "0";
@@ -257,14 +247,13 @@ export function CoolmixDeliverySection() {
           onComplete: () => { count.textContent = finalValue; },
         }, 0);
       }
-      return { card, reveal, splits };
+      return { card, reveal };
     });
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         const animation = animations.find(({ card }) => card === entry.target);
-        if (animation) revealedCards.add(animation.card);
         animation?.reveal.play();
         observer.unobserve(entry.target);
       });
@@ -273,9 +262,8 @@ export function CoolmixDeliverySection() {
 
     return () => {
       observer.disconnect();
-      animations.forEach(({ reveal, splits }) => {
+      animations.forEach(({ reveal }) => {
         reveal.kill();
-        splits.forEach((split) => split.revert());
       });
     };
   }, { scope: section });

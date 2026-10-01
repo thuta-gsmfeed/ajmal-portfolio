@@ -10,6 +10,12 @@ import Spline from "@splinetool/react-spline";
 const SCENE_URL =
   "https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode";
 
+const syncSceneBackground = (application: Application) => {
+  application.setBackgroundColor(
+    document.documentElement.dataset.theme === "light" ? "#f9faf9" : "#090909",
+  );
+};
+
 type ImmersiveSplineCanvasProps = {
   onLoad: () => void;
   active: boolean;
@@ -87,6 +93,14 @@ export default function ImmersiveSplineCanvas({
 
   useEffect(() => {
     if (!app) return;
+    const updateBackground = () => syncSceneBackground(app);
+    updateBackground();
+    window.addEventListener("portfolio:theme-change", updateBackground);
+    return () => window.removeEventListener("portfolio:theme-change", updateBackground);
+  }, [app]);
+
+  useEffect(() => {
+    if (!app) return;
 
     if (!active) {
       app.stop();
@@ -134,6 +148,7 @@ export default function ImmersiveSplineCanvas({
   }, [app, syncLogoToChest]);
 
   const handleLoad = (application: Application) => {
+    syncSceneBackground(application);
     setApp(application);
     window.requestAnimationFrame(() => syncLogoToChest(application));
     onLoad();

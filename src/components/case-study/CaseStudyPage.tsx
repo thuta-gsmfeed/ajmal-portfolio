@@ -6,6 +6,7 @@ import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion
 import { ArrowLeft, ArrowUpRight, Check, Share2 } from "lucide-react";
 import { Product, products } from "@/data/content";
 import { CinematicLink } from "@/components/navigation/CinematicLink";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
 export function CaseStudyPage({ product }: { product: Product }) {
   const [shared, setShared] = useState(false);
@@ -39,22 +40,22 @@ export function CaseStudyPage({ product }: { product: Product }) {
   };
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#030506] text-white">
+    <main className="case-study-page min-h-screen overflow-hidden bg-[#030506] text-white">
       <div className="fixed inset-x-0 top-0 z-50 px-4 pt-4 md:px-7">
-        <div className="mx-auto grid h-14 max-w-[1380px] grid-cols-[1fr_auto_1fr] items-center rounded-full border border-white/12 bg-black/55 px-3 backdrop-blur-xl md:h-16 md:px-5">
-          <CinematicLink href="/#products" ariaLabel="Back to products" className="group inline-flex items-center justify-self-start gap-3 text-sm text-white/65 transition-colors hover:text-white">
+        <div className="case-study__nav mx-auto grid h-14 max-w-[1380px] grid-cols-[1fr_auto_1fr] items-center rounded-full border border-white/12 bg-black/55 px-3 backdrop-blur-xl md:h-16 md:px-5">
+          <CinematicLink href="/#products" ariaLabel="Back to products" className="case-study__back group inline-flex items-center justify-self-start gap-3 text-sm text-white/65 transition-colors hover:text-white">
             <span className="grid size-9 place-items-center rounded-full border border-white/15 transition-transform group-hover:-translate-x-1"><ArrowLeft size={15} /></span>
             <span className="hidden font-mono uppercase tracking-[.1em] sm:block">Back to portfolio</span>
           </CinematicLink>
           <Image src={product.logo} alt={`${product.name} logo`} width={120} height={44} className="h-8 w-auto max-w-[108px] object-contain" />
-          <button type="button" onClick={share} aria-label={`Share ${product.name} case study`} className="inline-flex min-h-9 items-center justify-self-end gap-2 rounded-full border border-white/12 px-3 font-mono text-xs uppercase tracking-[.13em] text-white/55 transition-colors hover:border-cyan-200/35 hover:text-cyan-100">
+          <div className="case-study__actions flex items-center justify-self-end gap-2"><ThemeToggle /><button type="button" onClick={share} aria-label={`Share ${product.name} case study`} className="case-study__share inline-flex min-h-9 items-center gap-2 rounded-full border border-white/12 px-3 font-mono text-xs uppercase tracking-[.13em] text-white/55 transition-colors hover:border-cyan-200/35 hover:text-cyan-100">
             {shared ? <Check size={13} /> : <Share2 size={13} />}<span className="hidden sm:inline">{shared ? "Copied" : "Share"}</span>
-          </button>
+          </button></div>
         </div>
         <div className="mx-auto mt-2 h-px max-w-[1340px] overflow-hidden bg-white/8"><motion.div style={{ scaleX: scrollYProgress }} className="h-full origin-left bg-cyan-200" /></div>
       </div>
 
-      <section className="relative min-h-[110svh] overflow-hidden">
+      <section className="case-study__hero relative min-h-[110svh] overflow-hidden">
         <motion.div style={{ scale: mediaScale, y: mediaY }} className="absolute inset-0">
           <video ref={heroVideo} muted loop playsInline preload="metadata" className="size-full object-cover opacity-55">
             <source src={product.video.webm} type="video/webm" />
@@ -74,7 +75,7 @@ export function CaseStudyPage({ product }: { product: Product }) {
         </div>
       </section>
 
-      <section className="section-light border-y border-black/10 py-16 md:py-24">
+      <section className="case-study__metrics section-light border-y border-black/10 py-16 md:py-24">
         <div className="container grid gap-8 md:grid-cols-3">
           {product.metrics.map((metric, index) => (
             <motion.div key={metric.label} initial={reducedMotion ? false : { opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.45 }} transition={{ delay: index * 0.08, duration: 0.65 }} className="border-l border-cyan-700/35 pl-5">
@@ -85,7 +86,7 @@ export function CaseStudyPage({ product }: { product: Product }) {
         </div>
       </section>
 
-      <section className="py-20 md:py-40">
+      <section className="case-study__body py-20 md:py-40">
         <div className="container grid gap-14 lg:grid-cols-[.72fr_1.28fr] lg:gap-24">
           <div className="lg:sticky lg:top-28 lg:h-fit">
             <p className="eyebrow">The platform</p>
@@ -112,7 +113,7 @@ export function CaseStudyPage({ product }: { product: Product }) {
         </div>
       </section>
 
-      <section className="border-t border-white/10 bg-[#dfe9eb] py-20 text-[#071013] md:py-28">
+      <section className="case-study__next border-t border-white/10 bg-[#dfe9eb] py-20 text-[#071013] md:py-28">
         <div className="container">
           <p className="font-mono text-sm uppercase tracking-[.13em] text-black/45">Next case study</p>
           <CinematicLink href={`/work/${next.slug}`} className="group mt-5 flex items-end justify-between gap-7 border-b border-black/20 pb-8">

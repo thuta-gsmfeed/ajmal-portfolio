@@ -4,37 +4,22 @@ import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
+import { textParallax } from "@/components/animation/textParallax";
 
 export function VenturesSection() {
   const section = useRef<HTMLElement>(null);
 
   useGSAP(() => {
-    gsap.registerPlugin(ScrollTrigger, SplitText);
+    gsap.registerPlugin(ScrollTrigger);
     const match = gsap.matchMedia();
-    match.add("(min-width: 601px) and (prefers-reduced-motion: no-preference)", () => {
+    match.add("(prefers-reduced-motion: no-preference)", () => {
       const header = section.current?.querySelector<HTMLElement>(".ventures-showcase__header");
       if (!header) return;
 
       const blocks = Array.from(header.children) as HTMLElement[];
-      const splits = blocks.map((block, index) => SplitText.create(block, {
-        type: "lines",
-        linesClass: "ventures-reveal-line",
-        autoSplit: true,
-        aria: "auto",
-        onSplit: (split) => gsap.fromTo(split.lines,
-          { "--bg-progress": 30 },
-          {
-            "--bg-progress": 100,
-            duration: 1.55,
-            delay: index * 0.08,
-            ease: "none",
-            scrollTrigger: { trigger: header, start: "top 95%", toggleActions: "play none none none" },
-          },
-        ),
-      }));
+      const animations = blocks.map((block) => textParallax(block, block));
 
-      return () => splits.forEach((split) => split.revert());
+      return () => animations.forEach((animation) => animation.kill());
     });
     return () => match.revert();
   }, { scope: section });

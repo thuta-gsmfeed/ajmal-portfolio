@@ -4,8 +4,8 @@ import Image from "next/image";
 import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
 import { useGSAP } from "@gsap/react";
+import { textParallax } from "@/components/animation/textParallax";
 import { media } from "@/data/content";
 
 const biography = "I've spent more than 15 years turning opportunities into operating businesses — from marketing and iPhone distribution to e-commerce and AI software.";
@@ -14,7 +14,7 @@ export function AboutSection() {
   const section = useRef<HTMLElement>(null);
 
   useGSAP(() => {
-    gsap.registerPlugin(ScrollTrigger, SplitText);
+    gsap.registerPlugin(ScrollTrigger);
     const match = gsap.matchMedia();
 
     match.add("(prefers-reduced-motion: no-preference)", () => {
@@ -23,25 +23,7 @@ export function AboutSection() {
         `${mobileQuote ? ".about-quote-copy--mobile" : ".about-quote-copy--desktop"}, .about-bio-copy > p`,
       );
 
-      const splits = textBlocks.map((block, index) => SplitText.create(block, {
-        type: "lines",
-        linesClass: "about-reveal-line",
-        autoSplit: true,
-        aria: block.classList.contains("about-quote-copy") ? "hidden" : "auto",
-        onSplit: (split) => gsap.fromTo(split.lines, {
-          "--bg-progress": 30,
-        }, {
-          "--bg-progress": 100,
-          duration: 1.55,
-          delay: Math.max(0, index - 1) * 0.08,
-          ease: "none",
-          scrollTrigger: {
-            trigger: block.classList.contains("about-quote-copy") ? ".about-dossier__lead" : ".about-bio-copy",
-            start: "top 95%",
-            toggleActions: "play none none none",
-          },
-        }),
-      }));
+      const textAnimations = textBlocks.map((block) => textParallax(block, block));
 
       const portrait = gsap.timeline({
         scrollTrigger: {
@@ -55,7 +37,7 @@ export function AboutSection() {
         .fromTo(".about-frame", { opacity: 0, x: 54 }, { opacity: 1, x: 0, duration: 1.05, ease: "power3.inOut" }, 0)
         .fromTo(".about-signature", { opacity: 0, scale: 0.88 }, { opacity: 1, scale: 1, duration: 0.7, ease: "power3.out" }, 0.7);
 
-      return () => splits.forEach((split) => split.revert());
+      return () => textAnimations.forEach((animation) => animation.kill());
     });
 
     return () => match.revert();

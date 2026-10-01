@@ -5,13 +5,15 @@ import { motion, type PanInfo, useReducedMotion } from "framer-motion";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
+import { textParallax } from "@/components/animation/textParallax";
 import { timeline } from "@/data/content";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const stepHeight = 98;
 const pathHeight = 900;
 const pathTrim = 90;
+const ticksPerYear = 14;
+const yearTickLength = 22;
 const journeyPath = `M146 ${pathTrim} V326 C146 365 127 385 127 450 C127 515 146 535 146 574 V${pathHeight - pathTrim}`;
 const mobileJourneyPath = "M0 119 H150 C184 119 195 92 240 92 C285 92 296 119 330 119 H480";
 
@@ -44,12 +46,18 @@ function curveXAt(y: number) {
   return cubicPoint(start.x, controlA.x, controlB.x, end.x, (low + high) / 2);
 }
 
-const journeyTicks = Array.from({ length: 55 }, (_, index) => {
-  const y = 18 + index * 16;
-  const x = curveXAt(y);
-  const length = index % 6 === 0 ? 22 : 10;
-  return { x1: x - length - 4, x2: x - 4, y };
-}).filter(({ y }) => y >= pathTrim && y <= pathHeight - pathTrim);
+function getJourneyTicks(railHeight: number) {
+  // Fourteen equal tick intervals between year rows keep every connector aligned.
+  const tickStep = (stepHeight / ticksPerYear) * pathHeight / railHeight;
+  const halfCount = Math.ceil((pathHeight / 2 - pathTrim) / tickStep);
+  return Array.from({ length: halfCount * 2 + 1 }, (_, index) => {
+    const offset = index - halfCount;
+    const y = pathHeight / 2 + offset * tickStep;
+    const x = curveXAt(y);
+    const length = offset % (ticksPerYear / 2) === 0 ? yearTickLength : 10;
+    return { x1: x - length, x2: x, y };
+  }).filter(({ y }) => y >= pathTrim && y <= pathHeight - pathTrim);
+}
 
 function mobileCurveYAt(x: number) {
   if (x <= 150 || x >= 330) return 119;
@@ -84,23 +92,8 @@ const nextMilestoneLabel = (index: number) => index === timeline.length - 1
   ? `Restart timeline at ${timeline[0].year}`
   : `Next milestone: ${timeline[index + 1].year}`;
 
-function revealJourneyBlocks(blocks: HTMLElement[], trigger: HTMLElement) {
-  return blocks.map((block, index) => SplitText.create(block, {
-    type: "lines",
-    linesClass: "journey-reveal-line",
-    autoSplit: true,
-    aria: "auto",
-    onSplit: (split) => gsap.fromTo(split.lines,
-      { "--bg-progress": 30 },
-      {
-        "--bg-progress": 100,
-        duration: 1.55,
-        delay: index * 0.08,
-        ease: "none",
-        scrollTrigger: { trigger, start: "top 95%", toggleActions: "play none none none" },
-      },
-    ),
-  }));
+function parallaxJourneyBlocks(blocks: HTMLElement[]) {
+  return blocks.map((block) => textParallax(block, block));
 }
 
 function JourneyDetail({ milestone, mobile = false, animateOnScroll = false }: { milestone: (typeof timeline)[number]; mobile?: boolean; animateOnScroll?: boolean }) {
@@ -108,13 +101,13 @@ function JourneyDetail({ milestone, mobile = false, animateOnScroll = false }: {
 
   useGSAP(() => {
     if (!animateOnScroll || window.matchMedia("(prefers-reduced-motion: reduce)").matches || !detail.current) return;
-    gsap.registerPlugin(ScrollTrigger, SplitText);
+    gsap.registerPlugin(ScrollTrigger);
     const match = gsap.matchMedia();
     match.add(mobile ? "(max-width: 900px)" : "(min-width: 901px)", () => {
       if (!detail.current) return;
       const blocks = Array.from(detail.current.children) as HTMLElement[];
-      const splits = revealJourneyBlocks(blocks, detail.current);
-      return () => splits.forEach((split) => split.revert());
+      const animations = parallaxJourneyBlocks(blocks);
+      return () => animations.forEach((animation) => animation.kill());
     });
     return () => match.revert();
   }, { scope: detail, dependencies: [animateOnScroll], revertOnUpdate: true });
@@ -138,14 +131,14 @@ export function JourneySection() {
   const [railHeight, setRailHeight] = useState(pathHeight);
   const reducedMotion = useReducedMotion();
   useGSAP(() => {
-    gsap.registerPlugin(ScrollTrigger, SplitText);
+    gsap.registerPlugin(ScrollTrigger);
     const match = gsap.matchMedia();
     const addIntro = (query: string, selector: string) => match.add(query, () => {
       const header = section.current?.querySelector<HTMLElement>(selector);
       if (!header) return;
       const blocks = Array.from(header.children) as HTMLElement[];
-      const splits = revealJourneyBlocks(blocks, header);
-      return () => splits.forEach((split) => split.revert());
+      const animations = parallaxJourneyBlocks(blocks);
+      return () => animations.forEach((animation) => animation.kill());
     });
 
     addIntro("(min-width: 901px) and (prefers-reduced-motion: no-preference)", ".journey-motion__intro");
@@ -165,6 +158,7 @@ export function JourneySection() {
 
   const current = timeline[active];
   const mobileCurrent = timeline[mobileActive];
+  const journeyTicks = getJourneyTicks(railHeight);
   const showDesktopMilestone = (index: number) => {
     setDesktopInteracted(true);
     setActive(index);
@@ -235,22 +229,27 @@ export function JourneySection() {
               animate={{ y: -(active * stepHeight) - stepHeight / 2 }}
               transition={{ duration: reducedMotion ? 0 : 0.7, ease }}
             >
-              {timeline.map((milestone, index) => {
-                const distance = Math.abs(active - index);
-                const rowY = pathHeight / 2 + (index - active) * stepHeight * pathHeight / railHeight;
+              {timeline.map((milestone, visualIndex) => {
+                const offset = visualIndex - active;
+                const isVisible = offset >= -1 && offset <= 2;
+                const rowY = pathHeight / 2 + offset * stepHeight * pathHeight / railHeight;
                 const rowX = curveXAt(rowY);
                 return (
                   <button
-                    key={milestone.year}
+                    key={`${milestone.year}-${visualIndex}`}
                     type="button"
-                    className={`journey-motion__year ${active === index ? "journey-motion__year--active" : ""}`}
+                    className={`journey-motion__year ${offset === 0 ? "journey-motion__year--active" : ""}`}
                     style={{
-                      opacity: Math.max(0.12, 1 - distance * 0.24),
-                      width: `calc(${rowX / 2.2}% - 18px)`,
+                      opacity: isVisible ? 1 - Math.abs(offset) * 0.24 : 0,
+                      visibility: isVisible ? "visible" : "hidden",
+                      pointerEvents: isVisible ? "auto" : "none",
+                      width: `${(rowX - yearTickLength) / 2.2}%`,
                     }}
-                    onClick={() => showDesktopMilestone(index)}
+                    onClick={() => showDesktopMilestone(visualIndex)}
                     aria-label={`Show ${milestone.year}: ${milestone.title}`}
-                    aria-current={active === index ? "step" : undefined}
+                    aria-current={offset === 0 ? "step" : undefined}
+                    aria-hidden={!isVisible}
+                    tabIndex={isVisible ? 0 : -1}
                   >
                     <span>{milestone.year}</span>
                     <i aria-hidden />

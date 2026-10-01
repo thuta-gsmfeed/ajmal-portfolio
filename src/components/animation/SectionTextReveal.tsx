@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
+import { textParallax } from "@/components/animation/textParallax";
 
 export function SectionTextReveal({ rootId }: { rootId: string }) {
   const [near, setNear] = useState(false);
@@ -26,7 +26,7 @@ export function SectionTextReveal({ rootId }: { rootId: string }) {
 
   useGSAP(() => {
     if (!near) return;
-    gsap.registerPlugin(ScrollTrigger, SplitText);
+    gsap.registerPlugin(ScrollTrigger);
     const media = gsap.matchMedia();
 
     media.add({ motion: "(prefers-reduced-motion: no-preference)", mobile: "(max-width: 767px)" }, (context) => {
@@ -36,45 +36,8 @@ export function SectionTextReveal({ rootId }: { rootId: string }) {
       const blocks = Array.from(root.querySelectorAll<HTMLElement>("[data-gradient-reveal]"))
         .filter((block) => block.getClientRects().length > 0);
 
-      const cleanups = blocks.map((block, index) => {
-        const mode = block.dataset.gradientReveal;
-        let animation: gsap.core.Tween | undefined;
-        const timing = {
-          duration: mode === "clip" ? 1.1 : 1.55,
-          delay: Math.min(index * 0.035, 0.14),
-          ease: "none",
-          scrollTrigger: {
-            trigger: index === 0 ? root : block,
-            start: index === 0 ? "top bottom" : "top 110%",
-            toggleActions: "play none none none",
-          },
-        };
-
-        if (mode === "clip") {
-          animation = gsap.fromTo(block, { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", ...timing });
-          return () => animation?.kill();
-        }
-
-        if (mode === "static") {
-          animation = gsap.fromTo(block, { "--bg-progress": 30 }, { "--bg-progress": 100, ...timing });
-          return () => animation?.kill();
-        }
-
-        const split = SplitText.create(block, {
-          type: "lines",
-          linesClass: "section-gradient-reveal-line",
-          autoSplit: true,
-          aria: "auto",
-          onSplit: (result) => {
-            animation?.kill();
-            animation = gsap.fromTo(result.lines, { "--bg-progress": 30 }, { "--bg-progress": 100, ...timing });
-            return animation;
-          },
-        });
-        return () => { animation?.kill(); split.revert(); };
-      });
-
-      return () => cleanups.forEach((cleanup) => cleanup());
+      const animations = blocks.map((block) => textParallax(block, block));
+      return () => animations.forEach((animation) => animation.kill());
     });
 
     return () => media.revert();

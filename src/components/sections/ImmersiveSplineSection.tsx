@@ -41,6 +41,7 @@ export function ImmersiveSplineSection() {
     <motion.section
       ref={section}
       id="immersive"
+      data-header-theme="dark"
       aria-labelledby="immersive-title"
       className="immersive-section immersive-section--gsmfeed"
       data-no-section-transition

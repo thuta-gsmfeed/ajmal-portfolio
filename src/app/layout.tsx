@@ -13,7 +13,7 @@ const poppins = Poppins({
 
 export const viewport: Viewport = {
   themeColor: "#030506",
-  colorScheme: "dark",
+  colorScheme: "light dark",
 };
 
 export const metadata: Metadata = {
@@ -121,8 +121,9 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`dark ${poppins.variable}`}>
+    <html lang="en" className={poppins.variable} suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: `try{var theme=localStorage.getItem('portfolio-theme');document.documentElement.dataset.theme=theme==='light'?'light':'dark';document.documentElement.style.colorScheme=document.documentElement.dataset.theme}catch(e){document.documentElement.dataset.theme='dark'}` }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

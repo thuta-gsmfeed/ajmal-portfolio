@@ -6,7 +6,7 @@ import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
+import { textParallax } from "@/components/animation/textParallax";
 
 const businesses = [
   { name: "Coolmix", logo: "/images/logo/coolmix-logo.svg", className: "h-9 w-9", url: "https://coolmix.eu/" },
@@ -22,47 +22,18 @@ export function BusinessesSection() {
   const reducedMotion = useReducedMotion();
 
   useGSAP(() => {
-    gsap.registerPlugin(ScrollTrigger, SplitText);
+    gsap.registerPlugin(ScrollTrigger);
     const match = gsap.matchMedia();
 
     match.add("(prefers-reduced-motion: no-preference)", () => {
-      const titleLines = gsap.utils.toArray<HTMLElement>(".businesses-section__title .businesses-reveal-line");
-      const titleTween = gsap.fromTo(titleLines,
-        { "--bg-progress": 30 },
-        {
-          "--bg-progress": 100,
-          duration: 1.55,
-          stagger: 0.08,
-          ease: "none",
-          scrollTrigger: { trigger: ".businesses-section__inner > header", start: "top 95%", toggleActions: "play none none none" },
-        },
-      );
+      const titleTween = textParallax(".businesses-section__title", ".businesses-section__inner > header", 16);
 
       const textBlocks = gsap.utils.toArray<HTMLElement>(".businesses-section__kicker, .businesses-section__copy > p");
-      const splits = textBlocks.map((block, index) => SplitText.create(block, {
-        type: "lines",
-        linesClass: "businesses-reveal-line",
-        autoSplit: true,
-        aria: "auto",
-        onSplit: (split) => gsap.fromTo(split.lines,
-          { "--bg-progress": 30 },
-          {
-            "--bg-progress": 100,
-            duration: 1.55,
-            delay: index === 0 ? 0.16 : (index - 1) * 0.08,
-            ease: "none",
-            scrollTrigger: {
-              trigger: index === 0 ? ".businesses-section__inner > header" : ".businesses-section__copy",
-              start: "top 95%",
-              toggleActions: "play none none none",
-            },
-          },
-        ),
-      }));
+      const textAnimations = textBlocks.map((block) => textParallax(block, block));
 
       return () => {
         titleTween.kill();
-        splits.forEach((split) => split.revert());
+        textAnimations.forEach((animation) => animation.kill());
       };
     });
 

@@ -13,17 +13,15 @@ export function HeroSection() {
   const { desktop, reduced } = useMotionSettings();
   const scrollYProgress = useSectionProgress(ref, "top top", "bottom top");
   const contentY = useTransform(scrollYProgress, [0, 1], ["0vh", "-46vh"]);
+  const mobileContentY = useTransform(scrollYProgress, [0, 1], ["0vh", "-12vh"]);
 
   useGSAP(() => {
     const lines = gsap.utils.toArray<HTMLElement>(".hero-portrait__text-reveal");
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      gsap.set(lines, { "--bg-progress": 100 });
-      return;
-    }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     gsap.fromTo(lines,
-      { "--bg-progress": 0 },
-      { "--bg-progress": 100, duration: 2.2, delay: 0.3, ease: "none" },
+      { y: 32, autoAlpha: 0 },
+      { y: 0, autoAlpha: 1, duration: 1.05, stagger: 0.12, delay: 0.3, ease: "power3.out" },
     );
   }, { scope: ref });
 
@@ -31,6 +29,7 @@ export function HeroSection() {
     <section
       ref={ref}
       id="home"
+      data-header-theme="dark"
       className="hero-portrait relative min-h-[100svh] overflow-hidden bg-[#04060a]"
       aria-labelledby="hero-title"
     >
@@ -58,7 +57,7 @@ export function HeroSection() {
       <div className="grain" />
 
       <motion.div
-        style={{ y: desktop && !reduced ? contentY : 0 }}
+        style={{ y: reduced ? 0 : desktop ? contentY : mobileContentY }}
         className="hero-portrait__inner container relative z-10 flex min-h-[100svh] items-end pt-32"
       >
         <div className="hero-portrait__copy">

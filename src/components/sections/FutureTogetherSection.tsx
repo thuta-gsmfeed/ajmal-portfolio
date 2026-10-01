@@ -6,7 +6,7 @@ export function FutureTogetherSection() {
   const whatsappUrl = `https://wa.me/${site.whatsapp.phone}?text=${encodeURIComponent(site.whatsapp.message)}`;
 
   return (
-    <section id="contact" className="future-together" aria-labelledby="future-together-title">
+    <section id="contact" data-header-theme="dark" className="future-together" aria-labelledby="future-together-title">
       <div className="future-together__glow" aria-hidden />
       <div className="future-together__content">
         <a className="future-together__brand" href="#home" aria-label="Gholzad — back to home" data-section-reveal="up">

@@ -73,7 +73,8 @@ export function SectionRail() {
         for (const element of document.elementsFromPoint(sampleX, sampleY)) {
           const surface = (element as HTMLElement).closest<HTMLElement>("[data-header-theme]");
           if (!surface) continue;
-          nextLightSurface = surface.dataset.headerTheme === "light";
+          const originalLight = surface.dataset.headerTheme === "light";
+          nextLightSurface = document.documentElement.dataset.theme === "light" && !surface.closest("#home, #yachts, #network") ? !originalLight : originalLight;
           break;
         }
 
@@ -84,10 +85,12 @@ export function SectionRail() {
     update();
     window.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
+    window.addEventListener("portfolio:theme-change", update);
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
+      window.removeEventListener("portfolio:theme-change", update);
     };
   }, []);
 
