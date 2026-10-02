@@ -2148,7 +2148,7 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
   .yacht-stage__mobile-story { display:block; }
   .yacht-stage__mobile-story p { margin:0; color:#aab3b7; font-size:15px; line-height:1.8; }
   .yacht-stage__story-more { overflow:hidden; }
-  .yacht-stage__story-more > p { padding-top:12px; }
+  .yacht-stage__story-more > p { padding-top:0; }
   .yacht-stage__story-toggle { position:relative; min-height:0; padding:0 6px; border:0; background:none; color:#e0c98d; font:inherit; line-height:inherit; vertical-align:baseline; text-decoration:underline; text-underline-offset:4px; cursor:pointer; }
   .yacht-stage__story-toggle::before { content:""; position:absolute; top:50%; right:0; left:0; height:44px; transform:translateY(-50%); }
   .yacht-stage__story-toggle:focus-visible { outline:2px solid #cfb97f; outline-offset:2px; border-radius:2px; }
