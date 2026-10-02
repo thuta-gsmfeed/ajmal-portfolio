@@ -82,7 +82,7 @@ export function ImmersiveSplineSection() {
             </span>
           </h2>
           <p className="immersive-description" data-gradient-reveal>Download the gsmfeed app today and join the global trading community.</p>
-          <a className="immersive-app-store" href={APP_STORE_URL} target="_blank" rel="noopener noreferrer" aria-label="Download gsmfeed on the App Store">
+          <a className="immersive-app-store" href={APP_STORE_URL} target={isMobile ? "_self" : "_blank"} rel="noopener noreferrer" aria-label="Download gsmfeed on the App Store">
             <Image src="/images/gsmfeed/app-store-button.svg" alt="" width={182} height={54} aria-hidden="true" />
           </a>
         </div>
