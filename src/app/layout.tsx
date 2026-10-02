@@ -123,13 +123,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={poppins.variable} suppressHydrationWarning>
       <head>
-        <link
-          rel="preload"
-          href="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-          as="fetch"
-          crossOrigin="anonymous"
-          media="(max-width: 767px) and (prefers-reduced-motion: no-preference)"
-        />
         <script dangerouslySetInnerHTML={{ __html: `try{var theme=localStorage.getItem('portfolio-theme');document.documentElement.dataset.theme=theme==='light'?'light':'dark';document.documentElement.style.colorScheme=document.documentElement.dataset.theme}catch(e){document.documentElement.dataset.theme='dark'}` }} />
         <script
           type="application/ld+json"

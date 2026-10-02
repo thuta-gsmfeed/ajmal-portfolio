@@ -221,9 +221,16 @@ export function CoolmixDeliverySection() {
       draw.current?.();
     };
     van.onerror = () => setCanvasFailed(true);
-    van.src = window.matchMedia("(max-width: 767px)").matches
-      ? "/images/coolmix-delivery/coolmix-truck.webp"
-      : "/images/coolmix-delivery/coolmix-truck.png";
+    // Canvas images do not support native lazy loading. Fetch the existing
+    // sprite shortly before entry instead of competing with the hero image.
+    const loadObserver = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      van.src = window.matchMedia("(max-width: 767px)").matches
+        ? "/images/coolmix-delivery/coolmix-truck.webp"
+        : "/images/coolmix-delivery/coolmix-truck.png";
+      loadObserver.disconnect();
+    }, { rootMargin: "600px 0px" });
+    loadObserver.observe(canvasElement);
     resize();
 
     return () => {
@@ -232,6 +239,7 @@ export function CoolmixDeliverySection() {
       cancelAnimationFrame(frame.current);
       window.removeEventListener("portfolio:theme-change", requestDraw);
       intersectionObserver.disconnect();
+      loadObserver.disconnect();
       resizeObserver.disconnect();
       draw.current = null;
     };
@@ -240,7 +248,7 @@ export function CoolmixDeliverySection() {
   useGSAP(() => {
     const media = gsap.matchMedia();
     media.add({ motion: "(prefers-reduced-motion: no-preference)", mobile: "(max-width: 767px)" }, (context) => {
-      if (!context.conditions?.motion) return;
+      if (!context.conditions?.motion || context.conditions.mobile) return;
       const track = section.current?.querySelector<HTMLElement>(".coolmix-delivery__stage .coolmix-delivery__service-track");
       if (!track) return;
 
@@ -377,7 +385,7 @@ export function CoolmixDeliverySection() {
         <canvas ref={canvas} className={`coolmix-delivery__canvas ${canvasReady ? "is-ready" : ""}`} aria-hidden="true" />
         {canvasFailed && (
           <div className="coolmix-delivery__visual-fallback" aria-hidden="true">
-            <Image src="/images/coolmix-delivery/coolmix-truck.png" alt="" width={4627} height={1762} unoptimized />
+            <Image src="/images/coolmix-delivery/coolmix-truck.png" alt="" width={4627} height={1762} sizes="(max-width: 767px) 110vw, 70vw" />
           </div>
         )}
         <div data-header-theme="dark" className="coolmix-delivery__service-panel">
@@ -391,7 +399,7 @@ export function CoolmixDeliverySection() {
           <span>coolmix</span>
         </div>
         <div className="coolmix-delivery__reduced-van-wrap">
-          <Image className="coolmix-delivery__reduced-van" src="/images/coolmix-delivery/coolmix-truck.png" alt="Blue Coolmix delivery truck" width={4627} height={1762} unoptimized />
+          <Image className="coolmix-delivery__reduced-van" src="/images/coolmix-delivery/coolmix-truck.png" alt="Blue Coolmix delivery truck" width={4627} height={1762} sizes="(max-width: 767px) 100vw, 900px" />
         </div>
         <div className="coolmix-delivery__service-panel coolmix-delivery__service-panel--reduced">
           <CoolmixServiceContent />

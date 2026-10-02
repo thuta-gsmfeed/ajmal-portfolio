@@ -46,6 +46,7 @@ export function HeroSection() {
               alt={media.hero.alt}
               fill
               priority
+              fetchPriority="high"
               sizes="100vw"
               className="hero-portrait__image object-cover"
             />

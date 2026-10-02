@@ -66,6 +66,8 @@ export function Loader() {
               height={260}
               className="relative h-auto w-full object-contain"
               priority
+              fetchPriority="high"
+              sizes="(min-width: 768px) 300px, (min-width: 640px) 260px, 210px"
             />
             <motion.div aria-hidden className="mx-auto mt-8 h-px w-28 origin-left bg-gradient-to-r from-transparent via-cyan-200 to-transparent" initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: reduceMotion ? 0.15 : 0.55, ease: [0.22, 1, 0.36, 1] }} />
           </motion.div>

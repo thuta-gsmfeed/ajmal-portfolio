@@ -23,8 +23,10 @@ export function ImmersiveSplineSection() {
   const section = useRef<HTMLElement>(null);
   const sceneShell = useRef<HTMLDivElement>(null);
   const { reduced: reduceMotion } = useMotionSettings();
-  const { near, active } = useSceneVisibility(isMobile ? sceneShell : section, "150px 0px");
-  const shouldLoadScene = isMobile || near;
+  const { near, active } = useSceneVisibility(isMobile ? sceneShell : section, "600px 0px");
+  // Mounting the dynamic component also downloads and evaluates the Spline
+  // runtime. Keep that work off the initial mobile load, ahead of scene entry.
+  const shouldLoadScene = near;
   useEffect(() => {
     if (!shouldLoadScene) setSceneReady(false);
   }, [shouldLoadScene]);
