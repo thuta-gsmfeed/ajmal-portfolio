@@ -21,8 +21,13 @@ export function ImmersiveSplineSection() {
   const [sceneReady, setSceneReady] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const section = useRef<HTMLElement>(null);
+  const sceneShell = useRef<HTMLDivElement>(null);
   const { reduced: reduceMotion } = useMotionSettings();
-  const { near, active } = useSceneVisibility(section);
+  const { near, active } = useSceneVisibility(isMobile ? sceneShell : section, "150px 0px");
+  const shouldLoadScene = isMobile || near;
+  useEffect(() => {
+    if (!shouldLoadScene) setSceneReady(false);
+  }, [shouldLoadScene]);
   useEffect(() => {
     const query = window.matchMedia("(max-width: 767px)");
     const update = () => setIsMobile(query.matches);
@@ -31,10 +36,10 @@ export function ImmersiveSplineSection() {
     return () => query.removeEventListener("change", update);
   }, []);
   useEffect(() => {
-    if (!near || sceneReady || reduceMotion) return;
-    const timer = window.setTimeout(() => setFailed(true), 15000);
+    if (!shouldLoadScene || sceneReady || reduceMotion) return;
+    const timer = window.setTimeout(() => setFailed(true), isMobile ? 45000 : 15000);
     return () => clearTimeout(timer);
-  }, [near, sceneReady, reduceMotion]);
+  }, [shouldLoadScene, sceneReady, reduceMotion, isMobile]);
   const fallback = <div className="scene-fallback"><Image src="/images/logo/gsmfeed-full-logo.png" alt="gsmfeed" width={294} height={75} /><p>Connect. Trade. Grow.</p></div>;
 
   return (
@@ -52,11 +57,11 @@ export function ImmersiveSplineSection() {
       transition={{ duration: isMobile || reduceMotion ? 0 : 0.5, ease: revealEase }}
     >
       <div className="immersive-card">
-        <div className="immersive-scene-shell">
+        <div ref={sceneShell} className="immersive-scene-shell">
           <div className="immersive-spline-layer" aria-hidden="true">
-            {near && !reduceMotion && !failed ? <SceneBoundary fallback={fallback} onError={() => setFailed(true)}><ImmersiveSplineCanvas active={active} onLoad={() => setSceneReady(true)} /></SceneBoundary> : fallback}
+            {shouldLoadScene && !reduceMotion && !failed ? <SceneBoundary fallback={fallback} onError={() => setFailed(true)}><ImmersiveSplineCanvas active={active} onLoad={() => setSceneReady(true)} /></SceneBoundary> : fallback}
           </div>
-          {near && !reduceMotion && !sceneReady && !failed && (
+          {shouldLoadScene && !reduceMotion && !sceneReady && !failed && (
             <div className="immersive-loader pointer-events-none" role="status" aria-live="polite">
               <span aria-hidden="true" className="immersive-loader-spinner" />
               <span>Loading 3D scene</span>

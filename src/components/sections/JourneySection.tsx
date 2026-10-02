@@ -128,6 +128,7 @@ export function JourneySection() {
   const mobileRail = useRef<HTMLDivElement>(null);
   const mobileSelected = useRef(2);
   const mobileScrollAnimationPending = useRef(false);
+  const mobileStopMomentum = useRef<(() => void) | null>(null);
   const [active, setActive] = useState(0);
   const [desktopInteracted, setDesktopInteracted] = useState(false);
   const [desktopPulseRun, setDesktopPulseRun] = useState(0);
@@ -173,6 +174,14 @@ export function JourneySection() {
     let mouseDrag: { x: number; offset: number } | null = null;
     let touching = false;
     let dragged = false;
+    const dragSpeed = 0.5;
+    let momentumFrame = 0;
+    let touchDrag: { x: number; y: number; offset: number; axis: "x" | "y" | null; time: number; velocity: number } | null = null;
+    const stopMomentum = () => {
+      cancelAnimationFrame(momentumFrame);
+      momentumFrame = 0;
+    };
+    mobileStopMomentum.current = stopMomentum;
 
     const paintYears = () => {
       frame = 0;
@@ -185,7 +194,7 @@ export function JourneySection() {
       });
     };
     const settle = () => {
-      if (mouseDrag || touching) return;
+      if (mouseDrag || touching || momentumFrame) return;
       const index = Math.min(timeline.length - 1, Math.max(0, Math.round(scroller.scrollLeft / mobileYearGap)));
       mobileSelected.current = index;
       setMobileActive(index);
@@ -223,9 +232,10 @@ export function JourneySection() {
       initialized = true;
       paintYears();
     };
-    // Touch uses native momentum scrolling; mouse dragging also works in a narrow window.
+    // Scale horizontal gestures while keeping vertical page scrolling native.
     const onMouseDown = (event: MouseEvent) => {
       if (event.button !== 0) return;
+      stopMomentum();
       dragged = false;
       window.clearTimeout(settleTimer);
       mouseDrag = { x: event.clientX, offset: scroller.scrollLeft };
@@ -242,22 +252,74 @@ export function JourneySection() {
         setMobilePulseRun(0);
       }
       event.preventDefault();
-      scroller.scrollLeft = mouseDrag.offset - distance;
+      scroller.scrollLeft = mouseDrag.offset - distance * dragSpeed;
     };
     const onMouseUp = () => {
       if (!mouseDrag) return;
       mouseDrag = null;
       scheduleSettle();
     };
-    const onTouchStart = () => {
+    const onTouchStart = (event: TouchEvent) => {
+      if (event.touches.length !== 1) return;
+      stopMomentum();
+      dragged = false;
+      const touch = event.touches[0];
+      touchDrag = { x: touch.clientX, y: touch.clientY, offset: scroller.scrollLeft, axis: null, time: event.timeStamp, velocity: 0 };
       touching = true;
       setMobileInteracted(true);
       setMobilePulseRun(0);
       window.clearTimeout(settleTimer);
     };
-    const onTouchEnd = () => { touching = false; scheduleSettle(); };
+    const onTouchMove = (event: TouchEvent) => {
+      if (!touchDrag || event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      const dx = touch.clientX - touchDrag.x;
+      const dy = touch.clientY - touchDrag.y;
+      if (!touchDrag.axis) {
+        if (Math.max(Math.abs(dx), Math.abs(dy)) < 6) return;
+        touchDrag.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+      }
+      if (touchDrag.axis !== "x") return;
+      if (event.cancelable) event.preventDefault();
+      dragged = true;
+      mobileScrollAnimationPending.current = true;
+      const previous = scroller.scrollLeft;
+      scroller.scrollLeft = touchDrag.offset - dx * dragSpeed;
+      const elapsed = Math.max(1, event.timeStamp - touchDrag.time);
+      touchDrag.velocity = Math.max(-0.35, Math.min(0.35, (scroller.scrollLeft - previous) / elapsed));
+      touchDrag.time = event.timeStamp;
+    };
+    const onTouchEnd = (event: TouchEvent) => {
+      touching = false;
+      let speed = touchDrag?.axis === "x" && event.timeStamp - touchDrag.time < 80 ? touchDrag.velocity : 0;
+      touchDrag = null;
+      if (event.type === "touchcancel" || window.matchMedia("(prefers-reduced-motion: reduce)").matches || Math.abs(speed) < 0.012) {
+        scheduleSettle();
+        return;
+      }
+      let previousTime = performance.now();
+      const coast = (time: number) => {
+        const elapsed = Math.min(32, time - previousTime);
+        previousTime = time;
+        const previousOffset = scroller.scrollLeft;
+        scroller.scrollLeft += speed * elapsed;
+        speed *= Math.exp(-elapsed / 140);
+        if (Math.abs(speed) < 0.012 || Math.abs(scroller.scrollLeft - previousOffset) < 0.1) {
+          momentumFrame = 0;
+          scheduleSettle();
+          return;
+        }
+        momentumFrame = requestAnimationFrame(coast);
+      };
+      momentumFrame = requestAnimationFrame(coast);
+    };
     const onWheel = (event: WheelEvent) => {
       if (!event.deltaX && !event.shiftKey) return;
+      if (!event.cancelable) return;
+      event.preventDefault();
+      stopMomentum();
+      const pixels = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? scroller.clientWidth : 1;
+      scroller.scrollLeft += (event.deltaX || event.deltaY) * pixels * dragSpeed;
       mobileScrollAnimationPending.current = true;
       setMobileInteracted(true);
       setMobilePulseRun(0);
@@ -274,9 +336,10 @@ export function JourneySection() {
     scroller.addEventListener("scroll", onScroll, { passive: true });
     scroller.addEventListener("mousedown", onMouseDown);
     scroller.addEventListener("touchstart", onTouchStart, { passive: true });
+    scroller.addEventListener("touchmove", onTouchMove, { passive: false });
     scroller.addEventListener("touchend", onTouchEnd, { passive: true });
     scroller.addEventListener("touchcancel", onTouchEnd, { passive: true });
-    scroller.addEventListener("wheel", onWheel, { passive: true });
+    scroller.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
     scroller.addEventListener("click", onClick, true);
@@ -286,6 +349,7 @@ export function JourneySection() {
       scroller.removeEventListener("scroll", onScroll);
       scroller.removeEventListener("mousedown", onMouseDown);
       scroller.removeEventListener("touchstart", onTouchStart);
+      scroller.removeEventListener("touchmove", onTouchMove);
       scroller.removeEventListener("touchend", onTouchEnd);
       scroller.removeEventListener("touchcancel", onTouchEnd);
       scroller.removeEventListener("wheel", onWheel);
@@ -293,6 +357,8 @@ export function JourneySection() {
       window.removeEventListener("mouseup", onMouseUp);
       scroller.removeEventListener("click", onClick, true);
       cancelAnimationFrame(frame);
+      stopMomentum();
+      mobileStopMomentum.current = null;
       window.clearTimeout(settleTimer);
     };
   }, []);
@@ -306,6 +372,7 @@ export function JourneySection() {
     setActive(index);
   };
   const showMobileMilestone = (index: number) => {
+    mobileStopMomentum.current?.();
     mobileScrollAnimationPending.current = false;
     setMobileInteracted(true);
     setMobilePulseRun((previous) => previous + 1);

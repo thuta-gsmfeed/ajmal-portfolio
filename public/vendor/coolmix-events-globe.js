@@ -29,6 +29,10 @@
     var globe = new THREE.Group();
     var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var frameId = null;
+    var lastRenderTime = 0;
+    var lastWidth = 0;
+    var lastHeight = 0;
+    var lastPixelRatio = 0;
     var globeIsVisible = true;
     var dragging = false;
     var previousX = 0;
@@ -492,6 +496,10 @@
             2,
             maxPixelRatioForArea
         ));
+        if (width === lastWidth && height === lastHeight && pixelRatio === lastPixelRatio) return;
+        lastWidth = width;
+        lastHeight = height;
+        lastPixelRatio = pixelRatio;
         renderer.setPixelRatio(pixelRatio);
         renderer.setSize(width, height, false);
         camera.position.y = tightEdgeFit ? 0 : 7;
@@ -537,9 +545,16 @@
     function render() {
         frameId = null;
         var now = performance.now();
+        var mobile = window.innerWidth <= 767;
+        if (mobile && now - lastRenderTime < 1000 / 30 - 1) {
+            if (globeIsVisible && !document.hidden) frameId = window.requestAnimationFrame(render);
+            return;
+        }
+        var frameStep = mobile && lastRenderTime ? Math.min(3, (now - lastRenderTime) / (1000 / 60)) : 1;
+        lastRenderTime = now;
         if (!dragging && !reducedMotion) {
-            globe.rotation.y += velocity;
-            velocity += (rotationSpeed - velocity) * 0.015;
+            globe.rotation.y += velocity * frameStep;
+            velocity += (rotationSpeed - velocity) * (1 - Math.pow(0.985, frameStep));
         }
         if (targetRotation && !dragging) {
             var turnProgress = Math.min(1, (now - targetRotation.start) / 900);

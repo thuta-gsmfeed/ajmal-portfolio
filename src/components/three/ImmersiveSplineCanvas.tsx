@@ -32,6 +32,7 @@ export default function ImmersiveSplineCanvas({
   const [app, setApp] = useState<Application | null>(null);
   const logoRef = useRef<HTMLDivElement>(null);
   const syncTimerRef = useRef<number | null>(null);
+  const chestVectors = useRef({ size: new Vector3(), center: new Vector3(), left: new Vector3(), right: new Vector3() });
 
   const syncLogoToChest = useCallback((application: Application) => {
     const internals = application as SplineInternals;
@@ -50,12 +51,13 @@ export default function ImmersiveSplineCanvas({
     body.updateWorldMatrix(true, false);
     camera.updateMatrixWorld();
 
-    const size = bounds.getSize(new Vector3());
-    const center = bounds.getCenter(new Vector3());
+    const { size, center, left, right } = chestVectors.current;
+    bounds.getSize(size);
+    bounds.getCenter(center);
     center.y += size.y * 0.14;
 
-    const left = center.clone();
-    const right = center.clone();
+    left.copy(center);
+    right.copy(center);
     left.x -= size.x * 0.19;
     right.x += size.x * 0.19;
 
@@ -68,7 +70,7 @@ export default function ImmersiveSplineCanvas({
       };
     };
 
-    const chest = project(center.clone());
+    const chest = project(center);
     const chestLeft = project(left);
     const chestRight = project(right);
     const width = Math.hypot(
@@ -84,12 +86,12 @@ export default function ImmersiveSplineCanvas({
       chest.x > -width && chest.x < canvas.clientWidth + width &&
       chest.y > -40 && chest.y < canvas.clientHeight + 40;
 
-    logo.style.left = `${chest.x}px`;
-    logo.style.top = `${chest.y}px`;
+    logo.style.left = "0";
+    logo.style.top = "0";
     logo.style.width = `${Math.max(54, Math.min(width, 190))}px`;
     logo.style.opacity = visible ? "0.68" : "0";
     logo.style.transform =
-      `translate(-50%, -50%) rotate(${rotation}rad)`;
+      `translate3d(${chest.x}px, ${chest.y}px, 0) translate(-50%, -50%) rotate(${rotation}rad)`;
   }, []);
 
   useEffect(() => {
@@ -112,8 +114,9 @@ export default function ImmersiveSplineCanvas({
     app.play();
     syncLogoToChest(app);
     // The Spline runtime owns its render loop. The HTML decal only needs a
-    // lightweight 30fps position sync, avoiding a second full-speed RAF loop.
-    syncTimerRef.current = window.setInterval(() => syncLogoToChest(app), 1000 / 30);
+    // lightweight 20fps sync on phones (30fps on desktop), avoiding another RAF loop.
+    const mobile = matchMedia("(max-width: 767px)").matches;
+    syncTimerRef.current = window.setInterval(() => syncLogoToChest(app), 1000 / (mobile ? 20 : 30));
 
     return () => {
       if (syncTimerRef.current !== null) {
@@ -149,6 +152,7 @@ export default function ImmersiveSplineCanvas({
   }, [app, syncLogoToChest]);
 
   const handleLoad = (application: Application) => {
+    if (!active) application.stop();
     syncSceneBackground(application);
     setApp(application);
     window.requestAnimationFrame(() => syncLogoToChest(application));

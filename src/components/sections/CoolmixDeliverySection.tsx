@@ -180,7 +180,7 @@ export function CoolmixDeliverySection() {
       if (active) requestDraw();
     });
     const resizeObserver = new ResizeObserver(resize);
-    intersectionObserver.observe(section.current ?? canvasElement);
+    intersectionObserver.observe(canvasElement);
     resizeObserver.observe(canvasElement);
 
     van.onload = () => {
@@ -221,7 +221,9 @@ export function CoolmixDeliverySection() {
       draw.current?.();
     };
     van.onerror = () => setCanvasFailed(true);
-    van.src = "/images/coolmix-delivery/coolmix-truck.png";
+    van.src = window.matchMedia("(max-width: 767px)").matches
+      ? "/images/coolmix-delivery/coolmix-truck.webp"
+      : "/images/coolmix-delivery/coolmix-truck.png";
     resize();
 
     return () => {
@@ -236,63 +238,68 @@ export function CoolmixDeliverySection() {
   }, []);
 
   useGSAP(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const track = section.current?.querySelector<HTMLElement>(".coolmix-delivery__stage .coolmix-delivery__service-track");
-    if (!track) return;
+    const media = gsap.matchMedia();
+    media.add({ motion: "(prefers-reduced-motion: no-preference)", mobile: "(max-width: 767px)" }, (context) => {
+      if (!context.conditions?.motion) return;
+      const track = section.current?.querySelector<HTMLElement>(".coolmix-delivery__stage .coolmix-delivery__service-track");
+      if (!track) return;
 
-    const cards = Array.from(track.children) as HTMLElement[];
-    const animations = cards.map((card) => {
-      const headline = card.classList.contains("coolmix-delivery__headline");
-      const blocks = headline
-        ? Array.from(card.querySelectorAll<HTMLElement>("h2 > span, a > .coolmix-delivery__text-reveal"))
-        : Array.from(card.querySelectorAll<HTMLElement>(card.classList.contains("coolmix-delivery__overview") ? "h3, p" : "p"));
-      const count = card.querySelector<HTMLElement>(".coolmix-delivery__count");
-      const groups = count ? [count, ...blocks] : blocks;
-      const reveal = gsap.timeline({ paused: true });
-      groups.forEach((group, index) => {
-        gsap.set(group, { y: 14 });
-        reveal.to(group, { y: 0, duration: 0.7, ease: "power2.out" }, index * 0.06);
+      const cards = Array.from(track.children) as HTMLElement[];
+      const animations = cards.map((card) => {
+        const headline = card.classList.contains("coolmix-delivery__headline");
+        const blocks = headline
+          ? Array.from(card.querySelectorAll<HTMLElement>("h2 > span, a > .coolmix-delivery__text-reveal"))
+          : Array.from(card.querySelectorAll<HTMLElement>(card.classList.contains("coolmix-delivery__overview") ? "h3, p" : "p"));
+        const count = card.querySelector<HTMLElement>(".coolmix-delivery__count");
+        const groups = count ? [count, ...blocks] : blocks;
+        const reveal = gsap.timeline({ paused: true });
+        groups.forEach((group, index) => {
+          gsap.set(group, { y: 14 });
+          reveal.to(group, { y: 0, duration: 0.7, ease: "power2.out" }, index * 0.06);
+        });
+        if (count && !context.conditions?.mobile) {
+          const finalValue = count.closest<HTMLElement>("strong")?.dataset.countValue ?? "0";
+          const target = Number(finalValue.replace(/\D/g, ""));
+          const suffix = finalValue.endsWith("%") ? "%" : "+";
+          const formatter = new Intl.NumberFormat("de-DE");
+          const counter = { value: 0 };
+          reveal.set(count, { textContent: `0${suffix}` }, 0);
+          reveal.to(counter, {
+            value: target,
+            duration: 1.8,
+            ease: "power2.out",
+            onUpdate: () => { count.textContent = `${formatter.format(Math.round(counter.value))}${suffix}`; },
+            onComplete: () => { count.textContent = finalValue; },
+          }, 0);
+        }
+        return { card, reveal };
       });
-      if (count) {
-        const finalValue = count.closest<HTMLElement>("strong")?.dataset.countValue ?? "0";
-        const target = Number(finalValue.replace(/\D/g, ""));
-        const suffix = finalValue.endsWith("%") ? "%" : "+";
-        const formatter = new Intl.NumberFormat("de-DE");
-        const counter = { value: 0 };
-        reveal.set(count, { textContent: `0${suffix}` }, 0);
-        reveal.to(counter, {
-          value: target,
-          duration: 1.8,
-          ease: "power2.out",
-          onUpdate: () => { count.textContent = `${formatter.format(Math.round(counter.value))}${suffix}`; },
-          onComplete: () => { count.textContent = finalValue; },
-        }, 0);
-      }
-      return { card, reveal };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const animation = animations.find(({ card }) => card === entry.target);
+          animation?.reveal.play();
+          observer.unobserve(entry.target);
+        });
+      }, { rootMargin: "0px -2% 0px -2%", threshold: 0.1 });
+      animations.forEach(({ card }) => observer.observe(card));
+
+      return () => {
+        observer.disconnect();
+        animations.forEach(({ reveal }) => {
+          reveal.kill();
+        });
+      };
     });
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        const animation = animations.find(({ card }) => card === entry.target);
-        animation?.reveal.play();
-        observer.unobserve(entry.target);
-      });
-    }, { rootMargin: "0px -2% 0px -2%", threshold: 0.1 });
-    animations.forEach(({ card }) => observer.observe(card));
-
-    return () => {
-      observer.disconnect();
-      animations.forEach(({ reveal }) => {
-        reveal.kill();
-      });
-    };
+    return () => media.revert();
   }, { scope: section });
 
   useGSAP(() => {
     gsap.registerPlugin(ScrollTrigger);
     const media = gsap.matchMedia();
-    media.add("(prefers-reduced-motion: no-preference)", () => {
+    media.add({ motion: "(prefers-reduced-motion: no-preference)", mobile: "(max-width: 767px)" }, (context) => {
+      if (!context.conditions?.motion) return;
       let entranceTween: gsap.core.Tween | undefined;
       const startEntrance = () => {
         if (entranceTween || entrance.current === 1) return;
@@ -310,21 +317,33 @@ export function CoolmixDeliverySection() {
         onEnter: startEntrance,
         onRefresh: (self) => { if (self.progress > 0) startEntrance(); },
       });
-      const trigger = ScrollTrigger.create({
-        trigger: section.current,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: 0.35,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => {
-          const next = self.progress;
-          velocity.current = Math.max(velocity.current, Math.abs(next - lastProgress.current));
-          lastProgress.current = next;
-          progress.current = next;
-          draw.current?.();
-        },
-        onRefresh: (self) => { progress.current = self.progress; draw.current?.(); },
-      });
+      const updateProgress = (next: number) => {
+        velocity.current = Math.max(velocity.current, Math.abs(next - lastProgress.current));
+        lastProgress.current = next;
+        progress.current = next;
+        draw.current?.();
+      };
+      const trigger = context.conditions?.mobile
+        ? gsap.fromTo(progress, { current: 0 }, {
+          current: 1,
+          ease: "none",
+          onUpdate: () => updateProgress(progress.current),
+          scrollTrigger: {
+            trigger: section.current,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: 0.35,
+            invalidateOnRefresh: true,
+            onRefresh: () => draw.current?.(),
+          },
+        })
+        : ScrollTrigger.create({
+          trigger: section.current,
+          start: "top top",
+          end: "bottom bottom",
+          onUpdate: (self) => updateProgress(self.progress),
+          onRefresh: (self) => updateProgress(self.progress),
+        });
       return () => {
         entranceTrigger.kill();
         entranceTween?.kill();

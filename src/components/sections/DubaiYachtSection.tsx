@@ -217,7 +217,7 @@ export function DubaiYachtSection() {
               onPlaying={(event) => event.currentTarget.classList.add("is-visible")}
               onError={(event) => event.currentTarget.classList.remove("is-visible")}
             >
-              <source src="/videos/dubai-marina-yachts-scroll.mp4" type="video/mp4" />
+              <source src="/videos/dubai-marina-yachts-mobile.mp4" type="video/mp4" />
             </video>
           )}
           <div className="yacht-stage__shade pointer-events-none absolute inset-0" aria-hidden="true" />

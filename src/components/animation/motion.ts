@@ -67,7 +67,7 @@ export function useSectionProgress(ref: RefObject<HTMLElement | null>, start = "
   return progress;
 }
 
-export function useSceneVisibility(ref: RefObject<HTMLElement | null>) {
+export function useSceneVisibility(ref: RefObject<HTMLElement | null>, mobileRootMargin = "500px 0px") {
   const [near, setNear] = useState(false);
   const [active, setActive] = useState(false);
   const visible = useRef(false);
@@ -76,12 +76,22 @@ export function useSceneVisibility(ref: RefObject<HTMLElement | null>) {
     if (!node) return;
     // Heavy WebGL/Spline scenes mount shortly before entry and release once they
     // move well outside the viewport instead of staying resident for the page lifetime.
-    const nearby = new IntersectionObserver(([entry]) => setNear(entry.isIntersecting), { rootMargin: "500px 0px" });
+    const mobile = matchMedia("(max-width: 767px)");
+    let nearby: IntersectionObserver;
+    const observeNearby = () => {
+      nearby?.disconnect();
+      nearby = new IntersectionObserver(([entry]) => setNear(entry.isIntersecting), {
+        rootMargin: mobile.matches ? mobileRootMargin : "500px 0px",
+      });
+      nearby.observe(node);
+    };
+    observeNearby();
+    mobile.addEventListener("change", observeNearby);
     const update = () => setActive(visible.current && !document.hidden);
     const observer = new IntersectionObserver(([entry]) => { visible.current = entry.isIntersecting; update(); });
-    nearby.observe(node); observer.observe(node);
+    observer.observe(node);
     document.addEventListener("visibilitychange", update);
-    return () => { nearby.disconnect(); observer.disconnect(); document.removeEventListener("visibilitychange", update); };
-  }, [ref]);
+    return () => { nearby.disconnect(); observer.disconnect(); mobile.removeEventListener("change", observeNearby); document.removeEventListener("visibilitychange", update); };
+  }, [ref, mobileRootMargin]);
   return { near, active };
 }
