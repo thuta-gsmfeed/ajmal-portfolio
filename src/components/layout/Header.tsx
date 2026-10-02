@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { type MouseEvent, useEffect, useRef, useState } from "react";
-// import { ThemeToggle } from "./ThemeToggle";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
   const logo = useRef<HTMLSpanElement>(null);
@@ -68,7 +68,9 @@ export function Header() {
           setHidden(false);
         }
 
-        const nextLightSurface = themeAt(window.innerWidth / 2, Math.min(120, window.innerHeight / 4)) === "light";
+        const nextLightSurface = hiddenRef.current
+          ? lastLightSurface
+          : themeAt(window.innerWidth / 2, Math.min(120, window.innerHeight / 4)) === "light";
         const logoBounds = !nextScrolled ? logo.current?.getBoundingClientRect() : null;
 
         if (logo.current && logoBounds) {

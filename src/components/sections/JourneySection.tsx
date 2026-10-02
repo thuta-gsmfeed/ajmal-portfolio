@@ -1,7 +1,7 @@
 "use client";
 
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
-import { motion, type PanInfo, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -10,6 +10,7 @@ import { timeline } from "@/data/content";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const stepHeight = 98;
+const mobileYearGap = 85;
 const pathHeight = 900;
 const pathTrim = 90;
 const ticksPerYear = 14;
@@ -124,10 +125,15 @@ function JourneyDetail({ milestone, mobile = false, animateOnScroll = false }: {
 export function JourneySection() {
   const section = useRef<HTMLElement>(null);
   const rail = useRef<HTMLDivElement>(null);
+  const mobileRail = useRef<HTMLDivElement>(null);
+  const mobileSelected = useRef(2);
+  const mobileScrollAnimationPending = useRef(false);
   const [active, setActive] = useState(0);
   const [desktopInteracted, setDesktopInteracted] = useState(false);
+  const [desktopPulseRun, setDesktopPulseRun] = useState(0);
   const [mobileActive, setMobileActive] = useState(2);
   const [mobileInteracted, setMobileInteracted] = useState(false);
+  const [mobilePulseRun, setMobilePulseRun] = useState(0);
   const [railHeight, setRailHeight] = useState(pathHeight);
   const reducedMotion = useReducedMotion();
   useGSAP(() => {
@@ -156,30 +162,161 @@ export function JourneySection() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const scroller = mobileRail.current;
+    if (!scroller) return;
+    const years = Array.from(scroller.querySelectorAll<HTMLButtonElement>(".journey-motion__mobile-year"));
+    let frame = 0;
+    let settleTimer = 0;
+    let initialized = false;
+    let lastOffset = mobileSelected.current * mobileYearGap;
+    let mouseDrag: { x: number; offset: number } | null = null;
+    let touching = false;
+    let dragged = false;
+
+    const paintYears = () => {
+      frame = 0;
+      const position = scroller.scrollLeft / mobileYearGap;
+      years.forEach((year, index) => {
+        const distance = index - position;
+        const y = mobileCurveYAt(240 + distance * mobileYearGap) - 52;
+        year.style.transform = `translateY(${y}px)`;
+        year.style.opacity = `${Math.max(0.18, 1 - Math.abs(distance) * 0.2)}`;
+      });
+    };
+    const settle = () => {
+      if (mouseDrag || touching) return;
+      const index = Math.min(timeline.length - 1, Math.max(0, Math.round(scroller.scrollLeft / mobileYearGap)));
+      mobileSelected.current = index;
+      setMobileActive(index);
+      const target = index * mobileYearGap;
+      if (Math.abs(scroller.scrollLeft - target) > 0.5) {
+        scroller.scrollTo({
+          left: target,
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+        });
+        return;
+      }
+      if (mobileScrollAnimationPending.current) {
+        mobileScrollAnimationPending.current = false;
+        setMobilePulseRun((previous) => previous + 1);
+      }
+    };
+    const scheduleSettle = () => {
+      window.clearTimeout(settleTimer);
+      settleTimer = window.setTimeout(settle, 160);
+    };
+    const onScroll = () => {
+      if (!initialized) return;
+      if (Math.abs(scroller.scrollLeft - lastOffset) > 0.5) {
+        setMobileInteracted(true);
+        if (touching) mobileScrollAnimationPending.current = true;
+      }
+      lastOffset = scroller.scrollLeft;
+      if (!frame) frame = requestAnimationFrame(paintYears);
+      scheduleSettle();
+    };
+    const resize = () => {
+      if (!scroller.clientWidth) return;
+      scroller.style.setProperty("--journey-mobile-width", `${scroller.clientWidth}px`);
+      scroller.scrollLeft = lastOffset;
+      initialized = true;
+      paintYears();
+    };
+    // Touch uses native momentum scrolling; mouse dragging also works in a narrow window.
+    const onMouseDown = (event: MouseEvent) => {
+      if (event.button !== 0) return;
+      dragged = false;
+      window.clearTimeout(settleTimer);
+      mouseDrag = { x: event.clientX, offset: scroller.scrollLeft };
+      scroller.scrollTo({ left: scroller.scrollLeft, behavior: "instant" });
+    };
+    const onMouseMove = (event: MouseEvent) => {
+      if (!mouseDrag) return;
+      const distance = event.clientX - mouseDrag.x;
+      if (!dragged && Math.abs(distance) < 4) return;
+      if (!dragged) {
+        dragged = true;
+        mobileScrollAnimationPending.current = true;
+        setMobileInteracted(true);
+        setMobilePulseRun(0);
+      }
+      event.preventDefault();
+      scroller.scrollLeft = mouseDrag.offset - distance;
+    };
+    const onMouseUp = () => {
+      if (!mouseDrag) return;
+      mouseDrag = null;
+      scheduleSettle();
+    };
+    const onTouchStart = () => {
+      touching = true;
+      setMobileInteracted(true);
+      setMobilePulseRun(0);
+      window.clearTimeout(settleTimer);
+    };
+    const onTouchEnd = () => { touching = false; scheduleSettle(); };
+    const onWheel = (event: WheelEvent) => {
+      if (!event.deltaX && !event.shiftKey) return;
+      mobileScrollAnimationPending.current = true;
+      setMobileInteracted(true);
+      setMobilePulseRun(0);
+      scheduleSettle();
+    };
+    const onClick = (event: MouseEvent) => {
+      if (!dragged) return;
+      dragged = false;
+      event.preventDefault();
+      event.stopPropagation();
+    };
+    const observer = new ResizeObserver(resize);
+    observer.observe(scroller);
+    scroller.addEventListener("scroll", onScroll, { passive: true });
+    scroller.addEventListener("mousedown", onMouseDown);
+    scroller.addEventListener("touchstart", onTouchStart, { passive: true });
+    scroller.addEventListener("touchend", onTouchEnd, { passive: true });
+    scroller.addEventListener("touchcancel", onTouchEnd, { passive: true });
+    scroller.addEventListener("wheel", onWheel, { passive: true });
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+    scroller.addEventListener("click", onClick, true);
+    resize();
+    return () => {
+      observer.disconnect();
+      scroller.removeEventListener("scroll", onScroll);
+      scroller.removeEventListener("mousedown", onMouseDown);
+      scroller.removeEventListener("touchstart", onTouchStart);
+      scroller.removeEventListener("touchend", onTouchEnd);
+      scroller.removeEventListener("touchcancel", onTouchEnd);
+      scroller.removeEventListener("wheel", onWheel);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+      scroller.removeEventListener("click", onClick, true);
+      cancelAnimationFrame(frame);
+      window.clearTimeout(settleTimer);
+    };
+  }, []);
+
   const current = timeline[active];
   const mobileCurrent = timeline[mobileActive];
   const journeyTicks = getJourneyTicks(railHeight);
   const showDesktopMilestone = (index: number) => {
     setDesktopInteracted(true);
+    setDesktopPulseRun((previous) => previous + 1);
     setActive(index);
   };
-  const handleMobileSwipe = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const swipeIntent = info.offset.x + info.velocity.x * 0.16;
-    if (Math.abs(swipeIntent) < 42) return;
+  const showMobileMilestone = (index: number) => {
+    mobileScrollAnimationPending.current = false;
     setMobileInteracted(true);
-    setMobileActive((previous) => Math.min(
-      timeline.length - 1,
-      Math.max(0, previous + (swipeIntent < 0 ? 1 : -1)),
-    ));
+    setMobilePulseRun((previous) => previous + 1);
+    setMobileActive(index);
+    mobileSelected.current = index;
+    mobileRail.current?.scrollTo({ left: index * mobileYearGap, behavior: reducedMotion ? "instant" : "smooth" });
   };
   const handleMobileKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
     event.preventDefault();
-    setMobileInteracted(true);
-    setMobileActive((previous) => Math.min(
-      timeline.length - 1,
-      Math.max(0, previous + (event.key === "ArrowRight" ? 1 : -1)),
-    ));
+    showMobileMilestone(Math.min(timeline.length - 1, Math.max(0, mobileSelected.current + (event.key === "ArrowRight" ? 1 : -1))));
   };
 
   return (
@@ -259,9 +396,9 @@ export function JourneySection() {
             </motion.div>
 
             <button
-              key={active}
+              key={`desktop-pulse-${desktopPulseRun}`}
               type="button"
-              className="journey-motion__pulse"
+              className={`journey-motion__pulse ${desktopPulseRun > 0 && !reducedMotion ? "journey-motion__pulse--activated" : ""}`}
               aria-label={nextMilestoneLabel(active)}
               onClick={() => showDesktopMilestone(nextMilestone(active))}
             >
@@ -286,23 +423,15 @@ export function JourneySection() {
           <h2><span>The climb was</span><span>never linear.</span></h2>
           <p>Every venture added a new capability. Every setback sharpened the next decision. This is the path from first business to global products and technology.</p>
         </header>
-        <motion.div
+        <div
           className="journey-motion__mobile-timeline"
           aria-label={`Current milestone: ${mobileCurrent.year}. Swipe left or right to explore.`}
-          onPanEnd={handleMobileSwipe}
           onKeyDown={handleMobileKeyDown}
           tabIndex={0}
         >
           <div className="journey-motion__mobile-center-glow" aria-hidden />
           <svg viewBox="0 0 480 160" preserveAspectRatio="none" aria-hidden>
             <defs>
-              <filter id="journey-mobile-neon" x="-20%" y="-120%" width="140%" height="340%">
-                <feGaussianBlur stdDeviation="3" result="blur" />
-                <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-              </filter>
-              <filter id="journey-mobile-halo" x="-20%" y="-180%" width="140%" height="460%">
-                <feGaussianBlur stdDeviation="6" />
-              </filter>
               <linearGradient id="journey-mobile-line" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0" stopColor="#98c92e" stopOpacity=".18" />
                 <stop offset=".24" stopColor="#b9ef3a" stopOpacity=".5" />
@@ -311,9 +440,9 @@ export function JourneySection() {
                 <stop offset="1" stopColor="#98c92e" stopOpacity=".18" />
               </linearGradient>
             </defs>
-            <path className="journey-motion__mobile-line-glow" d={mobileJourneyPath} stroke="url(#journey-mobile-line)" filter="url(#journey-mobile-halo)" />
+            <path className="journey-motion__mobile-line-glow" d={mobileJourneyPath} stroke="url(#journey-mobile-line)" />
             <path className="journey-motion__mobile-line-shadow" d={mobileJourneyPath} />
-            <path className="journey-motion__mobile-line" d={mobileJourneyPath} stroke="url(#journey-mobile-line)" filter="url(#journey-mobile-neon)" />
+            <path className="journey-motion__mobile-line" d={mobileJourneyPath} stroke="url(#journey-mobile-line)" />
             <g className="journey-motion__mobile-ticks" aria-hidden>
               {mobileJourneyTicks.map((tick) => (
                 <line key={tick.x} x1={tick.x} x2={tick.x} y1={tick.y1} y2={tick.y2} />
@@ -321,33 +450,32 @@ export function JourneySection() {
             </g>
           </svg>
 
-          {timeline.map((milestone, index) => {
-            const distance = Math.abs(index - mobileActive);
-            return (
-              <button
-                key={milestone.year}
-                type="button"
-                className={`journey-motion__mobile-year ${index === mobileActive ? "journey-motion__mobile-year--active" : ""}`}
-                style={{
-                  left: `calc(50% + ${(index - mobileActive) * 85}px)`,
-                  top: mobileCurveYAt(240 + (index - mobileActive) * 85) - 52,
-                  opacity: Math.max(0.18, 1 - distance * 0.2),
-                }}
-                onClick={() => { setMobileInteracted(true); setMobileActive(index); }}
-                aria-label={`Show ${milestone.year}: ${milestone.title}`}
-                aria-current={index === mobileActive ? "step" : undefined}
-              >
-                {milestone.year}
-              </button>
-            );
-          })}
+          <div
+            ref={mobileRail}
+            className="journey-motion__mobile-years"
+          >
+            <div className="journey-motion__mobile-year-track">
+              {timeline.map((milestone, index) => (
+                <button
+                  key={milestone.year}
+                  type="button"
+                  className={`journey-motion__mobile-year ${index === mobileActive ? "journey-motion__mobile-year--active" : ""}`}
+                  onClick={() => showMobileMilestone(index)}
+                  aria-label={`Show ${milestone.year}: ${milestone.title}`}
+                  aria-current={index === mobileActive ? "step" : undefined}
+                >
+                  {milestone.year}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <button
-            key={`mobile-pulse-${mobileActive}`}
+            key={`mobile-pulse-${mobilePulseRun}`}
             type="button"
-            className="journey-motion__mobile-pulse"
+            className={`journey-motion__mobile-pulse ${mobilePulseRun > 0 && !reducedMotion ? "journey-motion__mobile-pulse--activated" : ""}`}
             aria-label={nextMilestoneLabel(mobileActive)}
-            onClick={() => { setMobileInteracted(true); setMobileActive(nextMilestone); }}
+            onClick={() => showMobileMilestone(nextMilestone(mobileActive))}
           >
             <span>
               <svg viewBox="0 0 34 34" role="presentation">
@@ -357,7 +485,7 @@ export function JourneySection() {
               </svg>
             </span>
           </button>
-        </motion.div>
+        </div>
 
         <JourneyDetail key={`${mobileCurrent.year}-${mobileCurrent.title}`} milestone={mobileCurrent} mobile animateOnScroll={!mobileInteracted} />
       </div>

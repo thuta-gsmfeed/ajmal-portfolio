@@ -77,16 +77,36 @@ export function CoolmixDeliverySection() {
     let width = 1;
     let height = 1;
     let dpr = 1;
+    let vanSprite: HTMLCanvasElement | null = null;
     let wheelFaces: HTMLCanvasElement[] = [];
+
+    const prepareVanSprite = () => {
+      if (!vanLoaded) return;
+      const vehicleWidth = Math.min(width < 700 ? width * 0.84 : width * 0.5, 800);
+      const vehicleHeight = vehicleWidth * (van.naturalHeight / van.naturalWidth);
+      const sprite = document.createElement("canvas");
+      sprite.width = Math.max(1, Math.round(vehicleWidth * dpr));
+      sprite.height = Math.max(1, Math.round(vehicleHeight * dpr));
+      const spriteContext = sprite.getContext("2d");
+      if (!spriteContext) return;
+      spriteContext.imageSmoothingQuality = "high";
+      spriteContext.drawImage(van, 0, 0, sprite.width, sprite.height);
+      vanSprite = sprite;
+    };
 
     const resize = () => {
       const bounds = canvasElement.getBoundingClientRect();
-      width = Math.max(1, bounds.width);
-      height = Math.max(1, bounds.height);
-      dpr = Math.min(window.devicePixelRatio || 1, width < 768 ? 3 : 2);
+      const nextWidth = Math.max(1, bounds.width);
+      const nextHeight = Math.max(1, bounds.height);
+      const nextDpr = Math.min(window.devicePixelRatio || 1, 2);
+      if (width === nextWidth && height === nextHeight && dpr === nextDpr) return;
+      width = nextWidth;
+      height = nextHeight;
+      dpr = nextDpr;
       canvasElement.width = Math.round(width * dpr);
       canvasElement.height = Math.round(height * dpr);
-      context.imageSmoothingQuality = "high";
+      context.imageSmoothingQuality = width < 768 ? "medium" : "high";
+      prepareVanSprite();
       draw.current?.();
     };
 
@@ -117,7 +137,7 @@ export function CoolmixDeliverySection() {
         context.fill();
         context.restore();
 
-        context.drawImage(van, vehicleX, vehicleY, vehicleWidth, vehicleHeight);
+        context.drawImage(vanSprite ?? van, vehicleX, vehicleY, vehicleWidth, vehicleHeight);
 
         // Boost the visible scroll rotation while keeping the entrance roll tied to travel.
         // Keep the tyres and arches in the base image so the contact points stay fixed.
@@ -196,6 +216,7 @@ export function CoolmixDeliverySection() {
         return face;
       });
       vanLoaded = true;
+      prepareVanSprite();
       setCanvasReady(true);
       draw.current?.();
     };

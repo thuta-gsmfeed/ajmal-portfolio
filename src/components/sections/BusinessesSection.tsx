@@ -10,9 +10,9 @@ import { textParallax } from "@/components/animation/textParallax";
 
 const businesses = [
   { name: "Coolmix", logo: "/images/logo/coolmix-logo.svg", className: "h-9 w-9", url: "https://coolmix.eu/" },
+  { name: "Dubai Marina Yachts", logo: "/images/logo/yachts-logo.svg", className: "h-10 w-10", url: "https://dubaimarinayachts.ae/" },
   { name: "Gsmfeed", logo: "/images/logo/gsmfeed-logo.svg", className: "h-7 w-12", url: "https://gsmfeed.com/" },
   { name: "Projectmix", logo: "/images/logo/projectmix-logo.svg", className: "h-10 w-10", url: "https://projectmix.ai/" },
-  { name: "Dubai Marina Yachts", logo: "/images/logo/yachts-logo.svg", className: "h-10 w-10", url: "https://dubaimarinayachts.ae/" },
 ] as const;
 
 const ease = [0.22, 1, 0.36, 1] as const;

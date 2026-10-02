@@ -42,7 +42,8 @@ export default function ImmersiveSplineCanvas({
 
     if (!body || !camera || !logo) return;
 
-    body.geometry.computeBoundingBox();
+    // The mesh bounds are static; scanning all robot vertices at 30fps stalls phones.
+    if (!body.geometry.boundingBox) body.geometry.computeBoundingBox();
     const bounds = body.geometry.boundingBox;
     if (!bounds) return;
 

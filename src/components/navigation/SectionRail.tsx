@@ -50,9 +50,11 @@ export function SectionRail() {
     );
 
     let frame = 0;
+    const visibleViewport = window.matchMedia("(min-width: 768px)");
 
     const update = () => {
-      if (frame) return;
+      // The rail is hidden on phones; avoid measuring every section on each scroll.
+      if (!visibleViewport.matches || frame) return;
       frame = requestAnimationFrame(() => {
         frame = 0;
         const marker = window.innerHeight * 0.52;
@@ -86,11 +88,13 @@ export function SectionRail() {
     window.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
     window.addEventListener("portfolio:theme-change", update);
+    visibleViewport.addEventListener("change", update);
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
       window.removeEventListener("portfolio:theme-change", update);
+      visibleViewport.removeEventListener("change", update);
     };
   }, []);
 

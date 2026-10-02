@@ -70,7 +70,7 @@ export function ImmersiveSplineSection() {
           <h2 id="immersive-title" className="immersive-title" aria-label="AI-powered platform with verified traders">
             <span className="section-gradient-reveal-line" data-gradient-reveal="static">AI-powered platform</span>
             <span>
-              <span className="section-gradient-reveal-line" data-gradient-reveal="static">with verified </span>
+              <span className="section-gradient-reveal-line" data-gradient-reveal="static">with verified</span>{" "}
               <span className="immersive-title-final"><span className="section-gradient-reveal-line" data-gradient-reveal="static">traders</span> <Image src="/images/gsmfeed/verified-badge.svg" alt="" width={51} height={51} aria-hidden="true" /></span>
             </span>
           </h2>

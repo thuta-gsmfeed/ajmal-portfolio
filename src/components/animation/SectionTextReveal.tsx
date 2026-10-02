@@ -36,7 +36,10 @@ export function SectionTextReveal({ rootId }: { rootId: string }) {
       const blocks = Array.from(root.querySelectorAll<HTMLElement>("[data-gradient-reveal]"))
         .filter((block) => block.getClientRects().length > 0);
 
-      const animations = blocks.map((block) => textParallax(block, block));
+      const targets = [...new Set(blocks.map((block) => context.conditions?.mobile
+        ? block.closest<HTMLElement>("[data-mobile-reveal-group]") ?? block
+        : block))];
+      const animations = targets.map((block) => textParallax(block, block));
       return () => animations.forEach((animation) => animation.kill());
     });
 
