@@ -307,7 +307,7 @@ img { user-select:none; }
   z-index:1;
   height:var(--journey-bridge-height);
   background-color:#000;
-  background-image:url('/images/transitions/hero-blur.png'),url('/images/transitions/hero-blur-black.avif');
+  background-image:var(--transition-texture,url('/images/transitions/hero-blur.png'),url('/images/transitions/hero-blur-black.avif'));
   background-position:center;
   background-repeat:no-repeat;
   background-size:100% 100%;
@@ -457,7 +457,7 @@ img { user-select:none; }
   content:"";
   position:absolute;
   inset:0;
-  background-image:url('/images/transitions/hero-blur.png'),url('/images/transitions/hero-blur-black.avif');
+  background-image:var(--transition-texture,url('/images/transitions/hero-blur.png'),url('/images/transitions/hero-blur-black.avif'));
   background-position:center;
   background-repeat:no-repeat;
   background-size:100% 100%;
@@ -2371,7 +2371,7 @@ html[data-theme="light"] .journey-motion__year--active > span { border-color:rgb
 /* Reverse the editorial white chapters while retaining their media assets. */
 html[data-theme="light"] .journey-ventures-transition {
   background-color:#f6f7f6;
-  background-image:linear-gradient(180deg,transparent 42%,rgba(0,0,0,.16) 58%,rgba(0,0,0,.72) 78%,#000 100%),url('/images/transitions/hero-blur.png'),url('/images/transitions/hero-blur-black.avif');
+  background-image:linear-gradient(180deg,transparent 42%,rgba(0,0,0,.16) 58%,rgba(0,0,0,.72) 78%,#000 100%),var(--transition-texture,url('/images/transitions/hero-blur.png'),url('/images/transitions/hero-blur-black.avif'));
 }
 html[data-theme="light"] .ventures-showcase { background:#000; color:#f7f8fa; }
 html[data-theme="light"] .ventures-showcase__header p:nth-child(3),
@@ -2702,7 +2702,6 @@ html[data-theme="light"] .immersive-section--gsmfeed .immersive-loader-spinner {
   .journey-motion__mobile-detail > p:first-child,
   #ventures-title,
   .coolmix-delivery__headline h2,
-  .coolmix-delivery__stat strong,
   #projectmix-title,
   #network-title,
   .network-partners__intro h3,
@@ -2710,6 +2709,9 @@ html[data-theme="light"] .immersive-section--gsmfeed .immersive-loader-spinner {
     font-size:clamp(1.8rem,8.5vw,2.1rem)!important;
   }
   #immersive-title { font-size:29px!important; }
+  .coolmix-delivery__stat strong { font-size:29px!important; }
+  .coolmix-delivery__count { font-size:29px; }
+  .deferred-transition:not(.is-media-ready) { --transition-texture:none; }
   #network-title { white-space:normal; }
 }
 

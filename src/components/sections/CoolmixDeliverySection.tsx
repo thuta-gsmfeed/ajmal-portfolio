@@ -18,7 +18,7 @@ const wheelCenters = [[775, 1531], [1315, 1531], [3832, 1531]] as const;
 const tyreRadius = 230;
 const wheelScrollSpeed = 2.5;
 
-function CoolmixServiceContent() {
+function CoolmixServiceContent({ eagerIcons }: { eagerIcons: boolean }) {
   return (
     <div className="coolmix-delivery__service-track">
       <div className="coolmix-delivery__headline">
@@ -28,7 +28,7 @@ function CoolmixServiceContent() {
           <span className="coolmix-delivery__text-reveal">since 2014</span>
         </h2>
         <a href="https://coolmix.eu/" target="_blank" rel="noopener noreferrer">
-          <span className="coolmix-delivery__text-reveal">Visit website <span aria-hidden="true">↗</span></span>
+          <span className="coolmix-delivery__text-reveal">Visit website <span aria-hidden="true">&gt;</span></span>
         </a>
       </div>
       <div className="coolmix-delivery__overview">
@@ -37,7 +37,7 @@ function CoolmixServiceContent() {
       </div>
       {stats.map((stat) => (
         <div className="coolmix-delivery__stat" key={stat.value}>
-          <Image src={stat.icon} alt="" width={48} height={48} aria-hidden="true" />
+          <Image src={stat.icon} alt="" width={48} height={48} loading={eagerIcons ? "eager" : "lazy"} aria-hidden="true" />
           <strong aria-label={stat.value} data-count-value={stat.value}>
             <span className="coolmix-delivery__count coolmix-delivery__reveal-line" aria-hidden="true">{stat.value}</span>
           </strong>
@@ -60,6 +60,15 @@ export function CoolmixDeliverySection() {
   const draw = useRef<(() => void) | null>(null);
   const [canvasReady, setCanvasReady] = useState(false);
   const [canvasFailed, setCanvasFailed] = useState(false);
+  const [mobile, setMobile] = useState(false);
+
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 767px)");
+    const update = () => setMobile(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
 
   useEffect(() => {
     const canvasElement = canvas.current;
@@ -389,7 +398,7 @@ export function CoolmixDeliverySection() {
           </div>
         )}
         <div data-header-theme="dark" className="coolmix-delivery__service-panel">
-          <CoolmixServiceContent />
+          <CoolmixServiceContent eagerIcons={mobile} />
         </div>
       </div>
 
@@ -402,7 +411,7 @@ export function CoolmixDeliverySection() {
           <Image className="coolmix-delivery__reduced-van" src="/images/coolmix-delivery/coolmix-truck.png" alt="Blue Coolmix delivery truck" width={4627} height={1762} sizes="(max-width: 767px) 100vw, 900px" />
         </div>
         <div className="coolmix-delivery__service-panel coolmix-delivery__service-panel--reduced">
-          <CoolmixServiceContent />
+          <CoolmixServiceContent eagerIcons={mobile} />
         </div>
       </div>
     </section>
