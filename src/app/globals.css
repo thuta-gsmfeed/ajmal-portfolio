@@ -1976,7 +1976,13 @@ html.route-entering body::after { animation:route-reveal .68s cubic-bezier(.22,1
 }
 
 @media (max-width:767px) {
-  .coolmix-delivery--rail .coolmix-delivery__stage { height:100svh; min-height:0; }
+  .coolmix-delivery--rail .coolmix-delivery__stage {
+    height:100svh;
+    min-height:0;
+    /* Keep the sticky edge on one compositor layer while the canvas repaints. */
+    transform:translateZ(0);
+    backface-visibility:hidden;
+  }
   /* Keep the canvas road aligned with the raised edge of the service panel. */
   .coolmix-delivery--rail .coolmix-delivery__canvas { height:54.86%; }
   .coolmix-delivery__service-panel { height:52%; }
